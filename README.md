@@ -1,0 +1,2 @@
+# CoreRL
+Roguelike gamedev components
