@@ -5,12 +5,14 @@
  */
 package com.zygon.rl.game.example;
 
-import com.zygon.rl.game.InputHandler;
+import com.zygon.rl.game.BaseInputHandler;
 import com.zygon.rl.game.Game;
 import com.zygon.rl.game.GameConfiguration;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.game.GameUI;
 import com.zygon.rl.game.Input;
+import com.zygon.rl.game.InputHandler;
+import com.zygon.rl.game.LayerInputHandler;
 import com.zygon.rl.world.Entities;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.Region;
@@ -18,10 +20,11 @@ import com.zygon.rl.world.Regions;
 import org.hexworks.zircon.api.uievent.KeyCode;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 import java.util.stream.Collectors;
 
+import static org.hexworks.zircon.api.uievent.KeyCode.KEY_B;
 import static org.hexworks.zircon.api.uievent.KeyCode.NUMPAD_1;
 import static org.hexworks.zircon.api.uievent.KeyCode.NUMPAD_2;
 import static org.hexworks.zircon.api.uievent.KeyCode.NUMPAD_3;
@@ -39,67 +42,132 @@ import static org.hexworks.zircon.api.uievent.KeyCode.NUMPAD_9;
  */
 public class BloodRLMain {
 
-    // This is the basic way to customize the game context. Check what the
-    // current context is and then utilize it and/or push/pop more context on
-    // the stack.
-    private static final class BloodActionSupplier extends InputHandler {
+    private static final class DefaultOuterActionSupplier extends BaseInputHandler {
+
+        public DefaultOuterActionSupplier() {
+            super(INPUTS_1_9);
+        }
 
         @Override
-        public GameState doApply(final GameState state, Input input) {
+        public GameState apply(final GameState state, Input input) {
             GameState.Builder copy = state.copy();
 
             KeyCode inputKeyCode = convert(input);
-            Stack<GameState.InputContext> inputContext = state.getInputContext();
 
-            switch (inputContext.peek().getName()) {
-                case "OUTER":
+            switch (inputKeyCode) {
+                case NUMPAD_5 -> {
+                    System.out.println("Waiting " + input.getInput());
+                    // TODO: needs a "tick the world" handle
+                    break;
+                }
+                case NUMPAD_1, NUMPAD_2, NUMPAD_3, NUMPAD_4, /* NOT 5*/
+                     NUMPAD_6, NUMPAD_7, NUMPAD_8, NUMPAD_9 -> {
+                    // TODO: find player, check if location is available, check for bump actions
+                    System.out.println("Moving " + input.getInput());
+                    Location playerLoc = state.getRegions().find(Entities.PLAYER).iterator().next();
+
+                    int nextX = playerLoc.getX();
+                    int nextY = playerLoc.getY();
+                    int nextZ = playerLoc.getZ();
+
                     switch (inputKeyCode) {
-                        case NUMPAD_5 -> {
-                            System.out.println("Waiting " + input.getInput());
-                            break;
+                        case NUMPAD_1 -> {
+                            nextX--;
+                            nextY--;
                         }
-                        case NUMPAD_1, NUMPAD_2, NUMPAD_3, NUMPAD_4, /* NOT 5*/
-                                NUMPAD_6, NUMPAD_7, NUMPAD_8, NUMPAD_9 -> {
-                            // TODO: find player, check if location is available,
-                            System.out.println("Moving " + input.getInput());
-                            Location playerLoc = state.getRegions().find(Entities.PLAYER).iterator().next();
-
-//                            state.getRegions().move(entity, destination);
+                        case NUMPAD_2 ->
+                            nextY--;
+                        case NUMPAD_3 -> {
+                            nextX++;
+                            nextY--;
                         }
-                        case KEY_B ->
-                            copy = copy.addInputContext(GameState.InputContext.builder()
-                                    .setName("BITE").build());
-                        default -> {
-                            invalidInput(input);
-                            // invalid but keep context as is
+                        case NUMPAD_4 ->
+                            nextX--;
+                        case NUMPAD_6 ->
+                            nextX++;
+                        case NUMPAD_7 -> {
+                            nextX--;
+                            nextY++;
+                        }
+                        case NUMPAD_8 ->
+                            nextY++;
+                        case NUMPAD_9 -> {
+                            nextX++;
+                            nextY++;
                         }
                     }
 
-                    // move player
-                    break;
-                case "BITE":
-                    switch (inputKeyCode) {
-                        case NUMPAD_5 -> {
-                            // special case
-                            System.out.println("Biting yourself");
-                            break;
-                        }
-                        case NUMPAD_1, NUMPAD_2, NUMPAD_3, NUMPAD_4, /* NOT 5*/
-                                NUMPAD_6, NUMPAD_7, NUMPAD_8, NUMPAD_9 ->
-                            // TODO: find valid target
-                            System.out.println("Biting " + input.getInput());
-                        default -> {
-                            invalidInput(input);
-                        }
-                    }
-
-                    // Pop context either way
-                    copy = copy.removeInputContext();
-                    break;
-
+                    Location destination = Location.create(nextX, nextY, nextZ);
+                    copy.setRegions(state.getRegions().move(Entities.PLAYER, destination));
+                }
+                default -> {
+                    invalidInput(input);
+                    // Invalid but keep context as is
+                }
             }
 
             return copy.build();
+        }
+    }
+
+    private static final class BloodOuterActionSupplier extends BaseInputHandler {
+
+        public BloodOuterActionSupplier() {
+            super(Set.of(Input.valueOf(KEY_B.getCode())));
+        }
+
+        @Override
+        public GameState apply(final GameState state, Input input) {
+            GameState.Builder copy = state.copy();
+
+            KeyCode inputKeyCode = convert(input);
+
+            switch (inputKeyCode) {
+                case KEY_B ->
+                    copy = copy.addInputContext(GameState.InputContext.builder()
+                            .setName("BITE").build());
+                default -> {
+                    invalidInput(input);
+                    // Invalid but keep context as is
+                }
+            }
+
+            return copy.build();
+        }
+    }
+
+    // This is the basic way to customize the game context. Check what the
+    // current context is and then utilize it and/or push/pop more context on
+    // the stack.
+    private static final class BiteActionSupplier extends BaseInputHandler {
+
+        public BiteActionSupplier() {
+            super(INPUTS_1_9);
+        }
+
+        @Override
+        public GameState apply(final GameState state, Input input) {
+            GameState.Builder copy = state.copy();
+
+            KeyCode inputKeyCode = convert(input);
+
+            switch (inputKeyCode) {
+                case NUMPAD_5 -> {
+                    // special case
+                    System.out.println("Biting yourself");
+                    break;
+                }
+                case NUMPAD_1, NUMPAD_2, NUMPAD_3, NUMPAD_4, /* NOT 5*/
+                        NUMPAD_6, NUMPAD_7, NUMPAD_8, NUMPAD_9 ->
+                    // TODO: find valid target
+                    System.out.println("Biting " + input.getInput());
+                default -> {
+                    invalidInput(input);
+                }
+            }
+
+            // Pop context either way
+            return copy.removeInputContext().build();
         }
     }
 
@@ -115,7 +183,19 @@ public class BloodRLMain {
      */
     public static void main(String[] args) {
 
-        InputHandler inputHandler = new BloodActionSupplier();
+        // TODO: goes in rl.game package??
+        DefaultOuterActionSupplier defaultOuterActionSupplier = new DefaultOuterActionSupplier();
+        BloodOuterActionSupplier bloodOuterActionSupplier = new BloodOuterActionSupplier();
+        LayerInputHandler compose = defaultOuterActionSupplier.compose(bloodOuterActionSupplier);
+
+        // Compose "default" actions with the outer action
+        Map<String, LayerInputHandler> of = Map.of(
+                "DEFAULT", compose,
+                "BITE", new BiteActionSupplier()
+        );
+
+        // need to compose defaults and customs
+        InputHandler inputHandler = new InputHandler(of);
 
         // Action pub/sub got sidelined for work on the input context
 //        BiFunction<GameState, Action, GameState> actionLogger = new ActionLogger();
@@ -134,7 +214,7 @@ public class BloodRLMain {
         outerWorldInputs.add(Input.valueOf(KeyCode.KEY_B.getCode()));
 
         GameState.InputContext initialGameContext = GameState.InputContext.builder()
-                .setName("OUTER")
+                .setName("DEFAULT")
                 // TODO: syntax sugar on this
                 .setValidInputs(outerWorldInputs)
                 .build();

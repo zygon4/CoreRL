@@ -15,6 +15,9 @@ import java.util.Stack;
  */
 public class GameState {
 
+    // TODO: this needs to be taught more information to provide to the next handler(s).
+    // E.g. an inventory context should be pre-loaded with input->item mapping so
+    // the inventory handler can
     public static class InputContext {
 
         private final String name;

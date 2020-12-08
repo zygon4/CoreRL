@@ -104,6 +104,7 @@ public class GameUI {
                         System.out.println(event);
                         Input input = Input.valueOf(event.getCode().getCode());
                         game = game.turn(input);
+                        updateGameScreen(gameScreenLayer, game);
                     }));
 
             VBox gameScreen = Components.vbox()
