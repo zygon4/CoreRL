@@ -159,20 +159,30 @@ public class GameUI {
 
                     Location loc = Location.create(getX, getY);
 
-                    Entity entity = playerRegion.get(loc, 0);
-                    WorldTile wt = WorldTile.get(entity);
+                    List<Entity> entity = playerRegion.get(loc);
 
-                    Tile tile = Tile.newBuilder()
-                            //                .withBackgroundColor(ANSITileColor.MAGENTA)
-                            .withForegroundColor(convert(wt.getColor()))
-                            .withCharacter(wt.getGlyph(entity))
-                            .buildCharacterTile();
+                    Entity bottom = entity.get(0);
+                    Tile bottomTile = toTile(bottom);
+                    gameScreenLayer.draw(bottomTile, uiScreenPosition);
 
-                    gameScreenLayer.draw(tile, uiScreenPosition);
+                    if (entity.size() > 1) {
+                        Entity top = (entity.get(entity.size() - 1));
+                        Tile topTile = toTile(top);
+                        gameScreenLayer.draw(topTile, uiScreenPosition);
+                    }
                 }
             }
 
         }
+    }
+
+    private static Tile toTile(Entity entity) {
+        WorldTile wt = WorldTile.get(entity);
+        return Tile.newBuilder()
+                //                .withBackgroundColor(ANSITileColor.MAGENTA)
+                .withForegroundColor(convert(wt.getColor()))
+                .withCharacter(wt.getGlyph(entity))
+                .buildCharacterTile();
     }
 
     // this is a specific view
