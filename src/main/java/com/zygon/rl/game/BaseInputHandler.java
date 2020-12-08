@@ -9,7 +9,6 @@ import org.hexworks.zircon.api.uievent.KeyCode;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -55,34 +54,6 @@ public abstract class BaseInputHandler implements LayerInputHandler {
     protected BaseInputHandler(Set<Input> inputs) {
         this.inputs = inputs != null
                 ? Collections.unmodifiableSet(inputs) : Collections.emptySet();
-    }
-
-    // composes the inputs and returns a chain of inputs starting with this
-    public LayerInputHandler compose(LayerInputHandler layerInputHandler) {
-
-        if (!Collections.disjoint(this.getInputs(), layerInputHandler.getInputs())) {
-            throw new IllegalArgumentException("Collections have overlapping inputs");
-        }
-
-        return new LayerInputHandler() {
-            @Override
-            public Set<Input> getInputs() {
-                Set<Input> all = new HashSet<>(BaseInputHandler.this.getInputs());
-                all.addAll(layerInputHandler.getInputs());
-                return all;
-            }
-
-            @Override
-            public GameState apply(GameState t, Input u) {
-                Set<Input> thisInputs = BaseInputHandler.this.getInputs();
-
-                if (thisInputs.contains(u)) {
-                    return BaseInputHandler.this.apply(t, u);
-                } else {
-                    return layerInputHandler.apply(t, u);
-                }
-            }
-        };
     }
 
     @Override

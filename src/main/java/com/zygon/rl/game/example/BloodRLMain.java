@@ -186,11 +186,11 @@ public class BloodRLMain {
         // TODO: goes in rl.game package??
         DefaultOuterActionSupplier defaultOuterActionSupplier = new DefaultOuterActionSupplier();
         BloodOuterActionSupplier bloodOuterActionSupplier = new BloodOuterActionSupplier();
-        LayerInputHandler compose = defaultOuterActionSupplier.compose(bloodOuterActionSupplier);
+        LayerInputHandler composed = defaultOuterActionSupplier.compose(bloodOuterActionSupplier);
 
         // Compose "default" actions with the outer action
         Map<String, LayerInputHandler> of = Map.of(
-                "DEFAULT", compose,
+                "DEFAULT", composed,
                 "BITE", new BiteActionSupplier()
         );
 
