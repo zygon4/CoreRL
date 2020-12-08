@@ -21,6 +21,7 @@ import org.hexworks.zircon.api.uievent.KeyCode;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -221,10 +222,15 @@ public class BloodRLMain {
 
         Regions regions = Regions.create();
         Region region = new Region();
+        Random random = new Random();
 
         for (int y = 50; y < 150; y++) {
             for (int x = 50; x < 150; x++) {
-                region = region.add(Entities.DIRT, Location.create(x, y));
+                if (random.nextBoolean()) {
+                    region = region.add(Entities.DIRT, Location.create(x, y));
+                } else {
+                    region = region.add(Entities.PUDDLE, Location.create(x, y));
+                }
             }
         }
 

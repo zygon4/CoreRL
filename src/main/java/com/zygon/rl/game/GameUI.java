@@ -33,6 +33,7 @@ import org.hexworks.zircon.api.view.base.BaseView;
 
 import java.awt.Color;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -40,6 +41,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author zygon
  */
 public class GameUI {
+
+    private static final System.Logger logger = System.getLogger(GameUI.class.getCanonicalName());
 
     private final Game game;
 
@@ -103,8 +106,16 @@ public class GameUI {
                     Functions.fromBiConsumer((event, phase) -> {
                         System.out.println(event);
                         Input input = Input.valueOf(event.getCode().getCode());
+
+                        long turnStart = System.nanoTime();
                         game = game.turn(input);
+                        logger.log(System.Logger.Level.DEBUG,
+                                "turn " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - turnStart));
+
+                        long updateGameScreen = System.nanoTime();
                         updateGameScreen(gameScreenLayer, game);
+                        logger.log(System.Logger.Level.DEBUG,
+                                "screen " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - updateGameScreen));
                     }));
 
             VBox gameScreen = Components.vbox()
@@ -124,9 +135,6 @@ public class GameUI {
             updateGameScreen(gameScreenLayer, game);
         }
 
-        // TODO: hash Position objects
-//        private final Map<Integer, Position> cachedPositions = new HashMap<>();
-//
         private void updateGameScreen(Layer gameScreenLayer, Game game) {
 
             Regions regions = game.getState().getRegions();
@@ -142,26 +150,17 @@ public class GameUI {
 
                     Position uiScreenPosition = Position.create(x, y);
                     // TODO: hash positions
-//                    int hash = Objects.hash(x, y);
-//                    Position uiScreenPosition = cachedPositions.get(hash);
-//                    if (uiScreenPosition == null) {
-//                        uiScreenPosition = Position.create(x, y);
-//                        cachedPositions.put(hash, uiScreenPosition);
-//                    }
-//                    if (uiScreenPosition.getX() != x || uiScreenPosition.getY() != y) {
-//                        throw new IllegalStateException("hash collision");
-//                    }
 
-                    // Carve out a viewing "window" in the game region
-                    int getX = x > xHalf
-                            ? playerLocation.getX() + xHalf - x : playerLocation.getX() - xHalf + x;
-                    int getY = y > yHalf
-                            ? playerLocation.getY() + yHalf - y : playerLocation.getY() - yHalf + y;
+                    int getX = playerLocation.getX() - xHalf + x;
+                    int getY = playerLocation.getY() + yHalf - y;
 
                     Location loc = Location.create(getX, getY);
 
                     List<Entity> entity = playerRegion.get(loc);
 
+                    if (entity.isEmpty()) {
+                        throw new IllegalStateException(loc.toString());
+                    }
                     Entity bottom = entity.get(0);
                     Tile bottomTile = toTile(bottom);
                     gameScreenLayer.draw(bottomTile, uiScreenPosition);
