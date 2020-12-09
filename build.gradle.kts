@@ -1,6 +1,6 @@
 
 plugins {
-    // Apply the java-library plugin to add support for Java Library
+    application
     `java-library`
 }
 
@@ -16,9 +16,14 @@ dependencies {
     implementation("com.google.guava:guava:30.0-jre")
     implementation("com.google.code.gson:gson:2.8.6")
 
-    implementation("org.hexworks.zircon:zircon.core-jvm:2020.1.8-PREVIEW")
-    implementation("org.hexworks.zircon:zircon.jvm.swing:2020.1.8-PREVIEW")
+    implementation("org.hexworks.zircon:zircon.core-jvm:2020.1.9-PREVIEW")
+    implementation("org.hexworks.zircon:zircon.jvm.swing:2020.1.9-PREVIEW")
+    implementation("org.hexworks.zircon:zircon.jvm.libgdx:2020.1.9-PREVIEW")
 
     // Use JUnit test framework
     testImplementation("junit:junit:4.13")
+}
+
+application {
+    mainClassName = "com.zygon.rl.game.example.BloodRLMain"
 }

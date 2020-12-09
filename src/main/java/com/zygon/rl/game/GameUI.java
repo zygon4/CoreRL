@@ -1,11 +1,14 @@
 package com.zygon.rl.game;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.zygon.rl.world.Entities;
 import com.zygon.rl.world.Entity;
 import com.zygon.rl.world.Location;
-import com.zygon.rl.world.Region;
 import com.zygon.rl.world.Regions;
 import com.zygon.rl.world.WorldTile;
+import org.hexworks.cobalt.datatypes.Maybe;
 import org.hexworks.zircon.api.CP437TilesetResources;
 import org.hexworks.zircon.api.ColorThemes;
 import org.hexworks.zircon.api.Components;
@@ -74,14 +77,22 @@ public class GameUI {
     private static final class GameView extends BaseView {
 
         private static final int LEFT_MOUSE = 1;
-
         private static final int SIDEBAR_SCREEN_WIDTH = 18;
-
         private static final Tile BLANK_TILE = Tile.newBuilder()
                 //                .withBackgroundColor(ANSITileColor.MAGENTA)
                 .withForegroundColor(ANSITileColor.RED)
                 .withCharacter('@')
                 .buildCharacterTile();
+
+        private final LoadingCache<Color, TileColor> colorCache
+                = CacheBuilder.newBuilder()
+                        .maximumSize(100)
+                        .build(new CacheLoader<Color, TileColor>() {
+                            @Override
+                            public TileColor load(Color key) {
+                                return convert(key);
+                            }
+                        });
 
         private final TileGrid tileGrid;
         private final ColorTheme colorTheme;
@@ -109,13 +120,13 @@ public class GameUI {
 
                         long turnStart = System.nanoTime();
                         game = game.turn(input);
-                        logger.log(System.Logger.Level.DEBUG,
+                        logger.log(System.Logger.Level.INFO,
                                 "turn " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - turnStart));
 
                         long updateGameScreen = System.nanoTime();
                         updateGameScreen(gameScreenLayer, game);
-                        logger.log(System.Logger.Level.DEBUG,
-                                "screen " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - updateGameScreen));
+                        logger.log(System.Logger.Level.INFO,
+                                "screen (ms) " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - updateGameScreen));
                     }));
 
             VBox gameScreen = Components.vbox()
@@ -138,51 +149,94 @@ public class GameUI {
         private void updateGameScreen(Layer gameScreenLayer, Game game) {
 
             Regions regions = game.getState().getRegions();
+            long start = System.nanoTime();
             Location playerLocation = regions.find(Entities.PLAYER).iterator().next();
-            Region playerRegion = regions.getRegion(playerLocation);
+//            logger.log(System.Logger.Level.INFO,
+//                    "find " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start));
 
             int xHalf = gameScreenLayer.getSize().getWidth() / 2;
             int yHalf = gameScreenLayer.getSize().getHeight() / 2;
 
+            // zircon is BOTTOM-LEFT oriented
             // starting with 1 because of the border
             for (int y = 1; y < gameScreenLayer.getHeight() - 1; y++) {
                 for (int x = 1; x < gameScreenLayer.getWidth() - 1; x++) {
 
-                    Position uiScreenPosition = Position.create(x, y);
-                    // TODO: hash positions
-
                     int getX = playerLocation.getX() - xHalf + x;
                     int getY = playerLocation.getY() + yHalf - y;
 
+//                    start = System.nanoTime();
                     Location loc = Location.create(getX, getY);
+//                    logger.log(System.Logger.Level.INFO,
+//                            "loc " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start));
 
-                    List<Entity> entity = playerRegion.get(loc);
+//                    start = System.nanoTime();
+                    List<Entity> entity = regions.get(loc);
+//                    logger.log(System.Logger.Level.INFO,
+//                            "e1 " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start));
 
                     if (entity.isEmpty()) {
                         throw new IllegalStateException(loc.toString());
                     }
+
+//                    start = System.nanoTime();
                     Entity bottom = entity.get(0);
-                    Tile bottomTile = toTile(bottom);
-                    gameScreenLayer.draw(bottomTile, uiScreenPosition);
+
+                    // TODO: hash positions
+                    Position uiScreenPosition = Position.create(x, y);
+
+//                    start = System.nanoTime();
+                    Maybe<Tile> existingTile = gameScreenLayer.getTileAt(uiScreenPosition);
+//                    logger.log(System.Logger.Level.INFO, "existingTile(ns) " + (System.nanoTime() - start));
+
+//                    start = System.nanoTime();
+                    Tile bottomTile = existingTile.get();
+                    boolean drawTile = true;
+
+                    if (bottomTile != null) {
+                        String existingTileHash = bottomTile.getCacheKey();
+                        bottomTile = toTile(bottomTile, bottom);
+                        drawTile = !bottomTile.getCacheKey().equals(existingTileHash);
+                    } else {
+                        bottomTile = toTile(bottom);
+                    }
+
+//                    Tile bottomTile = existingTile.isEmpty()
+//                            ? toTile(bottom) : toTile(existingTile.get(), bottom);
+//                    logger.log(System.Logger.Level.INFO, "bt(ns) " + (System.nanoTime() - start));
+                    // TODO: Need to avoid drawing when the entity is the same
+                    if (drawTile) {
+                        gameScreenLayer.draw(bottomTile, uiScreenPosition);
+                    }
 
                     if (entity.size() > 1) {
+//                        start = System.nanoTime();
                         Entity top = (entity.get(entity.size() - 1));
+                        // Reuse the bottom tile????
                         Tile topTile = toTile(top);
+//                        Tile topTile = toTile(bottomTile, top);
                         gameScreenLayer.draw(topTile, uiScreenPosition);
+//                        logger.log(System.Logger.Level.INFO, "tt " + (System.nanoTime() - start));
                     }
                 }
             }
-
         }
-    }
 
-    private static Tile toTile(Entity entity) {
-        WorldTile wt = WorldTile.get(entity);
-        return Tile.newBuilder()
-                //                .withBackgroundColor(ANSITileColor.MAGENTA)
-                .withForegroundColor(convert(wt.getColor()))
-                .withCharacter(wt.getGlyph(entity))
-                .buildCharacterTile();
+        private Tile toTile(Tile tile, Entity entity) {
+            WorldTile wt = WorldTile.get(entity);
+            return tile.asCharacterTile().get()
+                    .withForegroundColor(colorCache.getUnchecked(wt.getColor()))
+                    .withCharacter(wt.getGlyph(entity));
+        }
+
+        private Tile toTile(Entity entity) {
+            WorldTile wt = WorldTile.get(entity);
+            return Tile.newBuilder()
+                    //                .withBackgroundColor(ANSITileColor.MAGENTA)
+                    .withForegroundColor(colorCache.getUnchecked(wt.getColor()))
+                    .withCharacter(wt.getGlyph(entity))
+                    .buildCharacterTile();
+        }
     }
 
     // this is a specific view
@@ -239,13 +293,10 @@ public class GameUI {
     }
 
     public void start() {
-        // a TileGrid represents a 2D grid composed of Tiles
+        //LibgdxApplications
         TileGrid tileGrid = SwingApplications.startTileGrid(
                 AppConfig.newBuilder()
-                        // The number of tiles horizontally, and vertically
                         .withSize(Size.create(80, 60))
-                        // You can choose from a wide array of CP437, True Type or Graphical tilesets
-                        // which are built into Zircon
                         .withDefaultTileset(CP437TilesetResources.rexPaint16x16())
                         .build());
 

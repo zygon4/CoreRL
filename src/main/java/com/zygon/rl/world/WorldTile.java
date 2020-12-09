@@ -11,21 +11,21 @@ import java.util.function.Function;
  */
 public enum WorldTile {
 
-    FLOOR(Entities.FLOOR, (e) -> '.', Color.YELLOW),
-    DIRT(Entities.DIRT, (e) -> '.', new Color(109, 57, 4, 1)),
-    DOOR(Entities.DOOR, (t) -> {
+    FLOOR(Entities.FLOOR, '.', Color.YELLOW),
+    DIRT(Entities.DIRT, '.', new Color(109, 57, 4, 1)),
+    DOOR(Entities.DOOR, ' ', (t) -> {
         Openable openable = new Openable(t);
         return openable.isClosed() ? '+' : '\'';
     }, Color.ORANGE),
-    GRASS(Entities.GRASS, (e) -> '.', Color.GREEN),
-    TALL_GRASS(Entities.TALL_GRASS, (e) -> '"', Color.GREEN),
-    MONSTER(Entities.MONSTER, (e) -> 'm', Color.CYAN),
-    PUDDLE(Entities.PUDDLE, (e) -> '~', Color.BLUE),
-    PLAYER(Entities.PLAYER, (e) -> '@', Color.MAGENTA),
-    ROCK(Entities.ROCK, (e) -> ',', Color.YELLOW),
-    TREE(Entities.TREE, (e) -> '4', Color.GREEN),
-    WALL(Entities.WALL, (e) -> '#', Color.DARK_GRAY),
-    WINDOW(Entities.WINDOW, (t) -> {
+    GRASS(Entities.GRASS, '.', Color.GREEN),
+    TALL_GRASS(Entities.TALL_GRASS, '"', Color.GREEN),
+    MONSTER(Entities.MONSTER, 'm', Color.CYAN),
+    PUDDLE(Entities.PUDDLE, '~', Color.BLUE),
+    PLAYER(Entities.PLAYER, '@', Color.MAGENTA),
+    ROCK(Entities.ROCK, ',', Color.YELLOW),
+    TREE(Entities.TREE, '4', Color.GREEN),
+    WALL(Entities.WALL, '#', Color.DARK_GRAY),
+    WINDOW(Entities.WINDOW, ' ', (t) -> {
         Openable openable = new Openable(t);
         return openable.isClosed() ? '*' : '/';
     }, Color.LIGHT_GRAY);
@@ -39,13 +39,19 @@ public enum WorldTile {
     }
 
     private final Entity entity;
+    private final char glyph;
     private final Function<Entity, Character> getGlyphFn;
     private final Color color;
 
-    private WorldTile(Entity entity, Function<Entity, Character> getGlyphFn, Color color) {
+    private WorldTile(Entity entity, char glyph, Function<Entity, Character> getGlyphFn, Color color) {
         this.entity = entity.copy().build();
+        this.glyph = glyph;
         this.getGlyphFn = getGlyphFn;
         this.color = color;
+    }
+
+    private WorldTile(Entity entity, char glyph, Color color) {
+        this(entity, glyph, null, color);
     }
 
     // Also need a getColor(float lightPct)?
@@ -58,10 +64,14 @@ public enum WorldTile {
     }
 
     public char getGlyph(Entity entity) {
-        return getGlyphFn.apply(entity);
+        return getGlyphFn == null ? glyph : getGlyphFn.apply(entity);
+    }
+
+    public static WorldTile get(String entityName) {
+        return tilesByEntityName.get(entityName);
     }
 
     public static WorldTile get(Entity entity) {
-        return tilesByEntityName.get(entity.getName());
+        return get(entity.getName());
     }
 }

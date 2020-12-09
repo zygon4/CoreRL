@@ -15,13 +15,12 @@ import com.zygon.rl.game.InputHandler;
 import com.zygon.rl.game.LayerInputHandler;
 import com.zygon.rl.world.Entities;
 import com.zygon.rl.world.Location;
-import com.zygon.rl.world.Region;
+import com.zygon.rl.world.RegionHelper;
 import com.zygon.rl.world.Regions;
 import org.hexworks.zircon.api.uievent.KeyCode;
 
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -64,7 +63,7 @@ public class BloodRLMain {
                 case NUMPAD_1, NUMPAD_2, NUMPAD_3, NUMPAD_4, /* NOT 5*/
                      NUMPAD_6, NUMPAD_7, NUMPAD_8, NUMPAD_9 -> {
                     // TODO: find player, check if location is available, check for bump actions
-                    System.out.println("Moving " + input.getInput());
+
                     Location playerLoc = state.getRegions().find(Entities.PLAYER).iterator().next();
 
                     int nextX = playerLoc.getX();
@@ -99,6 +98,7 @@ public class BloodRLMain {
                     }
 
                     Location destination = Location.create(nextX, nextY, nextZ);
+                    System.out.println("Moving " + input.getInput() + " to " + destination);
                     copy.setRegions(state.getRegions().move(Entities.PLAYER, destination));
                 }
                 default -> {
@@ -198,12 +198,6 @@ public class BloodRLMain {
         // need to compose defaults and customs
         InputHandler inputHandler = new InputHandler(of);
 
-        // Action pub/sub got sidelined for work on the input context
-//        BiFunction<GameState, Action, GameState> actionLogger = new ActionLogger();
-//        BiFunction<GameState, Action, GameState> actionExecutor = new ActionExecutor();
-        // TODO: action persistance
-//        ActionPublisher actionPublisher = new ActionPublisher(List.of(actionLogger, actionExecutor));
-//
         // No zero/0 key
         Set<Input> numberDirectionKeys = getInputs(Set.of(
                 KeyCode.NUMPAD_1, KeyCode.NUMPAD_2, KeyCode.NUMPAD_3,
@@ -220,22 +214,22 @@ public class BloodRLMain {
                 .setValidInputs(outerWorldInputs)
                 .build();
 
+        // Create the world..
+        RegionHelper regionHelper = new RegionHelper();
         Regions regions = Regions.create();
-        Region region = new Region();
-        Random random = new Random();
 
-        for (int y = 50; y < 150; y++) {
-            for (int x = 50; x < 150; x++) {
-                if (random.nextBoolean()) {
-                    region = region.add(Entities.DIRT, Location.create(x, y));
-                } else {
-                    region = region.add(Entities.PUDDLE, Location.create(x, y));
-                }
+        // This creates the initial map
+        for (int y = 0; y < 400; y += 20) {
+            for (int x = 0; x < 400; x += 20) {
+                Location loc = Location.create(x, y);
+                boolean addPlayer = x == 200 && y == 200;
+                regions = regions.add(regionHelper.generateRegion(loc, 20, 20, addPlayer));
             }
         }
 
-        region = region.add(Entities.PLAYER, Location.create(110, 110));
-        regions = regions.add(region);
+        if (regions.find(Entities.PLAYER).isEmpty()) {
+            throw new IllegalStateException("No player generated");
+        }
 
         GameState initialState = GameState.builder()
                 .addInputContext(initialGameContext)
