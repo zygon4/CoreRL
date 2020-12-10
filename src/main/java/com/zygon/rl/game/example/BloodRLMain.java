@@ -184,6 +184,10 @@ public class BloodRLMain {
      */
     public static void main(String[] args) {
 
+        Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+            e.printStackTrace(System.err);
+        });
+
         // TODO: goes in rl.game package??
         DefaultOuterActionSupplier defaultOuterActionSupplier = new DefaultOuterActionSupplier();
         BloodOuterActionSupplier bloodOuterActionSupplier = new BloodOuterActionSupplier();

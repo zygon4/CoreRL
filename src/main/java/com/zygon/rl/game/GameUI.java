@@ -120,12 +120,12 @@ public class GameUI {
 
                         long turnStart = System.nanoTime();
                         game = game.turn(input);
-                        logger.log(System.Logger.Level.INFO,
+                        logger.log(System.Logger.Level.TRACE,
                                 "turn " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - turnStart));
 
                         long updateGameScreen = System.nanoTime();
                         updateGameScreen(gameScreenLayer, game);
-                        logger.log(System.Logger.Level.INFO,
+                        logger.log(System.Logger.Level.TRACE,
                                 "screen (ms) " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - updateGameScreen));
                     }));
 
@@ -149,10 +149,7 @@ public class GameUI {
         private void updateGameScreen(Layer gameScreenLayer, Game game) {
 
             Regions regions = game.getState().getRegions();
-            long start = System.nanoTime();
             Location playerLocation = regions.find(Entities.PLAYER).iterator().next();
-//            logger.log(System.Logger.Level.INFO,
-//                    "find " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start));
 
             int xHalf = gameScreenLayer.getSize().getWidth() / 2;
             int yHalf = gameScreenLayer.getSize().getHeight() / 2;
@@ -165,31 +162,21 @@ public class GameUI {
                     int getX = playerLocation.getX() - xHalf + x;
                     int getY = playerLocation.getY() + yHalf - y;
 
-//                    start = System.nanoTime();
                     Location loc = Location.create(getX, getY);
-//                    logger.log(System.Logger.Level.INFO,
-//                            "loc " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start));
 
-//                    start = System.nanoTime();
                     List<Entity> entity = regions.get(loc);
-//                    logger.log(System.Logger.Level.INFO,
-//                            "e1 " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start));
 
                     if (entity.isEmpty()) {
                         throw new IllegalStateException(loc.toString());
                     }
 
-//                    start = System.nanoTime();
                     Entity bottom = entity.get(0);
 
                     // TODO: hash positions
                     Position uiScreenPosition = Position.create(x, y);
 
-//                    start = System.nanoTime();
                     Maybe<Tile> existingTile = gameScreenLayer.getTileAt(uiScreenPosition);
-//                    logger.log(System.Logger.Level.INFO, "existingTile(ns) " + (System.nanoTime() - start));
 
-//                    start = System.nanoTime();
                     Tile bottomTile = existingTile.get();
                     boolean drawTile = true;
 
@@ -201,22 +188,14 @@ public class GameUI {
                         bottomTile = toTile(bottom);
                     }
 
-//                    Tile bottomTile = existingTile.isEmpty()
-//                            ? toTile(bottom) : toTile(existingTile.get(), bottom);
-//                    logger.log(System.Logger.Level.INFO, "bt(ns) " + (System.nanoTime() - start));
-                    // TODO: Need to avoid drawing when the entity is the same
                     if (drawTile) {
                         gameScreenLayer.draw(bottomTile, uiScreenPosition);
                     }
 
                     if (entity.size() > 1) {
-//                        start = System.nanoTime();
                         Entity top = (entity.get(entity.size() - 1));
-                        // Reuse the bottom tile????
                         Tile topTile = toTile(top);
-//                        Tile topTile = toTile(bottomTile, top);
                         gameScreenLayer.draw(topTile, uiScreenPosition);
-//                        logger.log(System.Logger.Level.INFO, "tt " + (System.nanoTime() - start));
                     }
                 }
             }
