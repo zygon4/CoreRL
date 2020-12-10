@@ -100,14 +100,12 @@ public class Regions {
     }
 
     public Region getRegion(Location location) {
-        // TODO: could have this indexed, would be faster
-        for (Region region : regionsByLocation.values()) {
-            if (region.contains(location)) {
-                return region;
-            }
-        }
 
-        return null;
+        int xMod = location.getX() % REGION_EDGE_SIZE;
+        int yMod = location.getY() % REGION_EDGE_SIZE;
+        Location idx = Location.create(location.getX() - xMod, location.getY() - yMod);
+
+        return regionsByLocation.get(idx);
     }
 
     // Note: removed the streaming methods here for performance reasons
