@@ -15,7 +15,6 @@ import org.hexworks.zircon.api.Components;
 import org.hexworks.zircon.api.Functions;
 import org.hexworks.zircon.api.SwingApplications;
 import org.hexworks.zircon.api.application.AppConfig;
-import org.hexworks.zircon.api.color.ANSITileColor;
 import org.hexworks.zircon.api.color.TileColor;
 import org.hexworks.zircon.api.component.Button;
 import org.hexworks.zircon.api.component.ColorTheme;
@@ -76,13 +75,7 @@ public class GameUI {
 
     private static final class GameView extends BaseView {
 
-        private static final int LEFT_MOUSE = 1;
         private static final int SIDEBAR_SCREEN_WIDTH = 18;
-        private static final Tile BLANK_TILE = Tile.newBuilder()
-                //                .withBackgroundColor(ANSITileColor.MAGENTA)
-                .withForegroundColor(ANSITileColor.RED)
-                .withCharacter('@')
-                .buildCharacterTile();
 
         private final LoadingCache<Color, TileColor> colorCache
                 = CacheBuilder.newBuilder()
@@ -204,7 +197,7 @@ public class GameUI {
         private Tile toTile(Tile tile, Entity entity) {
             WorldTile wt = WorldTile.get(entity);
             return tile.asCharacterTile().get()
-                    .withBackgroundColor(convert(Color.BLACK))
+                    .withBackgroundColor(colorCache.getUnchecked(Color.BLACK))
                     .withForegroundColor(colorCache.getUnchecked(wt.getColor()))
                     .withCharacter(wt.getGlyph(entity));
         }
