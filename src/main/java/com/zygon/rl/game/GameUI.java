@@ -20,6 +20,7 @@ import org.hexworks.zircon.api.component.Button;
 import org.hexworks.zircon.api.component.ColorTheme;
 import org.hexworks.zircon.api.component.Component;
 import org.hexworks.zircon.api.component.Fragment;
+import org.hexworks.zircon.api.component.HBox;
 import org.hexworks.zircon.api.component.TextArea;
 import org.hexworks.zircon.api.component.VBox;
 import org.hexworks.zircon.api.data.Position;
@@ -128,6 +129,14 @@ public class GameUI {
                     .build();
 
             getScreen().addComponent(gameScreen);
+
+            HBox statsBox = Components.hbox()
+                    .withSize(SIDEBAR_SCREEN_WIDTH, tileGrid.getSize().getHeight())
+                    .withPosition(Position.create(gameScreen.getWidth(), 0))
+                    .withDecorations(org.hexworks.zircon.api.ComponentDecorations.box(BoxType.SINGLE, "Info"))
+                    .build();
+
+            getScreen().addComponent(statsBox);
 
             // TODO: sidebar info
             gameScreenLayer = Layer.newBuilder()
