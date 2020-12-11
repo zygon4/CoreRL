@@ -174,7 +174,7 @@ public class RegionHelper {
                             newRegion = newRegion.add(entity, regionOffsetLoc);
 
                             // check if players can't visit
-                            if (entity.getAttributes(CommonAttributes.IMPASSABLE.name()).isEmpty()) {
+                            if (entity.getAttribute(CommonAttributes.IMPASSABLE.name()) == null) {
                                 availablePlayerLocations.add(regionOffsetLoc);
                             } else {
                                 availablePlayerLocations.remove(regionOffsetLoc);

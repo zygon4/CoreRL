@@ -1,10 +1,11 @@
 package com.zygon.rl.world;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * This was copied from BloodRL, needs to become its own here
@@ -12,7 +13,7 @@ import java.util.stream.Collectors;
  */
 public class Entity {
 
-    private final Set<Attribute> attributes;
+    private final Map<String, Attribute> attributes;
     private final Set<Behavior> behaviors;
 
     // Could become a "id" grouping object
@@ -22,7 +23,7 @@ public class Entity {
 
     private Entity(Builder builder) {
         this.attributes = builder.attributes != null
-                ? Collections.unmodifiableSet(builder.attributes) : Collections.emptySet();
+                ? Collections.unmodifiableMap(builder.attributes) : Collections.emptyMap();
         this.behaviors = builder.behaviors != null
                 ? Collections.unmodifiableSet(builder.behaviors) : Collections.emptySet();
         this.description = builder.description != null ? builder.description : "";
@@ -31,8 +32,8 @@ public class Entity {
     }
 
     public Entity add(Attribute attribute) {
-        Set<Attribute> attrs = new HashSet<>(attributes);
-        attrs.add(attribute);
+        Map<String, Attribute> attrs = new HashMap<>(attributes);
+        attrs.put(attribute.getName(), attribute);
         return copy().setAttributes(attributes).build();
     }
 
@@ -42,28 +43,12 @@ public class Entity {
         return copy().setBehaviors(behvs).build();
     }
 
-    public Set<Attribute> getAttributes() {
-        return attributes;
-    }
-
-    public Set<Attribute> getAttributes(String name) {
-
-        Set<Attribute> attrs = new HashSet<>();
-
-        for (Attribute attr : attributes) {
-            if (attr.getName().equals(name)) {
-                attrs.add(attr);
-            }
-        }
-
-        return attrs;
+    public Attribute getAttribute(String name) {
+        return attributes.get(name);
     }
 
     public String getAttributeValue(String name) {
-        return attributes.stream()
-                .filter(a -> a.getName().equals(name))
-                .map(Attribute::getValue)
-                .findFirst().orElse(null);
+        return getAttribute(name).getValue();
     }
 
     public String getDescription() {
@@ -117,7 +102,7 @@ public class Entity {
 
     public static class Builder {
 
-        private Set<Attribute> attributes;
+        private Map<String, Attribute> attributes;
         private Set<Behavior> behaviors;
 
         // Could become a "id" grouping object
@@ -136,7 +121,7 @@ public class Entity {
             this.name = entity.name;
         }
 
-        public Builder setAttributes(Set<Attribute> attributes) {
+        public Builder setAttributes(Map<String, Attribute> attributes) {
             this.attributes = attributes;
             return this;
         }
@@ -144,29 +129,24 @@ public class Entity {
         // Sets the first attribute it finds
         public Builder setAttributeValue(String name, String value) {
             if (attributes == null) {
-                setAttributes(new HashSet<>());
+                setAttributes(new HashMap<>());
             }
-            Set<Attribute> updatedAttributes = new HashSet<>(attributes);
 
-            Attribute toUpdate = updatedAttributes.stream()
-                    .filter(a -> a.getName().equals(name))
-                    .findFirst().orElse(null);
-
-            if (toUpdate != null) {
-                updatedAttributes.remove(toUpdate);
-                toUpdate = toUpdate.copy()
-                        .setValue(value)
-                        .build();
-            } else {
-                toUpdate = Attribute.builder()
+            Attribute attr = this.attributes.get(name);
+            if (attr == null) {
+                attr = Attribute.builder()
                         .setName(name)
                         .setValue(value)
                         .build();
+            } else {
+                attr = attr.copy()
+                        .setValue(value)
+                        .build();
             }
 
-            updatedAttributes.add(toUpdate);
+            this.attributes.put(name, attr);
 
-            return setAttributes(updatedAttributes);
+            return this;
         }
 
         public Builder setBehaviors(Set<Behavior> behaviors) {
@@ -190,9 +170,8 @@ public class Entity {
         }
 
         public Builder removeAttribute(String name) {
-            return setAttributes(this.attributes.stream()
-                    .filter(a -> !a.getName().equals(name))
-                    .collect(Collectors.toSet()));
+            this.attributes.remove(name);
+            return this;
         }
 
         public Entity build() {

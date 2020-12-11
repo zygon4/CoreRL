@@ -6,7 +6,7 @@
 package com.zygon.rl.world;
 
 import java.util.Collections;
-import java.util.Set;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -161,11 +161,12 @@ public class Entities {
                 .setValue(value);
     }
 
-    private static Set<Attribute> getAttributes(Attribute... attrs) {
+    private static Map<String, Attribute> getAttributes(Attribute... attrs) {
         if (attrs == null) {
-            return Collections.emptySet();
+            return Collections.emptyMap();
         }
 
-        return Collections.unmodifiableSet(Stream.of(attrs).collect(Collectors.toSet()));
+        return Stream.of(attrs)
+                .collect(Collectors.toMap(Attribute::getName, v -> v));
     }
 }
