@@ -204,6 +204,7 @@ public class GameUI {
         private Tile toTile(Tile tile, Entity entity) {
             WorldTile wt = WorldTile.get(entity);
             return tile.asCharacterTile().get()
+                    .withBackgroundColor(convert(Color.BLACK))
                     .withForegroundColor(colorCache.getUnchecked(wt.getColor()))
                     .withCharacter(wt.getGlyph(entity));
         }
@@ -211,7 +212,6 @@ public class GameUI {
         private Tile toTile(Entity entity) {
             WorldTile wt = WorldTile.get(entity);
             return Tile.newBuilder()
-                    //                .withBackgroundColor(ANSITileColor.MAGENTA)
                     .withForegroundColor(colorCache.getUnchecked(wt.getColor()))
                     .withCharacter(wt.getGlyph(entity))
                     .buildCharacterTile();
