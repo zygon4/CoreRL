@@ -15,13 +15,12 @@ import org.hexworks.zircon.api.Components;
 import org.hexworks.zircon.api.Functions;
 import org.hexworks.zircon.api.SwingApplications;
 import org.hexworks.zircon.api.application.AppConfig;
+import org.hexworks.zircon.api.behavior.TextOverride;
 import org.hexworks.zircon.api.color.TileColor;
 import org.hexworks.zircon.api.component.Button;
 import org.hexworks.zircon.api.component.ColorTheme;
 import org.hexworks.zircon.api.component.Component;
 import org.hexworks.zircon.api.component.Fragment;
-import org.hexworks.zircon.api.component.HBox;
-import org.hexworks.zircon.api.component.TextArea;
 import org.hexworks.zircon.api.component.VBox;
 import org.hexworks.zircon.api.data.Position;
 import org.hexworks.zircon.api.data.Size;
@@ -35,7 +34,9 @@ import org.hexworks.zircon.api.uievent.UIEventResponse;
 import org.hexworks.zircon.api.view.base.BaseView;
 
 import java.awt.Color;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -53,11 +54,12 @@ public class GameUI {
         this.game = game;
     }
 
-    private static final class Sidebar implements Fragment {
+    private static final class SideBar implements Fragment {
 
         private final VBox root;
+        private final Map<String, Component> childrenByName;
 
-        public Sidebar(List<Component> components, Size size, Position position, String title) {
+        public SideBar(Map<String, Component> components, Size size, Position position, String title) {
             this.root = Components.vbox()
                     .withSize(size)
                     .withPosition(position)
@@ -65,7 +67,16 @@ public class GameUI {
                             org.hexworks.zircon.api.ComponentDecorations.box(BoxType.DOUBLE, title))
                     .build();
 
-            components.forEach(root::addComponent);
+            childrenByName = components;
+            components.keySet().stream()
+                    .map(k -> components.get(k))
+                    .forEach(c -> {
+                        root.addComponent(c);
+                    });
+        }
+
+        private Map<String, Component> getComponentsByName() {
+            return childrenByName;
         }
 
         @Override
@@ -90,10 +101,10 @@ public class GameUI {
 
         private final TileGrid tileGrid;
         private final ColorTheme colorTheme;
-        private Game game;
 
-        private TextArea playerInfo = null;
+        private Game game;
         private Layer gameScreenLayer = null;
+        private SideBar sideBar = null;
 
         public GameView(TileGrid tileGrid, ColorTheme colorTheme, Game game) {
             super(tileGrid, colorTheme);
@@ -121,24 +132,19 @@ public class GameUI {
                         updateGameScreen(gameScreenLayer, game);
                         logger.log(System.Logger.Level.TRACE,
                                 "screen (ms) " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - updateGameScreen));
+
+                        updateSideBar(sideBar, game);
                     }));
 
             VBox gameScreen = Components.vbox()
                     .withSize(tileGrid.getSize().getWidth() - SIDEBAR_SCREEN_WIDTH, tileGrid.getSize().getHeight())
                     .withDecorations(org.hexworks.zircon.api.ComponentDecorations.box(BoxType.DOUBLE))
                     .build();
-
             getScreen().addComponent(gameScreen);
 
-            HBox statsBox = Components.hbox()
-                    .withSize(SIDEBAR_SCREEN_WIDTH, tileGrid.getSize().getHeight())
-                    .withPosition(Position.create(gameScreen.getWidth(), 0))
-                    .withDecorations(org.hexworks.zircon.api.ComponentDecorations.box(BoxType.SINGLE, "Info"))
-                    .build();
+            sideBar = createSideBar(Position.create(gameScreen.getWidth(), 0));
+            getScreen().addFragment(sideBar);
 
-            getScreen().addComponent(statsBox);
-
-            // TODO: sidebar info
             gameScreenLayer = Layer.newBuilder()
                     .withSize(gameScreen.getSize())
                     .build();
@@ -146,6 +152,35 @@ public class GameUI {
             getScreen().addLayer(gameScreenLayer);
 
             updateGameScreen(gameScreenLayer, game);
+            updateSideBar(sideBar, game);
+        }
+
+        private SideBar createSideBar(Position position) {
+
+            // TODO: creation method
+            Map<String, Component> componentsByName = new LinkedHashMap<>();
+
+            componentsByName.put("name", Components.header()
+                    .withText("name")
+                    .build());
+
+            componentsByName.put("health", Components.label()
+                    .withText("health")
+                    .build());
+
+            return new SideBar(componentsByName,
+                    Size.create(SIDEBAR_SCREEN_WIDTH, tileGrid.getSize().getHeight()),
+                    position,
+                    game.getConfiguration().getName());
+        }
+
+        private void updateSideBar(SideBar sideBar, Game game) {
+
+            Map<String, Component> componentsByName = sideBar.getComponentsByName();
+            ((TextOverride) componentsByName.get("name")).setText("NAME!");
+            ((TextOverride) componentsByName.get("health")).setText("HEALTH!");
+
+            Location playerLoc = game.getState().getRegions().find(Entities.PLAYER).iterator().next();
         }
 
         private void updateGameScreen(Layer gameScreenLayer, Game game) {
@@ -244,7 +279,6 @@ public class GameUI {
                     .withTileset(CP437TilesetResources.rexPaint16x16())
                     .build();
             startButton.handleMouseEvents(MouseEventType.MOUSE_CLICKED, (p1, p2) -> {
-//                game.start();
                 replaceWith(new GameView(tileGrid, colorTheme, game));
                 return UIEventResponse.processed();
             });
@@ -267,9 +301,15 @@ public class GameUI {
             attachment.onActivated(org.hexworks.zircon.api.Functions.fromConsumer(
                     (componentEvent -> attachment.setText(String.format("Remove: %d", count.getAndIncrement())))));
 
+            Map<String, Component> startMenuComponents = new LinkedHashMap<>();
+            startMenuComponents.put("start", startButton);
+            startMenuComponents.put("quit", quitButton);
+            startMenuComponents.put("attachment", attachment);
+
             getScreen().addFragment(
-                    new Sidebar(List.of(startButton, quitButton, attachment),
-                            tileGrid.getSize(), Position.create(0, 0), game.getConfiguration().getName()));
+                    new SideBar(startMenuComponents,
+                            tileGrid.getSize(), Position.create(0, 0), game.getConfiguration().getName())
+            );
         }
     }
 
@@ -278,6 +318,8 @@ public class GameUI {
         TileGrid tileGrid = SwingApplications.startTileGrid(
                 AppConfig.newBuilder()
                         .withSize(Size.create(80, 60))
+                        //                        .withDebugMode(true)
+                        //                        .withDebugConfig(DebugConfig.newBuilder().withRelaxBoundsCheck(true).build())
                         .withDefaultTileset(CP437TilesetResources.rexPaint16x16())
                         .build());
 
