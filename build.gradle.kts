@@ -8,10 +8,15 @@ repositories {
     // Use jcenter for resolving dependencies.
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
+    maven {
+        url = uri("https://jitpack.io")
+    }
 }
 
 dependencies {
     api("org.apache.commons:commons-math3:3.6.1")
+
+    implementation("com.github.stewsters:stewsters-util:0.19")
 
     implementation("com.google.guava:guava:30.0-jre")
     implementation("com.google.code.gson:gson:2.8.6")

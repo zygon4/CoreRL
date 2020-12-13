@@ -3,7 +3,12 @@ package com.zygon.rl.game;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.stewsters.util.shadow.twoDimention.LitMap2d;
+import com.stewsters.util.shadow.twoDimention.ShadowCaster2d;
 import com.zygon.rl.util.Noise;
+import com.zygon.rl.world.Attribute;
+import com.zygon.rl.world.CommonAttributes;
+import com.zygon.rl.world.DoubleAttribute;
 import com.zygon.rl.world.Entities;
 import com.zygon.rl.world.Entity;
 import com.zygon.rl.world.Location;
@@ -16,6 +21,7 @@ import org.hexworks.zircon.api.Functions;
 import org.hexworks.zircon.api.SwingApplications;
 import org.hexworks.zircon.api.application.AppConfig;
 import org.hexworks.zircon.api.behavior.TextOverride;
+import org.hexworks.zircon.api.color.ANSITileColor;
 import org.hexworks.zircon.api.color.TileColor;
 import org.hexworks.zircon.api.component.Button;
 import org.hexworks.zircon.api.component.ColorTheme;
@@ -35,7 +41,6 @@ import org.hexworks.zircon.api.view.base.BaseView;
 
 import java.awt.Color;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -48,6 +53,82 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class GameUI {
 
     private static final System.Logger logger = System.getLogger(GameUI.class.getCanonicalName());
+
+    private static class FOVHelper {
+
+        public static final String VIEW_BLOCK_NAME = CommonAttributes.VIEW_BLOCK.name();
+
+        public float[][] generateSimpleResistances(Location minValues,
+                Location maxValues, Random random) {
+
+            float[][] portion = new float[maxValues.getX() - minValues.getX()][maxValues.getY() - minValues.getY()];
+
+            for (int y = minValues.getY(); y < maxValues.getY(); y++) {
+                for (int x = minValues.getX(); x < maxValues.getX(); x++) {
+                    Entity entity = getEnity(Location.create(x, y), random);
+
+                    double viewBlocking = getMaxViewBlock(entity);
+
+                    try {
+                        portion[x - minValues.getX()][y - minValues.getY()] = (float) viewBlocking;
+                    } catch (java.lang.ArrayIndexOutOfBoundsException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            }
+
+            return portion;
+        }
+
+        public static double getMaxViewBlock(Entity entity) {
+            Attribute viewBlocker = entity.getAttribute(VIEW_BLOCK_NAME);
+            return viewBlocker != null ? DoubleAttribute.getValue(viewBlocker) : 0.0;
+        }
+    }
+
+    // Does this deserve a separate class??
+    private static final class LitMap2DImpl implements LitMap2d {
+
+        private final float[][] lightResistances;
+        private final float[][] light;
+
+        public LitMap2DImpl(float[][] lightResistances) {
+            this.lightResistances = lightResistances;
+            this.light = new float[this.lightResistances.length][this.lightResistances[0].length];
+        }
+
+        @Override
+        public void setLight(int startx, int starty, float force) {
+            // Inversed Y
+            this.light[startx][this.light[0].length - starty - 1] = force;
+        }
+
+        @Override
+        public int getXSize() {
+            return lightResistances.length;
+        }
+
+        @Override
+        public int getYSize() {
+            return lightResistances[0].length;
+        }
+
+        @Override
+        public float getLight(int currentX, int currentY) {
+            return this.light[currentX][currentY];
+        }
+
+        @Override
+        public float getResistance(int currentX, int currentY) {
+            return lightResistances[currentX][currentY];
+        }
+
+        @Override
+        public void addLight(int currentX, int currentY, float bright) {
+            // Inversed Y because the zircon screen's columns are bottom left, not top left
+            this.light[currentX][this.light[0].length - currentY] = bright;
+        }
+    }
 
     private final Game game;
 
@@ -90,6 +171,13 @@ public class GameUI {
 
         private static final int SIDEBAR_SCREEN_WIDTH = 18;
 
+        // TODO: support for different kinds of extra-sensory vision
+        private static final Tile BLANK_TILE = Tile.newBuilder()
+                .withBackgroundColor(ANSITileColor.BLACK)
+                .withForegroundColor(ANSITileColor.BLACK)
+                .withCharacter('.')
+                .buildCharacterTile();
+
         private final LoadingCache<Color, TileColor> colorCache
                 = CacheBuilder.newBuilder()
                         .maximumSize(100)
@@ -103,6 +191,7 @@ public class GameUI {
         private final TileGrid tileGrid;
         private final ColorTheme colorTheme;
         private final Random random;
+        private final FOVHelper fovHelper = new FOVHelper();
 
         private Game game;
         private Layer gameScreenLayer = null;
@@ -191,6 +280,21 @@ public class GameUI {
             int xHalf = gameScreenLayer.getSize().getWidth() / 2;
             int yHalf = gameScreenLayer.getSize().getHeight() / 2;
 
+            // Note these are zero-based
+            float[][] lightResistances = fovHelper.generateSimpleResistances(
+                    Location.create(playerLocation.getX() - xHalf, playerLocation.getY() - yHalf),
+                    Location.create(playerLocation.getX() + xHalf, playerLocation.getY() + yHalf),
+                    random);
+
+            LitMap2d lightMap = new LitMap2DImpl(lightResistances);
+            ShadowCaster2d shadowCaster = new ShadowCaster2d(lightMap);
+
+            try {
+                shadowCaster.recalculateFOV(lightMap.getXSize() / 2, lightMap.getYSize() / 2, 50, .5f);
+            } catch (java.lang.ArrayIndexOutOfBoundsException aioob) {
+                throw new RuntimeException(aioob);
+            }
+
             // zircon is BOTTOM-LEFT oriented
             // starting with 1 because of the border
             for (int y = 1; y < gameScreenLayer.getHeight() - 1; y++) {
@@ -199,80 +303,46 @@ public class GameUI {
                     int getX = playerLocation.getX() - xHalf + x;
                     int getY = playerLocation.getY() + yHalf - y;
 
-                    Location loc = Location.create(getX, getY);
-
-                    double terrainVal = Noise.noise(((double) getX / 800l), ((double) getY / 800l));
-
-                    //  This "smoothing" is wrong, it's just randomly generated
-                    // fluff that is not persistent.
-                    // This entire terrain layout could be offloaded to json and
-                    // configurable once it works correctly.
-                    double smoothingModifier = random.nextDouble();
-
-                    List<Entity> entity = null;
-                    if (terrainVal < -0.10) {
-                        if (smoothingModifier < 0.75) {
-                            entity = List.of(Entities.PUDDLE);
-                        } else {
-                            entity = List.of(Entities.DIRT);
+                    double locationLightLevelPct = 1.0;
+                    try {
+                        if (x < lightMap.getXSize() && y < lightMap.getYSize()) {
+                            locationLightLevelPct = lightMap.getLight(x, y);
                         }
-                    } else if (terrainVal < -0.05) {
-                        if (smoothingModifier < 0.75) {
-                            entity = List.of(Entities.DIRT);
-                        } else {
-                            entity = List.of(Entities.GRASS);
-                        }
-                    } else if (terrainVal < -0.00) {
-                        if (smoothingModifier < 0.75) {
-                            entity = List.of(Entities.GRASS);
-                        } else {
-                            entity = List.of(Entities.DIRT);
-                        }
-                    } else if (terrainVal < 0.05) {
-                        if (smoothingModifier < 0.75) {
-                            entity = List.of(Entities.GRASS);
-                        } else {
-                            entity = List.of(Entities.TALL_GRASS);
-                        }
-                    } else if (terrainVal < 0.10) {
-                        if (smoothingModifier < 0.75) {
-                            entity = List.of(Entities.TALL_GRASS);
-                        } else {
-                            entity = List.of(Entities.TREE);
-                        }
-                    } else {
-                        entity = List.of(Entities.TREE);
+                    } catch (java.lang.ArrayIndexOutOfBoundsException ex) {
+                        throw new RuntimeException(ex);
                     }
-
-                    if (entity.isEmpty()) {
-                        throw new IllegalStateException(loc.toString());
-                    }
-
-                    Entity bottom = entity.get(0);
 
                     // TODO: hash positions
                     Position uiScreenPosition = Position.create(x, y);
 
-                    Maybe<Tile> existingTile = gameScreenLayer.getTileAt(uiScreenPosition);
+                    if (locationLightLevelPct > .25) {
+                        Location loc = Location.create(getX, getY);
+                        Entity entity = getEnity(loc, random);
 
-                    Tile bottomTile = existingTile.get();
-                    boolean drawTile = true;
+                        Maybe<Tile> existingTile = gameScreenLayer.getTileAt(uiScreenPosition);
 
-                    if (bottomTile != null) {
-                        String existingTileHash = bottomTile.getCacheKey();
-                        bottomTile = toTile(bottomTile, bottom);
-                        drawTile = !bottomTile.getCacheKey().equals(existingTileHash);
+                        Tile bottomTile = existingTile.get();
+                        boolean drawTile = true;
+
+                        if (bottomTile != null) {
+                            String existingTileHash = bottomTile.getCacheKey();
+                            bottomTile = toTile(bottomTile, entity);
+                            drawTile = !bottomTile.getCacheKey().equals(existingTileHash);
+                        } else {
+                            bottomTile = toTile(entity);
+                        }
+
+                        if (drawTile) {
+                            gameScreenLayer.draw(bottomTile, uiScreenPosition);
+                        }
+
+                        // Not drawing player if they're in a shadow.. will this make sense?
+                        if (loc.equals(playerLocation)) {
+                            Tile topTile = toTile(Entities.PLAYER);
+                            gameScreenLayer.draw(topTile, uiScreenPosition);
+                        }
                     } else {
-                        bottomTile = toTile(bottom);
-                    }
-
-                    if (drawTile) {
-                        gameScreenLayer.draw(bottomTile, uiScreenPosition);
-                    }
-
-                    if (loc.equals(playerLocation)) {
-                        Tile topTile = toTile(Entities.PLAYER);
-                        gameScreenLayer.draw(topTile, uiScreenPosition);
+                        gameScreenLayer.draw(BLANK_TILE, uiScreenPosition);
                     }
                 }
             }
@@ -372,5 +442,55 @@ public class GameUI {
 
     private static TileColor convert(Color color) {
         return TileColor.create(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+    }
+
+    // TODO: could this instead
+//    private static final OpenSimplexNoise openSimplexNoise = new OpenSimplexNoise();
+    private static Entity getEnity(Location location, Random random) {
+        double terrainVal = Noise.noise(((double) location.getX() / 800l),
+                ((double) location.getY() / 800l));
+
+        //  This "smoothing" is wrong, it's just randomly generated
+        // fluff that is not persistent.
+        // This entire terrain layout could be offloaded to json and
+        // configurable once it works correctly.
+        double smoothingModifier = 0.0;
+//        double smoothingModifier = random.nextDouble();
+
+        Entity entity = null;
+        if (terrainVal < -0.10) {
+            if (smoothingModifier < 0.75) {
+                entity = Entities.PUDDLE;
+            } else {
+                entity = Entities.DIRT;
+            }
+        } else if (terrainVal < -0.05) {
+            if (smoothingModifier < 0.75) {
+                entity = Entities.DIRT;
+            } else {
+                entity = Entities.GRASS;
+            }
+        } else if (terrainVal < -0.00) {
+            if (smoothingModifier < 0.75) {
+                entity = Entities.GRASS;
+            } else {
+                entity = Entities.DIRT;
+            }
+        } else if (terrainVal < 0.05) {
+            if (terrainVal < 0.025) {
+                entity = Entities.TREE;
+            } else {
+                entity = Entities.TALL_GRASS;
+            }
+        } else if (terrainVal < 0.10) {
+            if (smoothingModifier < 0.75) {
+                entity = Entities.TALL_GRASS;
+            } else {
+                entity = Entities.TREE;
+            }
+        } else {
+            entity = Entities.TREE;
+        }
+        return entity;
     }
 }

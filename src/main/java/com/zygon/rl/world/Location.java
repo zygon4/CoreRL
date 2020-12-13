@@ -76,6 +76,10 @@ public class Location {
 
             if (loc.getX() != x || loc.getY() != y) {
                 // hash collision, fallback to slower hashing method
+                if (useDisplayMethod) {
+                    // attemp to use backup hashcode failed..
+                    throw new IllegalStateException(loc.toString());
+                }
                 return create(true, x, y, z);
             }
 

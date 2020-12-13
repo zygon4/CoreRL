@@ -109,6 +109,8 @@ public class Entities {
             .setName("TALL_GRASS")
             .setDescription("Tall grass")
             .setDisplayName("tall grass")
+            .setAttributes(getAttributes(
+                    create(CommonAttributes.VIEW_BLOCK.name(), "0.10").build()))
             .build();
 
     public static Entity WALL = Entity.builder()
