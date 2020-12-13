@@ -1,6 +1,7 @@
 package com.zygon.rl.game;
 
 // Would almost prefer a central "world" interface
+import com.zygon.rl.world.Location;
 import com.zygon.rl.world.Regions;
 
 import java.util.Collections;
@@ -69,6 +70,7 @@ public class GameState {
 
     private final Stack<InputContext> inputContext;
     private final Regions regions;
+    private final Location playerLocation;
 
     private GameState(Builder builder) {
         Stack<InputContext> stackCopy = new Stack<>();
@@ -77,6 +79,7 @@ public class GameState {
         }
         this.inputContext = stackCopy;
         this.regions = Objects.requireNonNull(builder.regions);
+        this.playerLocation = Objects.requireNonNull(builder.playerLocation);
     }
 
     public static Builder builder() {
@@ -91,6 +94,12 @@ public class GameState {
         return inputContext;
     }
 
+    public Location getPlayerLocation() {
+        return playerLocation;
+    }
+
+    // A new bucket is coming to replace the regions which holds entities
+    @Deprecated
     public Regions getRegions() {
         return regions;
     }
@@ -99,6 +108,7 @@ public class GameState {
 
         private Stack<InputContext> inputContext;
         private Regions regions;
+        private Location playerLocation;
 
         private Builder() {
 
@@ -107,6 +117,7 @@ public class GameState {
         private Builder(GameState gameState) {
             this.inputContext = gameState.getInputContext();
             this.regions = gameState.getRegions();
+            this.playerLocation = gameState.getPlayerLocation();
         }
 
         public Builder addInputContext(InputContext inputContext) {
@@ -125,6 +136,11 @@ public class GameState {
 
         public Builder setInputContext(Stack<InputContext> inputContext) {
             this.inputContext = inputContext;
+            return this;
+        }
+
+        public Builder setPlayerLocation(Location playerLocation) {
+            this.playerLocation = playerLocation;
             return this;
         }
 

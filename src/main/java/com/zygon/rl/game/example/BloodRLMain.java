@@ -13,14 +13,19 @@ import com.zygon.rl.game.GameUI;
 import com.zygon.rl.game.Input;
 import com.zygon.rl.game.InputHandler;
 import com.zygon.rl.game.LayerInputHandler;
+import com.zygon.rl.util.Noise;
 import com.zygon.rl.world.Entities;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.RegionHelper;
 import com.zygon.rl.world.Regions;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import org.hexworks.zircon.api.uievent.KeyCode;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -42,6 +47,7 @@ import static org.hexworks.zircon.api.uievent.KeyCode.NUMPAD_9;
  */
 public class BloodRLMain {
 
+    // TODO: move to game package, this belongs *in* the framework.
     private static final class DefaultOuterActionSupplier extends BaseInputHandler {
 
         public DefaultOuterActionSupplier() {
@@ -56,15 +62,16 @@ public class BloodRLMain {
 
             switch (inputKeyCode) {
                 case NUMPAD_5 -> {
-                    System.out.println("Waiting " + input.getInput());
+                    // TODO: log
+//                    System.out.println("Waiting " + input.getInput());
                     // TODO: needs a "tick the world" handle
                     break;
                 }
                 case NUMPAD_1, NUMPAD_2, NUMPAD_3, NUMPAD_4, /* NOT 5*/
                      NUMPAD_6, NUMPAD_7, NUMPAD_8, NUMPAD_9 -> {
-                    // TODO: find player, check if location is available, check for bump actions
+                    // TODO: check if location is available, check for bump actions
 
-                    Location playerLoc = state.getRegions().find(Entities.PLAYER).iterator().next();
+                    Location playerLoc = state.getPlayerLocation();
 
                     int nextX = playerLoc.getX();
                     int nextY = playerLoc.getY();
@@ -98,8 +105,7 @@ public class BloodRLMain {
                     }
 
                     Location destination = Location.create(nextX, nextY, nextZ);
-                    System.out.println("Moving " + input.getInput() + " to " + destination);
-                    copy.setRegions(state.getRegions().move(Entities.PLAYER, destination));
+                    copy.setPlayerLocation(destination);
                 }
                 default -> {
                     invalidInput(input);
@@ -182,12 +188,71 @@ public class BloodRLMain {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws UnsupportedAudioFileException, IOException, LineUnavailableException {
 
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
             e.printStackTrace(System.err);
         });
 
+        Random random = new Random();
+        Noise.init(random.nextInt());
+
+        // Testing code for the Noise generator
+//        double min = Double.MAX_VALUE;
+//        double max = Double.NEGATIVE_INFINITY;
+//
+//        for (double y = 1.0; y < 80.0; y += 1.0) {
+//            for (double x = 1.0; x < 60.0; x += 1.0) {
+//
+//                double val = Noise.noise(((double) x / 800l), ((double) y / 800l));
+//
+//                if (val > max) {
+//                    max = val;
+//                }
+//                if (val < min) {
+//                    min = val;
+//                }
+//
+//                if (val < -0.10) {
+//                    System.out.print("~");
+//                } else if (val < -0.05) {
+//                    System.out.print("s");
+//                } else if (val < -0.0) {
+//                    System.out.print(";");
+//                } else if (val < 0.05) {
+//                    System.out.print(".");
+//                } else if (val < 0.10) {
+//                    System.out.print("4");
+//                } else {
+//                    System.out.print("M");
+//                }
+//
+////                System.out.printf("%f ", val);
+//            }
+//            System.out.println();
+//        }
+//
+//        System.out.println("min: " + min);
+//        System.out.println("max: " + max);
+//
+//        System.out.println("diff: " + (max - min));
+//
+//        /*
+//        From: https://digitalfreepen.com/2017/06/20/range-perlin-noise.html
+//        The N-dimensional Perlin noise has values in the range of [−√N4,√N4]. It can be shown that the arrows
+//        must point to the center in N-dimension Perlin noise via induction reusing the steps of the 2D Perlin
+//        noise proof.
+//         */
+//        if (min < -0.7071067811865475244 || max > 0.7071067811865475244) {
+//            throw new IllegalStateException("min " + min + " max " + max);
+//        }
+//
+//        if (true) {
+//            return;
+//        }
+        // audio seems to slow the game down a lot??
+//        Audio audio = new Audio(Paths.get("/home/zygon/src/github/CoreRL/audio.wav"));
+//        audio.play();
         // TODO: goes in rl.game package??
         DefaultOuterActionSupplier defaultOuterActionSupplier = new DefaultOuterActionSupplier();
         BloodOuterActionSupplier bloodOuterActionSupplier = new BloodOuterActionSupplier();
@@ -237,7 +302,8 @@ public class BloodRLMain {
 
         GameState initialState = GameState.builder()
                 .addInputContext(initialGameContext)
-                .setRegions(regions) // todo full region
+                .setRegions(regions) // <- deprecated
+                .setPlayerLocation(Location.create(0, 0))
                 .build();
 
         GameConfiguration config = new GameConfiguration();
@@ -250,6 +316,6 @@ public class BloodRLMain {
                 .build();
 
         GameUI ui = new GameUI(game);
-        ui.start();
+        ui.start(random);
     }
 }

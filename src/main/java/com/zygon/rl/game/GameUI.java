@@ -3,10 +3,10 @@ package com.zygon.rl.game;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.zygon.rl.util.Noise;
 import com.zygon.rl.world.Entities;
 import com.zygon.rl.world.Entity;
 import com.zygon.rl.world.Location;
-import com.zygon.rl.world.Regions;
 import com.zygon.rl.world.WorldTile;
 import org.hexworks.cobalt.datatypes.Maybe;
 import org.hexworks.zircon.api.CP437TilesetResources;
@@ -37,6 +37,7 @@ import java.awt.Color;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -101,16 +102,18 @@ public class GameUI {
 
         private final TileGrid tileGrid;
         private final ColorTheme colorTheme;
+        private final Random random;
 
         private Game game;
         private Layer gameScreenLayer = null;
         private SideBar sideBar = null;
 
-        public GameView(TileGrid tileGrid, ColorTheme colorTheme, Game game) {
+        public GameView(TileGrid tileGrid, ColorTheme colorTheme, Random random, Game game) {
             super(tileGrid, colorTheme);
 
             this.tileGrid = tileGrid;
             this.colorTheme = colorTheme;
+            this.random = random;
             this.game = game;
         }
 
@@ -179,14 +182,11 @@ public class GameUI {
             Map<String, Component> componentsByName = sideBar.getComponentsByName();
             ((TextOverride) componentsByName.get("name")).setText("NAME!");
             ((TextOverride) componentsByName.get("health")).setText("HEALTH!");
-
-            Location playerLoc = game.getState().getRegions().find(Entities.PLAYER).iterator().next();
         }
 
         private void updateGameScreen(Layer gameScreenLayer, Game game) {
 
-            Regions regions = game.getState().getRegions();
-            Location playerLocation = regions.find(Entities.PLAYER).iterator().next();
+            Location playerLocation = game.getState().getPlayerLocation();
 
             int xHalf = gameScreenLayer.getSize().getWidth() / 2;
             int yHalf = gameScreenLayer.getSize().getHeight() / 2;
@@ -201,7 +201,48 @@ public class GameUI {
 
                     Location loc = Location.create(getX, getY);
 
-                    List<Entity> entity = regions.get(loc);
+                    double terrainVal = Noise.noise(((double) getX / 800l), ((double) getY / 800l));
+
+                    //  This "smoothing" is wrong, it's just randomly generated
+                    // fluff that is not persistent.
+                    // This entire terrain layout could be offloaded to json and
+                    // configurable once it works correctly.
+                    double smoothingModifier = random.nextDouble();
+
+                    List<Entity> entity = null;
+                    if (terrainVal < -0.10) {
+                        if (smoothingModifier < 0.75) {
+                            entity = List.of(Entities.PUDDLE);
+                        } else {
+                            entity = List.of(Entities.DIRT);
+                        }
+                    } else if (terrainVal < -0.05) {
+                        if (smoothingModifier < 0.75) {
+                            entity = List.of(Entities.DIRT);
+                        } else {
+                            entity = List.of(Entities.GRASS);
+                        }
+                    } else if (terrainVal < -0.00) {
+                        if (smoothingModifier < 0.75) {
+                            entity = List.of(Entities.GRASS);
+                        } else {
+                            entity = List.of(Entities.DIRT);
+                        }
+                    } else if (terrainVal < 0.05) {
+                        if (smoothingModifier < 0.75) {
+                            entity = List.of(Entities.GRASS);
+                        } else {
+                            entity = List.of(Entities.TALL_GRASS);
+                        }
+                    } else if (terrainVal < 0.10) {
+                        if (smoothingModifier < 0.75) {
+                            entity = List.of(Entities.TALL_GRASS);
+                        } else {
+                            entity = List.of(Entities.TREE);
+                        }
+                    } else {
+                        entity = List.of(Entities.TREE);
+                    }
 
                     if (entity.isEmpty()) {
                         throw new IllegalStateException(loc.toString());
@@ -229,9 +270,8 @@ public class GameUI {
                         gameScreenLayer.draw(bottomTile, uiScreenPosition);
                     }
 
-                    if (entity.size() > 1) {
-                        Entity top = (entity.get(entity.size() - 1));
-                        Tile topTile = toTile(top);
+                    if (loc.equals(playerLocation)) {
+                        Tile topTile = toTile(Entities.PLAYER);
                         gameScreenLayer.draw(topTile, uiScreenPosition);
                     }
                 }
@@ -260,14 +300,16 @@ public class GameUI {
 
         private final TileGrid tileGrid;
         private final ColorTheme colorTheme;
+        private final Random random;
         private final Game game;
 
-        public TitleView(TileGrid tileGrid, ColorTheme colorTheme, Game gameUI) {
+        public TitleView(TileGrid tileGrid, ColorTheme colorTheme, Random random, Game game) {
             super(tileGrid, colorTheme);
 
             this.tileGrid = tileGrid;
             this.colorTheme = colorTheme;
-            this.game = gameUI;
+            this.random = random;
+            this.game = game;
         }
 
         @Override
@@ -279,7 +321,7 @@ public class GameUI {
                     .withTileset(CP437TilesetResources.rexPaint16x16())
                     .build();
             startButton.handleMouseEvents(MouseEventType.MOUSE_CLICKED, (p1, p2) -> {
-                replaceWith(new GameView(tileGrid, colorTheme, game));
+                replaceWith(new GameView(tileGrid, colorTheme, random, game));
                 return UIEventResponse.processed();
             });
             // TODO: store/load game
@@ -313,7 +355,7 @@ public class GameUI {
         }
     }
 
-    public void start() {
+    public void start(Random random) {
         //LibgdxApplications
         TileGrid tileGrid = SwingApplications.startTileGrid(
                 AppConfig.newBuilder()
@@ -323,7 +365,7 @@ public class GameUI {
                         .withDefaultTileset(CP437TilesetResources.rexPaint16x16())
                         .build());
 
-        TitleView titleView = new TitleView(tileGrid, ColorThemes.afterDark(), game);
+        TitleView titleView = new TitleView(tileGrid, ColorThemes.afterDark(), random, game);
 
         titleView.dock();
     }
