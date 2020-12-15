@@ -14,40 +14,41 @@ public final class DefaultOuterActionSupplier extends BaseInputHandler {
         GameState.Builder copy = state.copy();
         KeyCode inputKeyCode = convert(input);
         switch (inputKeyCode) {
-            case NUMPAD_5 -> {
+            case NUMPAD_5, DIGIT_5 -> {
                 // TODO: log
                 //                    System.out.println("Waiting " + input.getInput());
                 // TODO: needs a "tick the world" handle
                 break;
             }
-            case NUMPAD_1, NUMPAD_2, NUMPAD_3, NUMPAD_4, /* NOT 5*/ NUMPAD_6, NUMPAD_7, NUMPAD_8, NUMPAD_9 -> {
+            case NUMPAD_1, NUMPAD_2, NUMPAD_3, NUMPAD_4, /* NOT 5*/ NUMPAD_6, NUMPAD_7, NUMPAD_8, NUMPAD_9,
+                 DIGIT_1, DIGIT_2, DIGIT_3, DIGIT_4, /* NOT 5*/ DIGIT_6, DIGIT_7, DIGIT_8, DIGIT_9 -> {
                 // TODO: check if location is available, check for bump actions
                 Location playerLoc = state.getPlayerLocation();
                 int nextX = playerLoc.getX();
                 int nextY = playerLoc.getY();
                 int nextZ = playerLoc.getZ();
                 switch (inputKeyCode) {
-                    case NUMPAD_1 -> {
+                    case NUMPAD_1, DIGIT_1 -> {
                         nextX--;
                         nextY--;
                     }
-                    case NUMPAD_2 ->
+                    case NUMPAD_2, DIGIT_2 ->
                         nextY--;
-                    case NUMPAD_3 -> {
+                    case NUMPAD_3, DIGIT_3 -> {
                         nextX++;
                         nextY--;
                     }
-                    case NUMPAD_4 ->
+                    case NUMPAD_4, DIGIT_4 ->
                         nextX--;
-                    case NUMPAD_6 ->
+                    case NUMPAD_6, DIGIT_6 ->
                         nextX++;
-                    case NUMPAD_7 -> {
+                    case NUMPAD_7, DIGIT_7 -> {
                         nextX--;
                         nextY++;
                     }
-                    case NUMPAD_8 ->
+                    case NUMPAD_8, DIGIT_8 ->
                         nextY++;
-                    case NUMPAD_9 -> {
+                    case NUMPAD_9, DIGIT_9 -> {
                         nextX++;
                         nextY++;
                     }

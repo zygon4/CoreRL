@@ -12,6 +12,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_1;
+import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_2;
+import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_3;
+import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_4;
+import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_5;
+import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_6;
+import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_7;
+import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_8;
+import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_9;
 import static org.hexworks.zircon.api.uievent.KeyCode.NUMPAD_1;
 import static org.hexworks.zircon.api.uievent.KeyCode.NUMPAD_2;
 import static org.hexworks.zircon.api.uievent.KeyCode.NUMPAD_3;
@@ -39,7 +48,16 @@ public abstract class BaseInputHandler implements LayerInputHandler {
             Input.valueOf(NUMPAD_6.getCode()),
             Input.valueOf(NUMPAD_7.getCode()),
             Input.valueOf(NUMPAD_8.getCode()),
-            Input.valueOf(NUMPAD_9.getCode()));
+            Input.valueOf(NUMPAD_9.getCode()),
+            Input.valueOf(DIGIT_1.getCode()),
+            Input.valueOf(DIGIT_2.getCode()),
+            Input.valueOf(DIGIT_3.getCode()),
+            Input.valueOf(DIGIT_4.getCode()),
+            Input.valueOf(DIGIT_5.getCode()),
+            Input.valueOf(DIGIT_6.getCode()),
+            Input.valueOf(DIGIT_7.getCode()),
+            Input.valueOf(DIGIT_8.getCode()),
+            Input.valueOf(DIGIT_9.getCode()));
 
     private static final Map<Integer, KeyCode> keyCodesByInt = new HashMap<>();
 
