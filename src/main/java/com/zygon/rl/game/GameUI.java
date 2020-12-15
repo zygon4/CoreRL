@@ -40,6 +40,7 @@ import org.hexworks.zircon.api.uievent.UIEventResponse;
 import org.hexworks.zircon.api.view.base.BaseView;
 
 import java.awt.Color;
+import java.nio.ByteBuffer;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
@@ -444,52 +445,80 @@ public class GameUI {
         return TileColor.create(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
     }
 
-    // TODO: could this instead
-//    private static final OpenSimplexNoise openSimplexNoise = new OpenSimplexNoise();
+    // Only used in a single thread
+    private static byte[] NOISE_BYTES = new byte[8];
+
     private static Entity getEnity(Location location, Random random) {
         double terrainVal = Noise.noise(((double) location.getX() / 800l),
                 ((double) location.getY() / 800l));
 
-        //  This "smoothing" is wrong, it's just randomly generated
-        // fluff that is not persistent.
-        // This entire terrain layout could be offloaded to json and
-        // configurable once it works correctly.
-        double smoothingModifier = 0.0;
-//        double smoothingModifier = random.nextDouble();
+        // First attemp to do this: pull out random ints from the noise value
+        // and convert it to a 0-9 to use as an extra noise value.
+        ByteBuffer.wrap(NOISE_BYTES).putDouble(terrainVal);
+        int noiseFactor = ByteBuffer.wrap(NOISE_BYTES).getInt(4);
+        int noise = Math.abs(noiseFactor % 9);
 
         Entity entity = null;
         if (terrainVal < -0.10) {
-            if (smoothingModifier < 0.75) {
+
+            if (noise > 8) {
                 entity = Entities.PUDDLE;
-            } else {
+            } else if (noise > 3) {
                 entity = Entities.DIRT;
+            } else {
+                entity = Entities.TALL_GRASS;
             }
+
         } else if (terrainVal < -0.05) {
-            if (smoothingModifier < 0.75) {
+
+            if (noise > 7) {
                 entity = Entities.DIRT;
-            } else {
+            } else if (noise > 3) {
                 entity = Entities.GRASS;
+            } else {
+                entity = Entities.PUDDLE;
             }
+
         } else if (terrainVal < -0.00) {
-            if (smoothingModifier < 0.75) {
+
+            if (noise > 6) {
                 entity = Entities.GRASS;
+            } else if (noise > 2) {
+                entity = Entities.DIRT;
+            } else {
+                entity = Entities.TALL_GRASS;
+            }
+
+        } else if (terrainVal < 0.05) {
+
+            if (noise > 8) {
+                entity = Entities.TREE;
+            } else if (noise > 5) {
+                entity = Entities.TALL_GRASS;
+            } else {
+                entity = Entities.GRASS;
+            }
+
+        } else if (terrainVal < 0.10) {
+
+            if (noise > 8) {
+                entity = Entities.TALL_GRASS;
+            } else if (noise > 5) {
+                entity = Entities.TREE;
             } else {
                 entity = Entities.DIRT;
             }
-        } else if (terrainVal < 0.05) {
-            if (terrainVal < 0.025) {
-                entity = Entities.TREE;
-            } else {
-                entity = Entities.TALL_GRASS;
-            }
-        } else if (terrainVal < 0.10) {
-            if (smoothingModifier < 0.75) {
-                entity = Entities.TALL_GRASS;
-            } else {
-                entity = Entities.TREE;
-            }
+
         } else {
-            entity = Entities.TREE;
+
+            // default to generic "plain" area
+            if (noise > 6) {
+                entity = Entities.GRASS;
+            } else if (noise > 2) {
+                entity = Entities.DIRT;
+            } else {
+                entity = Entities.TALL_GRASS;
+            }
         }
         return entity;
     }
