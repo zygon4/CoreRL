@@ -228,7 +228,10 @@ public class GameUI {
                                 "screen (ms) " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - updateGameScreen));
 
                         updateSideBar(sideBar, game);
-                        updateMiniMap(miniMapLayer, game);
+                        // I didn't intend to leave this "delay" in here, but it's not a terrible idea..
+                        if (game.getState().getTurnCount() % 10 == 0) {
+                            updateMiniMap(miniMapLayer, game);
+                        }
                     }));
 
             VBox gameScreen = Components.vbox()
@@ -254,10 +257,7 @@ public class GameUI {
 
             updateGameScreen(gameScreenLayer, game);
             updateSideBar(sideBar, game);
-            // I didn't intend to leave this "delay" in here, but it's not a terrible idea..
-            if (game.getState().getTurnCount() % 10 == 0) {
-                updateMiniMap(miniMapLayer, game);
-            }
+            updateMiniMap(miniMapLayer, game);
         }
 
         private SideBar createSideBar(Position position) {
@@ -486,11 +486,9 @@ public class GameUI {
                 Location location = Location.create(x, y);
                 Entity entity = getEnity(location);
                 WorldTile wt = WorldTile.get(entity);
-//                System.out.print(wt.getGlyph(entity));
 
                 colorsByLocation.put(Location.create(realX, realY), wt.getColor());
             }
-//            System.out.println();
         }
 
         return colorsByLocation;
