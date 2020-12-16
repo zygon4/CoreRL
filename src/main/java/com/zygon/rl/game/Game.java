@@ -37,6 +37,10 @@ public class Game {
 
         GameState newState = inputHandler.apply(state, input);
 
+        newState = newState.copy()
+                .addTurnCount()
+                .build();
+
         return copy()
                 .setState(newState)
                 .build();

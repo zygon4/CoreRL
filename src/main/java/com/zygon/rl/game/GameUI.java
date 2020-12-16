@@ -177,7 +177,6 @@ public class GameUI {
         private static final Tile BLANK_TILE = Tile.newBuilder()
                 .withBackgroundColor(ANSITileColor.BLACK)
                 .withForegroundColor(ANSITileColor.BLACK)
-                .withCharacter('.')
                 .buildCharacterTile();
 
         private final LoadingCache<Color, TileColor> colorCache
@@ -243,6 +242,7 @@ public class GameUI {
 
             miniMapLayer = Layer.newBuilder()
                     .withSize(SIDEBAR_SCREEN_WIDTH, SIDEBAR_SCREEN_WIDTH)
+                    .withOffset(gameScreen.getSize().getWidth() + 1, sideBar.getRoot().getHeight() + 1)
                     .build();
             getScreen().addLayer(miniMapLayer);
 
@@ -254,7 +254,10 @@ public class GameUI {
 
             updateGameScreen(gameScreenLayer, game);
             updateSideBar(sideBar, game);
-            updateMiniMap(miniMapLayer, game);
+            // I didn't intend to leave this "delay" in here, but it's not a terrible idea..
+            if (game.getState().getTurnCount() % 10 == 0) {
+                updateMiniMap(miniMapLayer, game);
+            }
         }
 
         private SideBar createSideBar(Position position) {
@@ -286,18 +289,18 @@ public class GameUI {
 
         private void updateMiniMap(Layer miniMap, Game game) {
 
-            Map<Location, Color> createMiniMap = createMiniMap(
-                    game.getState().getPlayerLocation(), random);
+            Map<Location, Color> miniMapLocations = createMiniMap(
+                    game.getState().getPlayerLocation());
 
-            for (Location loc : createMiniMap.keySet()) {
-                Color color = createMiniMap.get(loc);
+            for (Location loc : miniMapLocations.keySet()) {
+                Color color = miniMapLocations.get(loc);
                 TileColor tileColor = colorCache.getUnchecked(color);
                 Tile tile = BLANK_TILE.createCopy()
-                        .withBackgroundColor(tileColor);
+                        .withBackgroundColor(tileColor)
+                        .withForegroundColor(ANSITileColor.BRIGHT_CYAN);
 
-                // TODO: the locations from the map are real vs "minified",
-                // need to shrink down the map locations.
-//                gameScreenLayer.draw(tile, Position.create(loc.getX(), loc.getY()));
+                Position offset = Position.create(loc.getX(), loc.getY());
+                miniMap.draw(tile, offset);
             }
         }
 
@@ -472,34 +475,22 @@ public class GameUI {
         return TileColor.create(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
     }
 
-    private static Map<Location, Color> createMiniMap(Location center, Random random) {
+    private static Map<Location, Color> createMiniMap(Location center) {
 
+        // PERF: could be passed in for performance
         Map<Location, Color> colorsByLocation = new HashMap<>();
-//        Map<Integer, Entity> entitiesByHash = new HashMap<>();
 
-        for (int y = center.getY() + 100; y > center.getY() - 100; y -= 25) {
-            for (int x = center.getX() - 100; x < center.getX() + 100; x += 25) {
+        for (int y = center.getY() + 200, realY = 0; y > center.getY() - 200; y -= 25, realY++) {
+            for (int x = center.getX() - 200, realX = 0; x < center.getX() + 200; x += 25, realX++) {
 
-//                Frequency freq = new Frequency();
-//                for (int yy = y; yy > yy - 25; yy -= 5) {
-//                    for (int xx = x; xx < xx + 25; xx += 5) {
                 Location location = Location.create(x, y);
                 Entity entity = getEnity(location);
                 WorldTile wt = WorldTile.get(entity);
-                System.out.print(wt.getGlyph(entity));
+//                System.out.print(wt.getGlyph(entity));
 
-                colorsByLocation.put(location, wt.getColor());
-
-//                int entityHash = entity.getName().hashCode();
-//                entitiesByHash.put(entityHash, entity);
-//                freq.addValue(entityHash);
-//                    }
-//                }
-//                freq.get
-//                System.out.print(freq);
-//                System.out.print(Location.create(x, y) + " ");
+                colorsByLocation.put(Location.create(realX, realY), wt.getColor());
             }
-            System.out.println();
+//            System.out.println();
         }
 
         return colorsByLocation;
@@ -507,7 +498,7 @@ public class GameUI {
 
     // Only used in a single thread
     private static final byte[] NOISE_BYTES = new byte[8];
-    private static final NoiseUtil terrainNoise = new NoiseUtil(new Random().nextInt(), 5.0, 0.25);
+    private static final NoiseUtil terrainNoise = new NoiseUtil(new Random().nextInt(), 1.0, 1.0);
 
     // TODO: this should be completely customizable via json/config
     private static Entity getEnity(Location location) {
@@ -517,15 +508,15 @@ public class GameUI {
         int noiseFactor = ByteBuffer.wrap(NOISE_BYTES).getInt(4);
         int noise = Math.abs(noiseFactor % 9);
 
-        if (terrainVal < .2) {
+        if (terrainVal < .4) {
             return Entities.PUDDLE;
-        } else if (terrainVal < .3) {
+        } else if (terrainVal < .5) {
             if (noise > 3) {
                 return Entities.DIRT;
             } else {
                 return Entities.GRASS;
             }
-        } else if (terrainVal < .4) {
+        } else if (terrainVal < .6) {
             if (noise > 4) {
                 return Entities.TALL_GRASS;
             } else if (noise > 2) {
@@ -533,13 +524,13 @@ public class GameUI {
             } else {
                 return Entities.GRASS;
             }
-        } else if (terrainVal < .5) {
+        } else if (terrainVal < .7) {
             if (noise > 3) {
                 return Entities.GRASS;
             } else {
                 return Entities.TALL_GRASS;
             }
-        } else if (terrainVal < .6) {
+        } else if (terrainVal < .8) {
             if (noise > 6) {
                 return Entities.TREE;
             } else {

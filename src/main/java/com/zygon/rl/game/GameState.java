@@ -68,6 +68,7 @@ public class GameState {
         }
     }
 
+    private final int turnCount;
     private final Stack<InputContext> inputContext;
     private final Regions regions;
     private final Location playerLocation;
@@ -77,6 +78,7 @@ public class GameState {
         if (builder.inputContext != null) {
             stackCopy.addAll(builder.inputContext);
         }
+        this.turnCount = builder.turnCount;
         this.inputContext = stackCopy;
         this.regions = Objects.requireNonNull(builder.regions);
         this.playerLocation = Objects.requireNonNull(builder.playerLocation);
@@ -98,6 +100,10 @@ public class GameState {
         return playerLocation;
     }
 
+    public int getTurnCount() {
+        return turnCount;
+    }
+
     // A new bucket is coming to replace the regions which holds entities
     @Deprecated
     public Regions getRegions() {
@@ -106,6 +112,7 @@ public class GameState {
 
     public static class Builder {
 
+        private int turnCount = 0;
         private Stack<InputContext> inputContext;
         private Regions regions;
         private Location playerLocation;
@@ -115,6 +122,7 @@ public class GameState {
         }
 
         private Builder(GameState gameState) {
+            this.turnCount = gameState.getTurnCount();
             this.inputContext = gameState.getInputContext();
             this.regions = gameState.getRegions();
             this.playerLocation = gameState.getPlayerLocation();
@@ -125,6 +133,11 @@ public class GameState {
                 this.inputContext = new Stack<>();
             }
             this.inputContext.push(inputContext);
+            return this;
+        }
+
+        public Builder addTurnCount() {
+            this.turnCount++;
             return this;
         }
 
@@ -146,6 +159,11 @@ public class GameState {
 
         public Builder setRegions(Regions regions) {
             this.regions = regions;
+            return this;
+        }
+
+        public Builder setTurnCount(int turnCount) {
+            this.turnCount = turnCount;
             return this;
         }
 

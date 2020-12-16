@@ -34,8 +34,8 @@ public final class NoiseUtil {
     // Returns a noise value offset with the frequency/octaves values.
     public double getValue(int x, int y) {
 
-        double xx = frequency * (((double) x) / 800l);
-        double yy = frequency * (((double) y) / 800l);
+        double xx = frequency * (((double) x) / 200l);
+        double yy = frequency * (((double) y) / 200l);
 
         double terrainVal = octaves * noise.eval(xx, yy);
 
