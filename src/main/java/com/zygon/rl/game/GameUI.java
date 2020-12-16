@@ -5,7 +5,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.stewsters.util.shadow.twoDimention.LitMap2d;
 import com.stewsters.util.shadow.twoDimention.ShadowCaster2d;
-import com.zygon.rl.util.Noise;
+import com.zygon.rl.util.NoiseUtil;
 import com.zygon.rl.world.Attribute;
 import com.zygon.rl.world.CommonAttributes;
 import com.zygon.rl.world.DoubleAttribute;
@@ -41,6 +41,7 @@ import org.hexworks.zircon.api.view.base.BaseView;
 
 import java.awt.Color;
 import java.nio.ByteBuffer;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
@@ -66,7 +67,7 @@ public class GameUI {
 
             for (int y = minValues.getY(); y < maxValues.getY(); y++) {
                 for (int x = minValues.getX(); x < maxValues.getX(); x++) {
-                    Entity entity = getEnity(Location.create(x, y), random);
+                    Entity entity = getEnity(Location.create(x, y));
 
                     double viewBlocking = getMaxViewBlock(entity);
 
@@ -197,6 +198,7 @@ public class GameUI {
         private Game game;
         private Layer gameScreenLayer = null;
         private SideBar sideBar = null;
+        private Layer miniMapLayer = null;
 
         public GameView(TileGrid tileGrid, ColorTheme colorTheme, Random random, Game game) {
             super(tileGrid, colorTheme);
@@ -227,6 +229,7 @@ public class GameUI {
                                 "screen (ms) " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - updateGameScreen));
 
                         updateSideBar(sideBar, game);
+                        updateMiniMap(miniMapLayer, game);
                     }));
 
             VBox gameScreen = Components.vbox()
@@ -238,6 +241,11 @@ public class GameUI {
             sideBar = createSideBar(Position.create(gameScreen.getWidth(), 0));
             getScreen().addFragment(sideBar);
 
+            miniMapLayer = Layer.newBuilder()
+                    .withSize(SIDEBAR_SCREEN_WIDTH, SIDEBAR_SCREEN_WIDTH)
+                    .build();
+            getScreen().addLayer(miniMapLayer);
+
             gameScreenLayer = Layer.newBuilder()
                     .withSize(gameScreen.getSize())
                     .build();
@@ -246,6 +254,7 @@ public class GameUI {
 
             updateGameScreen(gameScreenLayer, game);
             updateSideBar(sideBar, game);
+            updateMiniMap(miniMapLayer, game);
         }
 
         private SideBar createSideBar(Position position) {
@@ -262,7 +271,8 @@ public class GameUI {
                     .build());
 
             return new SideBar(componentsByName,
-                    Size.create(SIDEBAR_SCREEN_WIDTH, tileGrid.getSize().getHeight()),
+                    Size.create(SIDEBAR_SCREEN_WIDTH,
+                            tileGrid.getSize().getHeight() - SIDEBAR_SCREEN_WIDTH),
                     position,
                     game.getConfiguration().getName());
         }
@@ -272,6 +282,23 @@ public class GameUI {
             Map<String, Component> componentsByName = sideBar.getComponentsByName();
             ((TextOverride) componentsByName.get("name")).setText("NAME!");
             ((TextOverride) componentsByName.get("health")).setText("HEALTH!");
+        }
+
+        private void updateMiniMap(Layer miniMap, Game game) {
+
+            Map<Location, Color> createMiniMap = createMiniMap(
+                    game.getState().getPlayerLocation(), random);
+
+            for (Location loc : createMiniMap.keySet()) {
+                Color color = createMiniMap.get(loc);
+                TileColor tileColor = colorCache.getUnchecked(color);
+                Tile tile = BLANK_TILE.createCopy()
+                        .withBackgroundColor(tileColor);
+
+                // TODO: the locations from the map are real vs "minified",
+                // need to shrink down the map locations.
+//                gameScreenLayer.draw(tile, Position.create(loc.getX(), loc.getY()));
+            }
         }
 
         private void updateGameScreen(Layer gameScreenLayer, Game game) {
@@ -318,7 +345,7 @@ public class GameUI {
 
                     if (locationLightLevelPct > .25) {
                         Location loc = Location.create(getX, getY);
-                        Entity entity = getEnity(loc, random);
+                        Entity entity = getEnity(loc);
 
                         Maybe<Tile> existingTile = gameScreenLayer.getTileAt(uiScreenPosition);
 
@@ -445,81 +472,81 @@ public class GameUI {
         return TileColor.create(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
     }
 
+    private static Map<Location, Color> createMiniMap(Location center, Random random) {
+
+        Map<Location, Color> colorsByLocation = new HashMap<>();
+//        Map<Integer, Entity> entitiesByHash = new HashMap<>();
+
+        for (int y = center.getY() + 100; y > center.getY() - 100; y -= 25) {
+            for (int x = center.getX() - 100; x < center.getX() + 100; x += 25) {
+
+//                Frequency freq = new Frequency();
+//                for (int yy = y; yy > yy - 25; yy -= 5) {
+//                    for (int xx = x; xx < xx + 25; xx += 5) {
+                Location location = Location.create(x, y);
+                Entity entity = getEnity(location);
+                WorldTile wt = WorldTile.get(entity);
+                System.out.print(wt.getGlyph(entity));
+
+                colorsByLocation.put(location, wt.getColor());
+
+//                int entityHash = entity.getName().hashCode();
+//                entitiesByHash.put(entityHash, entity);
+//                freq.addValue(entityHash);
+//                    }
+//                }
+//                freq.get
+//                System.out.print(freq);
+//                System.out.print(Location.create(x, y) + " ");
+            }
+            System.out.println();
+        }
+
+        return colorsByLocation;
+    }
+
     // Only used in a single thread
-    private static byte[] NOISE_BYTES = new byte[8];
+    private static final byte[] NOISE_BYTES = new byte[8];
+    private static final NoiseUtil terrainNoise = new NoiseUtil(new Random().nextInt(), 5.0, 0.25);
 
-    private static Entity getEnity(Location location, Random random) {
-        double terrainVal = Noise.noise(((double) location.getX() / 800l),
-                ((double) location.getY() / 800l));
+    // TODO: this should be completely customizable via json/config
+    private static Entity getEnity(Location location) {
+        double terrainVal = terrainNoise.getScaledValue(location.getX(), location.getY());
 
-        // First attemp to do this: pull out random ints from the noise value
-        // and convert it to a 0-9 to use as an extra noise value.
         ByteBuffer.wrap(NOISE_BYTES).putDouble(terrainVal);
         int noiseFactor = ByteBuffer.wrap(NOISE_BYTES).getInt(4);
         int noise = Math.abs(noiseFactor % 9);
 
-        Entity entity = null;
-        if (terrainVal < -0.10) {
-
-            if (noise > 8) {
-                entity = Entities.PUDDLE;
-            } else if (noise > 3) {
-                entity = Entities.DIRT;
+        if (terrainVal < .2) {
+            return Entities.PUDDLE;
+        } else if (terrainVal < .3) {
+            if (noise > 3) {
+                return Entities.DIRT;
             } else {
-                entity = Entities.TALL_GRASS;
+                return Entities.GRASS;
             }
-
-        } else if (terrainVal < -0.05) {
-
-            if (noise > 7) {
-                entity = Entities.DIRT;
-            } else if (noise > 3) {
-                entity = Entities.GRASS;
-            } else {
-                entity = Entities.PUDDLE;
-            }
-
-        } else if (terrainVal < -0.00) {
-
-            if (noise > 6) {
-                entity = Entities.GRASS;
+        } else if (terrainVal < .4) {
+            if (noise > 4) {
+                return Entities.TALL_GRASS;
             } else if (noise > 2) {
-                entity = Entities.DIRT;
+                return Entities.TREE;
             } else {
-                entity = Entities.TALL_GRASS;
+                return Entities.GRASS;
             }
-
-        } else if (terrainVal < 0.05) {
-
-            if (noise > 8) {
-                entity = Entities.TREE;
-            } else if (noise > 5) {
-                entity = Entities.TALL_GRASS;
+        } else if (terrainVal < .5) {
+            if (noise > 3) {
+                return Entities.GRASS;
             } else {
-                entity = Entities.GRASS;
+                return Entities.TALL_GRASS;
             }
-
-        } else if (terrainVal < 0.10) {
-
-            if (noise > 8) {
-                entity = Entities.TALL_GRASS;
-            } else if (noise > 5) {
-                entity = Entities.TREE;
+        } else if (terrainVal < .6) {
+            if (noise > 6) {
+                return Entities.TREE;
             } else {
-                entity = Entities.DIRT;
+                return Entities.DIRT;
             }
-
         } else {
-
-            // default to generic "plain" area
-            if (noise > 6) {
-                entity = Entities.GRASS;
-            } else if (noise > 2) {
-                entity = Entities.DIRT;
-            } else {
-                entity = Entities.TALL_GRASS;
-            }
+            return Entities.WALL;
         }
-        return entity;
     }
 }

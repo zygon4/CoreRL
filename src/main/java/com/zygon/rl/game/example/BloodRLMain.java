@@ -14,7 +14,6 @@ import com.zygon.rl.game.GameUI;
 import com.zygon.rl.game.Input;
 import com.zygon.rl.game.InputHandler;
 import com.zygon.rl.game.LayerInputHandler;
-import com.zygon.rl.util.Noise;
 import com.zygon.rl.world.Entities;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.RegionHelper;
@@ -126,7 +125,6 @@ public class BloodRLMain {
         });
 
         Random random = new Random();
-        Noise.init(random.nextInt());
 
         // Testing code for the Noise generator
 //        double min = Double.MAX_VALUE;
