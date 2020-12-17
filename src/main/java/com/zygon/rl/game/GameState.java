@@ -80,7 +80,7 @@ public class GameState {
         }
         this.turnCount = builder.turnCount;
         this.inputContext = stackCopy;
-        this.regions = Objects.requireNonNull(builder.regions);
+        this.regions = builder.regions;
         this.playerLocation = Objects.requireNonNull(builder.playerLocation);
     }
 

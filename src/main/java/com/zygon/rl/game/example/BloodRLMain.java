@@ -10,14 +10,12 @@ import com.zygon.rl.game.DefaultOuterActionSupplier;
 import com.zygon.rl.game.Game;
 import com.zygon.rl.game.GameConfiguration;
 import com.zygon.rl.game.GameState;
+import com.zygon.rl.game.GameSystem;
 import com.zygon.rl.game.GameUI;
 import com.zygon.rl.game.Input;
 import com.zygon.rl.game.InputHandler;
 import com.zygon.rl.game.LayerInputHandler;
-import com.zygon.rl.world.Entities;
 import com.zygon.rl.world.Location;
-import com.zygon.rl.world.RegionHelper;
-import com.zygon.rl.world.Regions;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import org.hexworks.zircon.api.uievent.KeyCode;
@@ -46,6 +44,17 @@ import static org.hexworks.zircon.api.uievent.KeyCode.NUMPAD_9;
  * @author zygon
  */
 public class BloodRLMain {
+
+    private static final class PlayerHealth extends GameSystem {
+
+        public PlayerHealth() {
+        }
+
+        @Override
+        public GameState apply(GameState t) {
+            return t;
+        }
+    }
 
     private static final class BloodOuterActionSupplier extends BaseInputHandler {
 
@@ -211,26 +220,8 @@ public class BloodRLMain {
                 .setValidInputs(outerWorldInputs)
                 .build();
 
-        // Create the world..
-        RegionHelper regionHelper = new RegionHelper();
-        Regions regions = Regions.create();
-
-        // This creates the initial map
-        for (int y = 0; y < 400; y += 20) {
-            for (int x = 0; x < 400; x += 20) {
-                Location loc = Location.create(x, y);
-                boolean addPlayer = x == 200 && y == 200;
-                regions = regions.add(regionHelper.generateRegion(loc, 20, 20, addPlayer));
-            }
-        }
-
-        if (regions.find(Entities.PLAYER).isEmpty()) {
-            throw new IllegalStateException("No player generated");
-        }
-
         GameState initialState = GameState.builder()
                 .addInputContext(initialGameContext)
-                .setRegions(regions) // <- deprecated
                 .setPlayerLocation(Location.create(0, 0))
                 .build();
 

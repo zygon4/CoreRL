@@ -280,28 +280,27 @@ public class GameUI {
                     game.getConfiguration().getName());
         }
 
+        private Tile toTile(Tile tile, Entity entity) {
+            WorldTile wt = WorldTile.get(entity);
+            return tile.asCharacterTile().get()
+                    .withBackgroundColor(colorCache.getUnchecked(Color.BLACK))
+                    .withForegroundColor(colorCache.getUnchecked(wt.getColor()))
+                    .withCharacter(wt.getGlyph(entity));
+        }
+
+        private Tile toTile(Entity entity) {
+            WorldTile wt = WorldTile.get(entity);
+            return Tile.newBuilder()
+                    .withForegroundColor(colorCache.getUnchecked(wt.getColor()))
+                    .withCharacter(wt.getGlyph(entity))
+                    .buildCharacterTile();
+        }
+
         private void updateSideBar(SideBar sideBar, Game game) {
 
             Map<String, Component> componentsByName = sideBar.getComponentsByName();
             ((TextOverride) componentsByName.get("name")).setText("NAME!");
             ((TextOverride) componentsByName.get("health")).setText("HEALTH!");
-        }
-
-        private void updateMiniMap(Layer miniMap, Game game) {
-
-            Map<Location, Color> miniMapLocations = createMiniMap(
-                    game.getState().getPlayerLocation());
-
-            for (Location loc : miniMapLocations.keySet()) {
-                Color color = miniMapLocations.get(loc);
-                TileColor tileColor = colorCache.getUnchecked(color);
-                Tile tile = BLANK_TILE.createCopy()
-                        .withBackgroundColor(tileColor)
-                        .withForegroundColor(ANSITileColor.BRIGHT_CYAN);
-
-                Position offset = Position.create(loc.getX(), loc.getY());
-                miniMap.draw(tile, offset);
-            }
         }
 
         private void updateGameScreen(Layer gameScreenLayer, Game game) {
@@ -379,20 +378,21 @@ public class GameUI {
             }
         }
 
-        private Tile toTile(Tile tile, Entity entity) {
-            WorldTile wt = WorldTile.get(entity);
-            return tile.asCharacterTile().get()
-                    .withBackgroundColor(colorCache.getUnchecked(Color.BLACK))
-                    .withForegroundColor(colorCache.getUnchecked(wt.getColor()))
-                    .withCharacter(wt.getGlyph(entity));
-        }
+        private void updateMiniMap(Layer miniMap, Game game) {
 
-        private Tile toTile(Entity entity) {
-            WorldTile wt = WorldTile.get(entity);
-            return Tile.newBuilder()
-                    .withForegroundColor(colorCache.getUnchecked(wt.getColor()))
-                    .withCharacter(wt.getGlyph(entity))
-                    .buildCharacterTile();
+            Map<Location, Color> miniMapLocations = createMiniMap(
+                    game.getState().getPlayerLocation());
+
+            for (Location loc : miniMapLocations.keySet()) {
+                Color color = miniMapLocations.get(loc);
+                TileColor tileColor = colorCache.getUnchecked(color);
+                Tile tile = BLANK_TILE.createCopy()
+                        .withBackgroundColor(tileColor)
+                        .withForegroundColor(ANSITileColor.BRIGHT_CYAN);
+
+                Position offset = Position.create(loc.getX(), loc.getY());
+                miniMap.draw(tile, offset);
+            }
         }
     }
 
