@@ -17,5 +17,6 @@ public enum CommonAttributes {
     LOCKED,
     LIVING,
     TERRAIN_DIFFICULTY,
-    VIEW_BLOCK
+    VIEW_BLOCK,
+    NAME
 }
