@@ -4,7 +4,7 @@ package com.zygon.rl.game;
  *
  * @author zygon
  */
-public class DefaultGameSystem extends GameSystem {
+/*pkg*/ final class DefaultGameSystem extends GameSystem {
 
     @Override
     public GameState apply(GameState state) {
