@@ -1,5 +1,6 @@
 package com.zygon.rl.game;
 
+import com.zygon.rl.world.Entities;
 import com.zygon.rl.world.Location;
 import org.hexworks.zircon.api.uievent.KeyCode;
 
@@ -23,10 +24,11 @@ public final class DefaultOuterActionSupplier extends BaseInputHandler {
             case NUMPAD_1, NUMPAD_2, NUMPAD_3, NUMPAD_4, /* NOT 5*/ NUMPAD_6, NUMPAD_7, NUMPAD_8, NUMPAD_9,
                  DIGIT_1, DIGIT_2, DIGIT_3, DIGIT_4, /* NOT 5*/ DIGIT_6, DIGIT_7, DIGIT_8, DIGIT_9 -> {
                 // TODO: check if location is available, check for bump actions
-                Location playerLoc = state.getPlayerLocation();
-                int nextX = playerLoc.getX();
-                int nextY = playerLoc.getY();
-                int nextZ = playerLoc.getZ();
+                Location playerLocation = state.getWorld()
+                        .find(Entities.PLAYER).iterator().next();
+                int nextX = playerLocation.getX();
+                int nextY = playerLocation.getY();
+                int nextZ = playerLocation.getZ();
                 switch (inputKeyCode) {
                     case NUMPAD_1, DIGIT_1 -> {
                         nextX--;
@@ -54,7 +56,8 @@ public final class DefaultOuterActionSupplier extends BaseInputHandler {
                     }
                 }
                 Location destination = Location.create(nextX, nextY, nextZ);
-                copy.setPlayerLocation(destination);
+                // TODO: get player
+                copy.setWorld(state.getWorld().move(Entities.PLAYER, destination));
             }
             default -> {
                 invalidInput(input);

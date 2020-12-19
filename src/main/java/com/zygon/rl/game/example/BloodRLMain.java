@@ -15,15 +15,19 @@ import com.zygon.rl.game.GameUI;
 import com.zygon.rl.game.Input;
 import com.zygon.rl.game.InputHandler;
 import com.zygon.rl.game.LayerInputHandler;
+import com.zygon.rl.world.Attribute;
+import com.zygon.rl.world.BooleanAttribute;
+import com.zygon.rl.world.CommonAttributes;
+import com.zygon.rl.world.Entities;
 import com.zygon.rl.world.Location;
+import com.zygon.rl.world.Player;
+import com.zygon.rl.world.World;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import org.hexworks.zircon.api.uievent.KeyCode;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -45,6 +49,7 @@ import static org.hexworks.zircon.api.uievent.KeyCode.NUMPAD_9;
  */
 public class BloodRLMain {
 
+    // TODO:
     private static final class PlayerHealth extends GameSystem {
 
         public PlayerHealth() {
@@ -127,13 +132,12 @@ public class BloodRLMain {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws UnsupportedAudioFileException, IOException, LineUnavailableException {
+    public static void main(String[] args) throws UnsupportedAudioFileException,
+            IOException, LineUnavailableException {
 
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
             e.printStackTrace(System.err);
         });
-
-        Random random = new Random();
 
         // Testing code for the Noise generator
 //        double min = Double.MAX_VALUE;
@@ -204,37 +208,41 @@ public class BloodRLMain {
         // need to compose defaults and customs
         InputHandler inputHandler = new InputHandler(of);
 
-        // No zero/0 key
-        Set<Input> numberDirectionKeys = getInputs(Set.of(
-                KeyCode.NUMPAD_1, KeyCode.NUMPAD_2, KeyCode.NUMPAD_3,
-                KeyCode.NUMPAD_4, KeyCode.NUMPAD_5, KeyCode.NUMPAD_6,
-                KeyCode.NUMPAD_7, KeyCode.NUMPAD_8, KeyCode.NUMPAD_9));
-
-        Set<Input> outerWorldInputs = new HashSet<>();
-        outerWorldInputs.addAll(numberDirectionKeys);
-        outerWorldInputs.add(Input.valueOf(KeyCode.KEY_B.getCode()));
-
         GameState.InputContext initialGameContext = GameState.InputContext.builder()
                 .setName("DEFAULT")
-                // TODO: syntax sugar on this
-                .setValidInputs(outerWorldInputs)
+                .build();
+
+        Player player = Player.create(Entities.PLAYER)
+                .add(Attribute.builder()
+                        .setName(CommonAttributes.NAME.name())
+                        .setDisplayName("joe")
+                        .setValue("joe")
+                        .build())
+                .add(Attribute.builder()
+                        .setName(CommonAttributes.HEALTH.name())
+                        .setDisplayName("Health")
+                        .setValue("100")
+                        .build())
+                .add(BooleanAttribute.create(Attribute.builder()
+                        .setName(CommonAttributes.LIVING.name()).build(), true))
                 .build();
 
         GameState initialState = GameState.builder()
                 .addInputContext(initialGameContext)
-                .setPlayerLocation(Location.create(0, 0))
+                .setWorld(new World().add(player.getEntity(), Location.create(0, 0)))
                 .build();
 
         GameConfiguration config = new GameConfiguration();
         config.setName("BloodRL");
 
         Game game = Game.builder()
+                .addGameSystem(new PlayerHealth())
                 .setInputHandler(inputHandler)
                 .setConfiguration(config)
                 .setState(initialState)
                 .build();
 
         GameUI ui = new GameUI(game);
-        ui.start(random);
+        ui.start();
     }
 }

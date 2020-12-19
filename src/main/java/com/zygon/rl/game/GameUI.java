@@ -12,6 +12,8 @@ import com.zygon.rl.world.DoubleAttribute;
 import com.zygon.rl.world.Entities;
 import com.zygon.rl.world.Entity;
 import com.zygon.rl.world.Location;
+import com.zygon.rl.world.Player;
+import com.zygon.rl.world.World;
 import com.zygon.rl.world.WorldTile;
 import org.hexworks.cobalt.datatypes.Maybe;
 import org.hexworks.zircon.api.CP437TilesetResources;
@@ -46,7 +48,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  *
@@ -61,7 +62,7 @@ public class GameUI {
         public static final String VIEW_BLOCK_NAME = CommonAttributes.VIEW_BLOCK.name();
 
         public float[][] generateSimpleResistances(Location minValues,
-                Location maxValues, Random random) {
+                Location maxValues) {
 
             float[][] portion = new float[maxValues.getX() - minValues.getX()][maxValues.getY() - minValues.getY()];
 
@@ -191,7 +192,6 @@ public class GameUI {
 
         private final TileGrid tileGrid;
         private final ColorTheme colorTheme;
-        private final Random random;
         private final FOVHelper fovHelper = new FOVHelper();
 
         private Game game;
@@ -199,12 +199,11 @@ public class GameUI {
         private SideBar sideBar = null;
         private Layer miniMapLayer = null;
 
-        public GameView(TileGrid tileGrid, ColorTheme colorTheme, Random random, Game game) {
+        public GameView(TileGrid tileGrid, ColorTheme colorTheme, Game game) {
             super(tileGrid, colorTheme);
 
             this.tileGrid = tileGrid;
             this.colorTheme = colorTheme;
-            this.random = random;
             this.game = game;
         }
 
@@ -266,11 +265,11 @@ public class GameUI {
             Map<String, Component> componentsByName = new LinkedHashMap<>();
 
             componentsByName.put("name", Components.header()
-                    .withText("name")
+                    .withSize(SIDEBAR_SCREEN_WIDTH - 2, 1)
                     .build());
 
             componentsByName.put("health", Components.label()
-                    .withText("health")
+                    .withSize(SIDEBAR_SCREEN_WIDTH - 2, 1)
                     .build());
 
             return new SideBar(componentsByName,
@@ -299,13 +298,25 @@ public class GameUI {
         private void updateSideBar(SideBar sideBar, Game game) {
 
             Map<String, Component> componentsByName = sideBar.getComponentsByName();
-            ((TextOverride) componentsByName.get("name")).setText("NAME!");
-            ((TextOverride) componentsByName.get("health")).setText("HEALTH!");
+
+            World world = game.getState().getWorld();
+            // TODO: don't use this, it's the "initial" info
+            Location playerLoc = world.find(Entities.PLAYER).iterator().next();
+            Player player = Player.create(world.get(playerLoc, 0)).build();
+
+            // TODO: this is UGLY code
+//            ((TextOverride) componentsByName.get("name"))
+//                    .setText(player.getDisplayName());
+            ((TextOverride) componentsByName.get("name"))
+                    .setText("Joe");
+            ((TextOverride) componentsByName.get("health"))
+                    .setText("Health: " + player.getEntity().getAttribute("HEALTH").getValue());
         }
 
         private void updateGameScreen(Layer gameScreenLayer, Game game) {
 
-            Location playerLocation = game.getState().getPlayerLocation();
+            Location playerLocation = game.getState().getWorld()
+                    .find(Entities.PLAYER).iterator().next();
 
             int xHalf = gameScreenLayer.getSize().getWidth() / 2;
             int yHalf = gameScreenLayer.getSize().getHeight() / 2;
@@ -313,8 +324,7 @@ public class GameUI {
             // Note these are zero-based
             float[][] lightResistances = fovHelper.generateSimpleResistances(
                     Location.create(playerLocation.getX() - xHalf, playerLocation.getY() - yHalf),
-                    Location.create(playerLocation.getX() + xHalf, playerLocation.getY() + yHalf),
-                    random);
+                    Location.create(playerLocation.getX() + xHalf, playerLocation.getY() + yHalf));
 
             LitMap2d lightMap = new LitMap2DImpl(lightResistances);
             ShadowCaster2d shadowCaster = new ShadowCaster2d(lightMap);
@@ -381,7 +391,7 @@ public class GameUI {
         private void updateMiniMap(Layer miniMap, Game game) {
 
             Map<Location, Color> miniMapLocations = createMiniMap(
-                    game.getState().getPlayerLocation());
+                    game.getState().getWorld().find(Entities.PLAYER).iterator().next());
 
             for (Location loc : miniMapLocations.keySet()) {
                 Color color = miniMapLocations.get(loc);
@@ -401,15 +411,13 @@ public class GameUI {
 
         private final TileGrid tileGrid;
         private final ColorTheme colorTheme;
-        private final Random random;
         private final Game game;
 
-        public TitleView(TileGrid tileGrid, ColorTheme colorTheme, Random random, Game game) {
+        public TitleView(TileGrid tileGrid, ColorTheme colorTheme, Game game) {
             super(tileGrid, colorTheme);
 
             this.tileGrid = tileGrid;
             this.colorTheme = colorTheme;
-            this.random = random;
             this.game = game;
         }
 
@@ -422,7 +430,7 @@ public class GameUI {
                     .withTileset(CP437TilesetResources.rexPaint16x16())
                     .build();
             startButton.handleMouseEvents(MouseEventType.MOUSE_CLICKED, (p1, p2) -> {
-                replaceWith(new GameView(tileGrid, colorTheme, random, game));
+                replaceWith(new GameView(tileGrid, colorTheme, game));
                 return UIEventResponse.processed();
             });
             // TODO: store/load game
@@ -435,19 +443,9 @@ public class GameUI {
                 return UIEventResponse.processed();
             });
 
-            // This is just a UI example
-            AtomicInteger count = new AtomicInteger();
-            Button attachment = Components.button()
-                    .withText(String.format("Remove: %d", count.get()))
-                    .withSize(12, 1)
-                    .build();
-            attachment.onActivated(org.hexworks.zircon.api.Functions.fromConsumer(
-                    (componentEvent -> attachment.setText(String.format("Remove: %d", count.getAndIncrement())))));
-
             Map<String, Component> startMenuComponents = new LinkedHashMap<>();
             startMenuComponents.put("start", startButton);
             startMenuComponents.put("quit", quitButton);
-            startMenuComponents.put("attachment", attachment);
 
             getScreen().addFragment(
                     new SideBar(startMenuComponents,
@@ -456,17 +454,18 @@ public class GameUI {
         }
     }
 
-    public void start(Random random) {
+    public void start() {
         //LibgdxApplications
         TileGrid tileGrid = SwingApplications.startTileGrid(
                 AppConfig.newBuilder()
+                        .withTitle("BloodRL")
                         .withSize(Size.create(80, 60))
                         //                        .withDebugMode(true)
                         //                        .withDebugConfig(DebugConfig.newBuilder().withRelaxBoundsCheck(true).build())
                         .withDefaultTileset(CP437TilesetResources.rexPaint16x16())
                         .build());
 
-        TitleView titleView = new TitleView(tileGrid, ColorThemes.afterDark(), random, game);
+        TitleView titleView = new TitleView(tileGrid, ColorThemes.afterDark(), game);
 
         titleView.dock();
     }
@@ -477,11 +476,15 @@ public class GameUI {
 
     private static Map<Location, Color> createMiniMap(Location center) {
 
+        // round
+        Location rounded = Location.create(25 * (Math.round(center.getX() / 25)),
+                25 * (Math.round(center.getY() / 25)));
+
         // PERF: could be passed in for performance
         Map<Location, Color> colorsByLocation = new HashMap<>();
 
-        for (int y = center.getY() + 200, realY = 0; y > center.getY() - 200; y -= 25, realY++) {
-            for (int x = center.getX() - 200, realX = 0; x < center.getX() + 200; x += 25, realX++) {
+        for (int y = rounded.getY() + 200, realY = 0; y > rounded.getY() - 200; y -= 25, realY++) {
+            for (int x = rounded.getX() - 200, realX = 0; x < rounded.getX() + 200; x += 25, realX++) {
 
                 Location location = Location.create(x, y);
                 Entity entity = getEnity(location);

@@ -22,6 +22,11 @@ public class BooleanAttribute extends Attribute {
         return new BooleanAttribute(attribute);
     }
 
+    public static BooleanAttribute create(Attribute attribute, boolean value) {
+        return new BooleanAttribute(attribute.copy()
+                .setValue(Boolean.toString(value)).build());
+    }
+
     public boolean getBooleanValue() {
         return value;
     }

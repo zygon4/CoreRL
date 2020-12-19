@@ -1,12 +1,9 @@
 package com.zygon.rl.game;
 
 // Would almost prefer a central "world" interface
-import com.zygon.rl.world.Location;
-import com.zygon.rl.world.Regions;
+import com.zygon.rl.world.World;
 
-import java.util.Collections;
 import java.util.Objects;
-import java.util.Set;
 import java.util.Stack;
 
 /**
@@ -22,23 +19,13 @@ public class GameState {
     public static class InputContext {
 
         private final String name;
-        private final Set<Input> validInputs;
 
         private InputContext(Builder builder) {
             this.name = Objects.requireNonNull(builder.name);
-            this.validInputs = builder.validInputs != null
-                    ? Collections.unmodifiableSet(builder.validInputs) : Collections.emptySet();
         }
 
         public String getName() {
             return name;
-        }
-
-        // I'm not sure if this is that useful yet. Right now a lot of logic is in
-        // the subclasses (not great) _when_ it gets moved common, this will be more
-        // useful.
-        public Set<Input> getValidInputs() {
-            return validInputs;
         }
 
         public static Builder builder() {
@@ -48,17 +35,9 @@ public class GameState {
         public static class Builder {
 
             private String name;
-            private Set<Input> validInputs;
 
             public Builder setName(String name) {
                 this.name = name;
-                return this;
-            }
-
-            // Not useful yet
-            @Deprecated
-            public Builder setValidInputs(Set<Input> validInputs) {
-                this.validInputs = validInputs;
                 return this;
             }
 
@@ -70,8 +49,7 @@ public class GameState {
 
     private final int turnCount;
     private final Stack<InputContext> inputContext;
-    private final Regions regions;
-    private final Location playerLocation;
+    private final World world;
 
     private GameState(Builder builder) {
         Stack<InputContext> stackCopy = new Stack<>();
@@ -80,8 +58,7 @@ public class GameState {
         }
         this.turnCount = builder.turnCount;
         this.inputContext = stackCopy;
-        this.regions = builder.regions;
-        this.playerLocation = Objects.requireNonNull(builder.playerLocation);
+        this.world = builder.world;
     }
 
     public static Builder builder() {
@@ -96,26 +73,19 @@ public class GameState {
         return inputContext;
     }
 
-    public Location getPlayerLocation() {
-        return playerLocation;
-    }
-
     public int getTurnCount() {
         return turnCount;
     }
 
-    // A new bucket is coming to replace the regions which holds entities
-    @Deprecated
-    public Regions getRegions() {
-        return regions;
+    public World getWorld() {
+        return world;
     }
 
     public static class Builder {
 
         private int turnCount = 0;
         private Stack<InputContext> inputContext;
-        private Regions regions;
-        private Location playerLocation;
+        private World world;
 
         private Builder() {
 
@@ -124,8 +94,7 @@ public class GameState {
         private Builder(GameState gameState) {
             this.turnCount = gameState.getTurnCount();
             this.inputContext = gameState.getInputContext();
-            this.regions = gameState.getRegions();
-            this.playerLocation = gameState.getPlayerLocation();
+            this.world = gameState.getWorld();
         }
 
         public Builder addInputContext(InputContext inputContext) {
@@ -152,13 +121,8 @@ public class GameState {
             return this;
         }
 
-        public Builder setPlayerLocation(Location playerLocation) {
-            this.playerLocation = playerLocation;
-            return this;
-        }
-
-        public Builder setRegions(Regions regions) {
-            this.regions = regions;
+        public Builder setWorld(World world) {
+            this.world = world;
             return this;
         }
 
