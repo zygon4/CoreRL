@@ -4,11 +4,12 @@ package com.zygon.rl.world;
  *
  * @author zygon
  */
-public class Openable {
+public class Openable extends EntityWrapper {
 
     private final Entity openable;
 
     public Openable(Entity openable) {
+        super(openable);
         this.openable = openable;
     }
 
@@ -21,10 +22,6 @@ public class Openable {
                         .setAttributeValue(CommonAttributes.VIEW_BLOCK.name(), "1.0")
                         .build())
                 : this;
-    }
-
-    public Entity getEntity() {
-        return openable;
     }
 
     public boolean isClosed() {
