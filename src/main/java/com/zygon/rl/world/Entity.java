@@ -6,29 +6,36 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 /**
- * This was copied from BloodRL, needs to become its own here
+ * Primary entity component.
+ *
+ * Keep in mind for future impl, entities should be anything from players,
+ * items, other things like furniture? or even doors/windows?
+ *
  *
  */
 public class Entity {
 
+    private final UUID id;
+    private final String name;
+    private final String description;
+    private final Location location;
     private final Map<String, Attribute> attributes;
+
     private final Set<Behavior> behaviors;
 
-    // Could become a "id" grouping object
-    private final String description;
-    private final String displayName;
-    private final String name;
-
     private Entity(Builder builder) {
+        this.id = builder.id != null ? builder.id : UUID.randomUUID();
+        this.name = builder.name;
+        this.description = builder.description != null ? builder.description : "";
+        this.location = builder.location;
+
         this.attributes = builder.attributes != null
                 ? Collections.unmodifiableMap(builder.attributes) : Collections.emptyMap();
         this.behaviors = builder.behaviors != null
                 ? Collections.unmodifiableSet(builder.behaviors) : Collections.emptySet();
-        this.description = builder.description != null ? builder.description : "";
-        this.displayName = builder.displayName != null ? builder.displayName : "";
-        this.name = builder.name != null ? builder.name : "";
     }
 
     public Entity add(Attribute attribute) {
@@ -43,6 +50,26 @@ public class Entity {
         return copy().setBehaviors(behvs).build();
     }
 
+    public UUID getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public Set<String> getAttributeNames() {
+        return Collections.unmodifiableSet(attributes.keySet());
+    }
+
     public Attribute getAttribute(String name) {
         return attributes.get(name);
     }
@@ -51,23 +78,10 @@ public class Entity {
         return getAttribute(name).getValue();
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public String getName() {
-        return name;
-    }
-
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 89 * hash + Objects.hashCode(this.displayName);
-        hash = 89 * hash + Objects.hashCode(this.name);
+        hash = 89 * hash + Objects.hashCode(this.id);
         return hash;
     }
 
@@ -83,12 +97,10 @@ public class Entity {
             return false;
         }
         final Entity other = (Entity) obj;
-        if (!Objects.equals(this.displayName, other.displayName)) {
+        if (!Objects.equals(this.id, other.id)) {
             return false;
         }
-        if (!Objects.equals(this.name, other.name)) {
-            return false;
-        }
+
         return true;
     }
 
@@ -98,27 +110,37 @@ public class Entity {
 
     public Builder copy() {
         return new Builder(this);
+
     }
 
+    // needs more work!
     public static class Builder {
 
-        private Map<String, Attribute> attributes;
-        private Set<Behavior> behaviors;
-
-        // Could become a "id" grouping object
-        private String description;
-        private String displayName;
+        private UUID id;
         private String name;
+        private String description;
+        private Location location;
+        private Map<String, Attribute> attributes;
+
+        private Set<Behavior> behaviors;
 
         private Builder() {
         }
 
         private Builder(Entity entity) {
-            this.attributes = entity.attributes;
-            this.behaviors = entity.behaviors;
-            this.description = entity.description;
-            this.displayName = entity.displayName;
+            this.id = entity.id;
             this.name = entity.name;
+            this.description = entity.description;
+            this.attributes = new HashMap<>(entity.attributes);
+            this.behaviors = entity.behaviors;
+        }
+
+        public Builder addAttributes(Attribute attribute) {
+            if (attributes == null) {
+                setAttributes(new HashMap<>());
+            }
+            attributes.put(attribute.getName(), attribute);
+            return this;
         }
 
         public Builder setAttributes(Map<String, Attribute> attributes) {
@@ -159,13 +181,18 @@ public class Entity {
             return this;
         }
 
-        public Builder setDisplayName(String displayName) {
-            this.displayName = displayName;
+        public Builder setName(String name) {
+            this.name = name;
             return this;
         }
 
-        public Builder setName(String name) {
-            this.name = name;
+        public Builder setId(UUID id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder setLocation(Location location) {
+            this.location = location;
             return this;
         }
 

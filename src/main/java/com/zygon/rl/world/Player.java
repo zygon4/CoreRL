@@ -46,11 +46,6 @@ public class Player extends EntityWrapper {
             this.playerEntity = Objects.requireNonNull(entity);
         }
 
-        public Builder add(Attribute attr) {
-            playerEntity.add(attr);
-            return this;
-        }
-
         public Builder add(Item item) {
             items.add(item);
             return this;

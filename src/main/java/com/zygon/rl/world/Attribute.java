@@ -8,16 +8,13 @@ import java.util.Objects;
  */
 public class Attribute {
 
-    // id?
-    private final String description;
-    private final String displayName;
     private final String name;
+    private final String description;
     private final String value;
 
     protected Attribute(Builder builder) {
-        this.description = builder.description;
-        this.displayName = builder.displayName;
         this.name = builder.name;
+        this.description = builder.description;
         this.value = builder.value;
     }
 
@@ -27,10 +24,6 @@ public class Attribute {
 
     public String getDescription() {
         return description;
-    }
-
-    public String getDisplayName() {
-        return displayName;
     }
 
     public String getName() {
@@ -44,8 +37,6 @@ public class Attribute {
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 79 * hash + Objects.hashCode(this.description);
-        hash = 79 * hash + Objects.hashCode(this.displayName);
         hash = 79 * hash + Objects.hashCode(this.name);
         hash = 79 * hash + Objects.hashCode(this.value);
         return hash;
@@ -63,12 +54,6 @@ public class Attribute {
             return false;
         }
         final Attribute other = (Attribute) obj;
-        if (!Objects.equals(this.description, other.description)) {
-            return false;
-        }
-        if (!Objects.equals(this.displayName, other.displayName)) {
-            return false;
-        }
         if (!Objects.equals(this.name, other.name)) {
             return false;
         }
@@ -85,7 +70,6 @@ public class Attribute {
     public static class Builder {
 
         private String name;
-        private String displayName;
         private String description;
         private String value;
 
@@ -94,23 +78,17 @@ public class Attribute {
 
         private Builder(Attribute attribute) {
             this.name = attribute.getName();
-            this.displayName = attribute.getDisplayName();
             this.description = attribute.getDescription();
             this.value = attribute.getValue();
         }
 
-        public Builder setDescription(String description) {
-            this.description = description;
-            return this;
-        }
-
-        public Builder setDisplayName(String displayName) {
-            this.displayName = displayName;
-            return this;
-        }
-
         public Builder setName(String name) {
             this.name = name;
+            return this;
+        }
+
+        public Builder setDescription(String description) {
+            this.description = description;
             return this;
         }
 

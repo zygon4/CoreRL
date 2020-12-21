@@ -24,7 +24,7 @@ class EntityWrapper {
         return entity;
     }
 
-    public String getDisplayName() {
-        return getEntity().getAttribute(CommonAttributes.NAME.name()).getDisplayName();
+    public String getName() {
+        return getEntity().getName();
     }
 }

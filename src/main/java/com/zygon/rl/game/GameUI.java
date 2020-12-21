@@ -239,7 +239,7 @@ public class GameUI {
                     .build();
             getScreen().addComponent(gameScreen);
 
-            sideBar = createSideBar(Position.create(gameScreen.getWidth(), 0));
+            sideBar = createSideBar(Position.create(gameScreen.getWidth(), 0), game);
             getScreen().addFragment(sideBar);
 
             miniMapLayer = Layer.newBuilder()
@@ -259,24 +259,28 @@ public class GameUI {
             updateMiniMap(miniMapLayer, game);
         }
 
-        private SideBar createSideBar(Position position) {
+        private SideBar createSideBar(Position position, Game game) {
 
             // TODO: creation method
             Map<String, Component> componentsByName = new LinkedHashMap<>();
-
-            componentsByName.put("name", Components.header()
-                    .withSize(SIDEBAR_SCREEN_WIDTH - 2, 1)
-                    .build());
 
             componentsByName.put("health", Components.label()
                     .withSize(SIDEBAR_SCREEN_WIDTH - 2, 1)
                     .build());
 
+            String playerName = game.getState().getWorld()
+                    .get(game.getConfiguration().getPlayerUuid()).getName();
+
             return new SideBar(componentsByName,
                     Size.create(SIDEBAR_SCREEN_WIDTH,
                             tileGrid.getSize().getHeight() - SIDEBAR_SCREEN_WIDTH),
                     position,
-                    game.getConfiguration().getName());
+                    playerName);
+        }
+
+        private Location getPlayerLocation(Game game) {
+            return game.getState().getWorld()
+                    .get(game.getConfiguration().getPlayerUuid()).getLocation();
         }
 
         private Tile toTile(Tile tile, Entity entity) {
@@ -300,23 +304,16 @@ public class GameUI {
             Map<String, Component> componentsByName = sideBar.getComponentsByName();
 
             World world = game.getState().getWorld();
-            // TODO: don't use this, it's the "initial" info
-            Location playerLoc = world.find(Entities.PLAYER).iterator().next();
-            Player player = Player.create(world.get(playerLoc, 0)).build();
+            Location playerLoc = getPlayerLocation(game);
+            Player player = Player.create(world.get(playerLoc)).build();
 
-            // TODO: this is UGLY code
-//            ((TextOverride) componentsByName.get("name"))
-//                    .setText(player.getDisplayName());
-            ((TextOverride) componentsByName.get("name"))
-                    .setText("Joe");
             ((TextOverride) componentsByName.get("health"))
                     .setText("Health: " + player.getEntity().getAttribute("HEALTH").getValue());
         }
 
         private void updateGameScreen(Layer gameScreenLayer, Game game) {
 
-            Location playerLocation = game.getState().getWorld()
-                    .find(Entities.PLAYER).iterator().next();
+            Location playerLocation = getPlayerLocation(game);
 
             int xHalf = gameScreenLayer.getSize().getWidth() / 2;
             int yHalf = gameScreenLayer.getSize().getHeight() / 2;
@@ -391,7 +388,7 @@ public class GameUI {
         private void updateMiniMap(Layer miniMap, Game game) {
 
             Map<Location, Color> miniMapLocations = createMiniMap(
-                    game.getState().getWorld().find(Entities.PLAYER).iterator().next());
+                    getPlayerLocation(game));
 
             for (Location loc : miniMapLocations.keySet()) {
                 Color color = miniMapLocations.get(loc);
@@ -449,7 +446,7 @@ public class GameUI {
 
             getScreen().addFragment(
                     new SideBar(startMenuComponents,
-                            tileGrid.getSize(), Position.create(0, 0), game.getConfiguration().getName())
+                            tileGrid.getSize(), Position.create(0, 0), game.getConfiguration().getGameName())
             );
         }
     }
@@ -458,7 +455,7 @@ public class GameUI {
         //LibgdxApplications
         TileGrid tileGrid = SwingApplications.startTileGrid(
                 AppConfig.newBuilder()
-                        .withTitle("BloodRL")
+                        .withTitle(game.getConfiguration().getGameName())
                         .withSize(Size.create(80, 60))
                         //                        .withDebugMode(true)
                         //                        .withDebugConfig(DebugConfig.newBuilder().withRelaxBoundsCheck(true).build())

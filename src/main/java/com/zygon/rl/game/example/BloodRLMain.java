@@ -29,6 +29,7 @@ import org.hexworks.zircon.api.uievent.KeyCode;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.hexworks.zircon.api.uievent.KeyCode.KEY_B;
@@ -195,7 +196,11 @@ public class BloodRLMain {
         // audio seems to slow the game down a lot??
 //        Audio audio = new Audio(Paths.get("/home/zygon/src/github/CoreRL/audio.wav"));
 //        audio.play();
-        DefaultOuterActionSupplier defaultOuterActionSupplier = new DefaultOuterActionSupplier();
+        GameConfiguration config = new GameConfiguration();
+        config.setGameName("BloodRL");
+        config.setPlayerUuid(UUID.randomUUID());
+
+        DefaultOuterActionSupplier defaultOuterActionSupplier = new DefaultOuterActionSupplier(config);
         BloodOuterActionSupplier bloodOuterActionSupplier = new BloodOuterActionSupplier();
         LayerInputHandler composed = defaultOuterActionSupplier.compose(bloodOuterActionSupplier);
 
@@ -212,28 +217,25 @@ public class BloodRLMain {
                 .setName("DEFAULT")
                 .build();
 
-        Player player = Player.create(Entities.PLAYER)
-                .add(Attribute.builder()
-                        .setName(CommonAttributes.NAME.name())
-                        .setDisplayName("joe")
-                        .setValue("joe")
-                        .build())
-                .add(Attribute.builder()
+        Player player = Player.create(Entities.PLAYER
+                .copy()
+                .setId(config.getPlayerUuid())
+                .setName("Joe")
+                .setDescription("fierce something")
+                .setLocation(Location.create(0, 0))
+                .addAttributes(Attribute.builder()
                         .setName(CommonAttributes.HEALTH.name())
-                        .setDisplayName("Health")
+                        .setDescription("Health")
                         .setValue("100")
                         .build())
-                .add(BooleanAttribute.create(Attribute.builder()
+                .addAttributes(BooleanAttribute.create(Attribute.builder()
                         .setName(CommonAttributes.LIVING.name()).build(), true))
-                .build();
+                .build()).build();
 
         GameState initialState = GameState.builder()
                 .addInputContext(initialGameContext)
-                .setWorld(new World().add(player.getEntity(), Location.create(0, 0)))
+                .setWorld(new World().add(player.getEntity()))
                 .build();
-
-        GameConfiguration config = new GameConfiguration();
-        config.setName("BloodRL");
 
         Game game = Game.builder()
                 .addGameSystem(new PlayerHealth())
