@@ -21,6 +21,7 @@ public class Entity {
     private final UUID id;
     private final String name;
     private final String description;
+    private final Location origin;
     private final Location location;
     private final Map<String, Attribute> attributes;
 
@@ -30,6 +31,7 @@ public class Entity {
         this.id = builder.id != null ? builder.id : UUID.randomUUID();
         this.name = builder.name;
         this.description = builder.description != null ? builder.description : "";
+        this.origin = builder.origin;
         this.location = builder.location;
 
         this.attributes = builder.attributes != null
@@ -66,6 +68,10 @@ public class Entity {
         return location;
     }
 
+    public Location getOrigin() {
+        return origin;
+    }
+
     public Set<String> getAttributeNames() {
         return Collections.unmodifiableSet(attributes.keySet());
     }
@@ -74,8 +80,16 @@ public class Entity {
         return attributes.get(name);
     }
 
+    private Map<String, Attribute> getAttributes() {
+        return attributes;
+    }
+
     public String getAttributeValue(String name) {
         return getAttribute(name).getValue();
+    }
+
+    private Set<Behavior> getBehaviors() {
+        return behaviors;
     }
 
     @Override
@@ -119,6 +133,7 @@ public class Entity {
         private UUID id;
         private String name;
         private String description;
+        private Location origin;
         private Location location;
         private Map<String, Attribute> attributes;
 
@@ -128,11 +143,13 @@ public class Entity {
         }
 
         private Builder(Entity entity) {
-            this.id = entity.id;
-            this.name = entity.name;
-            this.description = entity.description;
-            this.attributes = new HashMap<>(entity.attributes);
-            this.behaviors = entity.behaviors;
+            this.id = entity.getId();
+            this.name = entity.getName();
+            this.description = entity.getDescription();
+            this.origin = entity.getOrigin();
+            this.location = entity.getLocation();
+            this.attributes = new HashMap<>(entity.getAttributes());
+            this.behaviors = entity.getBehaviors();
         }
 
         public Builder addAttributes(Attribute attribute) {
@@ -193,6 +210,11 @@ public class Entity {
 
         public Builder setLocation(Location location) {
             this.location = location;
+            return this;
+        }
+
+        public Builder setOrigin(Location origin) {
+            this.origin = origin;
             return this;
         }
 

@@ -6,6 +6,8 @@ import com.google.common.cache.LoadingCache;
 import com.stewsters.util.shadow.twoDimention.LitMap2d;
 import com.stewsters.util.shadow.twoDimention.ShadowCaster2d;
 import com.zygon.rl.util.NoiseUtil;
+import com.zygon.rl.util.rng.family.FamilyTreeGenerator;
+import com.zygon.rl.util.rng.family.Person;
 import com.zygon.rl.world.Attribute;
 import com.zygon.rl.world.CommonAttributes;
 import com.zygon.rl.world.DoubleAttribute;
@@ -47,6 +49,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -68,7 +71,7 @@ public class GameUI {
 
             for (int y = minValues.getY(); y < maxValues.getY(); y++) {
                 for (int x = minValues.getX(); x < maxValues.getX(); x++) {
-                    Entity entity = getEnity(Location.create(x, y));
+                    Entity entity = getTerrain(Location.create(x, y));
 
                     double viewBlocking = getMaxViewBlock(entity);
 
@@ -351,13 +354,14 @@ public class GameUI {
 
                     // TODO: hash positions
                     Position uiScreenPosition = Position.create(x, y);
+                    Location loc = Location.create(getX, getY);
+
+                    Entity npc = getNPC(game, loc);
 
                     if (locationLightLevelPct > .25) {
-                        Location loc = Location.create(getX, getY);
-                        Entity entity = getEnity(loc);
+                        Entity entity = getTerrain(loc);
 
                         Maybe<Tile> existingTile = gameScreenLayer.getTileAt(uiScreenPosition);
-
                         Tile bottomTile = existingTile.get();
                         boolean drawTile = true;
 
@@ -374,8 +378,15 @@ public class GameUI {
                         }
 
                         // Not drawing player if they're in a shadow.. will this make sense?
+                        Tile topTile = null;
                         if (loc.equals(playerLocation)) {
-                            Tile topTile = toTile(Entities.PLAYER);
+                            topTile = toTile(Entities.PLAYER);
+                        } else {
+                            if (npc != null) {
+                                topTile = toTile(npc);
+                            }
+                        }
+                        if (topTile != null) {
                             gameScreenLayer.draw(topTile, uiScreenPosition);
                         }
                     } else {
@@ -484,7 +495,7 @@ public class GameUI {
             for (int x = rounded.getX() - 200, realX = 0; x < rounded.getX() + 200; x += 25, realX++) {
 
                 Location location = Location.create(x, y);
-                Entity entity = getEnity(location);
+                Entity entity = getTerrain(location);
                 WorldTile wt = WorldTile.get(entity);
 
                 colorsByLocation.put(Location.create(realX, realY), wt.getColor());
@@ -497,9 +508,12 @@ public class GameUI {
     // Only used in a single thread
     private static final byte[] NOISE_BYTES = new byte[8];
     private static final NoiseUtil terrainNoise = new NoiseUtil(new Random().nextInt(), 1.0, 1.0);
+    private static final NoiseUtil npcNoise = new NoiseUtil(new Random().nextInt(), 1.0, 1.0);
 
     // TODO: this should be completely customizable via json/config
-    private static Entity getEnity(Location location) {
+    // This is also weird because terrain tiles are NOT being set in the world ECS
+    // this is just a convenient way to get tile information.
+    private static Entity getTerrain(Location location) {
         double terrainVal = terrainNoise.getScaledValue(location.getX(), location.getY());
 
         ByteBuffer.wrap(NOISE_BYTES).putDouble(terrainVal);
@@ -537,5 +551,43 @@ public class GameUI {
         } else {
             return Entities.WALL;
         }
+    }
+
+    // need to answer: Is there an NPC there?
+    // if yes, return it
+    // but also: if there was supposed to be a NPC created at that location
+    // and it's not in existance, create it.
+    // If these overlap, then need to move one.
+    private static Entity getNPC(Game game, Location location) {
+
+        Set<Entity> entities = game.getState().getWorld().getAll(location, null);
+
+        Entity entity = entities.stream()
+                .filter(ent -> ent.getAttribute(CommonAttributes.NPC.name()) != null)
+                .findFirst().orElse(null);
+
+        if (entity == null) {
+            // We didn't find anything
+            // Maybe we should spawn something?
+            final double spawnVal = npcNoise.getScaledValue(location.getX(), location.getY());
+            final double spawnRate = game.getConfiguration().getNpcSpawnRate();
+
+            // If there IS an NPC at this location, return it,
+            // if there
+            if (spawnVal < spawnRate) {
+                // this location should spawn or will have spawned an NPC
+                if (game.getState().getWorld()
+                        .getAll(null, location).isEmpty()) {
+                    Person person = FamilyTreeGenerator.create();
+                    entity = Entities.createMonster(person.getName().toString()).copy()
+                            .setOrigin(location)
+                            .setLocation(location)
+                            .build();
+                    game.getState().getWorld().add(entity);
+                }
+            }
+        }
+
+        return entity;
     }
 }

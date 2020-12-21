@@ -198,6 +198,7 @@ public class BloodRLMain {
 //        audio.play();
         GameConfiguration config = new GameConfiguration();
         config.setGameName("BloodRL");
+        config.setNpcSpawnRate(0.00000001);
         config.setPlayerUuid(UUID.randomUUID());
 
         DefaultOuterActionSupplier defaultOuterActionSupplier = new DefaultOuterActionSupplier(config);
@@ -226,15 +227,18 @@ public class BloodRLMain {
                 .addAttributes(Attribute.builder()
                         .setName(CommonAttributes.HEALTH.name())
                         .setDescription("Health")
-                        .setValue("100")
+                        .setValue("85")
                         .build())
                 .addAttributes(BooleanAttribute.create(Attribute.builder()
                         .setName(CommonAttributes.LIVING.name()).build(), true))
                 .build()).build();
 
+        World world = new World();
+        world.add(player.getEntity());
+
         GameState initialState = GameState.builder()
                 .addInputContext(initialGameContext)
-                .setWorld(new World().add(player.getEntity()))
+                .setWorld(world)
                 .build();
 
         Game game = Game.builder()

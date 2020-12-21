@@ -7,7 +7,10 @@ import java.util.UUID;
  */
 public class GameConfiguration {
 
-    private String gameName;
+    private String gameName = "";
+    // this needs to take in account other factors like context (where are the
+    // people spawned, in a town?)
+    private double npcSpawnRate = 0.01;
     private UUID playerUuid;
 
     public String getGameName() {
@@ -24,5 +27,13 @@ public class GameConfiguration {
 
     public void setPlayerUuid(UUID playerUuid) {
         this.playerUuid = playerUuid;
+    }
+
+    public double getNpcSpawnRate() {
+        return npcSpawnRate;
+    }
+
+    public void setNpcSpawnRate(double npcSpawnRate) {
+        this.npcSpawnRate = npcSpawnRate;
     }
 }

@@ -18,10 +18,12 @@ public class EntityManager {
     public static class Query {
 
         private final Map<String, String> attributes;
+        private final Location origin;
         private final Location location;
 
         private Query(Builder builder) {
             this.attributes = Collections.unmodifiableMap(builder.attributes);
+            this.origin = builder.origin;
             this.location = builder.location;
         }
 
@@ -33,6 +35,10 @@ public class EntityManager {
             return location;
         }
 
+        public Location getOrigin() {
+            return origin;
+        }
+
         public static Builder builder() {
             return new Builder();
         }
@@ -40,6 +46,7 @@ public class EntityManager {
         public static class Builder {
 
             private Map<String, String> attributes = new HashMap<>();
+            private Location origin;
             private Location location;
 
             /**
@@ -74,6 +81,17 @@ public class EntityManager {
              */
             public Builder setLocation(Location location) {
                 this.location = location;
+                return this;
+            }
+
+            /**
+             * Returns entities at the given origin location
+             *
+             * @param origin
+             * @return
+             */
+            public Builder setOrigin(Location origin) {
+                this.origin = origin;
                 return this;
             }
 
@@ -136,6 +154,16 @@ public class EntityManager {
         if (queryLocation != null) {
             entities.addAll(entitiesByUuid.values().stream()
                     .filter(ent -> ent.getLocation().equals(queryLocation))
+                    .collect(Collectors.toSet()));
+        }
+
+        // Query for origin location
+        // TBD: consider storing by location if slow
+        // The original Region code had a location cache
+        Location queryOrigin = query.getOrigin();
+        if (queryOrigin != null) {
+            entities.addAll(entitiesByUuid.values().stream()
+                    .filter(ent -> ent.getOrigin() != null && ent.getOrigin().equals(queryOrigin))
                     .collect(Collectors.toSet()));
         }
 

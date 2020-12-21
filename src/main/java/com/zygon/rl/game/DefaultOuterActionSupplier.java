@@ -62,7 +62,7 @@ public final class DefaultOuterActionSupplier extends BaseInputHandler {
                     }
                 }
                 Location destination = Location.create(nextX, nextY, nextZ);
-                copy.setWorld(state.getWorld().move(player, destination));
+                state.getWorld().move(player, destination);
             }
             default -> {
                 invalidInput(input);

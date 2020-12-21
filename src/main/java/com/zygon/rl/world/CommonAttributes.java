@@ -18,5 +18,5 @@ public enum CommonAttributes {
     LIVING,
     TERRAIN_DIFFICULTY,
     VIEW_BLOCK,
-    NAME
+    NPC
 }

@@ -27,6 +27,8 @@ public class Entities {
             .setName(CommonAttributes.HEALTH.name()).setValue("100").build();
     private static final Attribute LIVING = Attribute.builder()
             .setName(CommonAttributes.LIVING.name()).setValue(Boolean.TRUE.toString()).build();
+    private static final Attribute NPC = Attribute.builder()
+            .setName(CommonAttributes.NPC.name()).setValue(Boolean.TRUE.toString()).build();
 
     public static Entity FLOOR = Entity.builder()
             .setName("FLOOR")
@@ -75,6 +77,7 @@ public class Entities {
                     LIVING,
                     HEALTH,
                     IMPASSABLE,
+                    NPC,
                     create(CommonAttributes.VIEW_BLOCK.name(), "0.25").build()))
             .build();
 
