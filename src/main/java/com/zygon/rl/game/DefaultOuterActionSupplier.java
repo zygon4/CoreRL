@@ -6,6 +6,15 @@ import org.hexworks.zircon.api.uievent.KeyCode;
 
 import java.util.Objects;
 
+import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_1;
+import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_2;
+import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_3;
+import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_4;
+import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_6;
+import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_7;
+import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_8;
+import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_9;
+
 public final class DefaultOuterActionSupplier extends BaseInputHandler {
 
     private final GameConfiguration gameConfiguration;
@@ -32,36 +41,7 @@ public final class DefaultOuterActionSupplier extends BaseInputHandler {
                 Entity player = state.getWorld().get(gameConfiguration.getPlayerUuid());
                 Location playerLocation = player.getLocation();
 
-                int nextX = playerLocation.getX();
-                int nextY = playerLocation.getY();
-                int nextZ = playerLocation.getZ();
-                switch (inputKeyCode) {
-                    case NUMPAD_1, DIGIT_1 -> {
-                        nextX--;
-                        nextY--;
-                    }
-                    case NUMPAD_2, DIGIT_2 ->
-                        nextY--;
-                    case NUMPAD_3, DIGIT_3 -> {
-                        nextX++;
-                        nextY--;
-                    }
-                    case NUMPAD_4, DIGIT_4 ->
-                        nextX--;
-                    case NUMPAD_6, DIGIT_6 ->
-                        nextX++;
-                    case NUMPAD_7, DIGIT_7 -> {
-                        nextX--;
-                        nextY++;
-                    }
-                    case NUMPAD_8, DIGIT_8 ->
-                        nextY++;
-                    case NUMPAD_9, DIGIT_9 -> {
-                        nextX++;
-                        nextY++;
-                    }
-                }
-                Location destination = Location.create(nextX, nextY, nextZ);
+                Location destination = getRelativeLocation(playerLocation, input);
                 state.getWorld().move(player, destination);
             }
             default -> {

@@ -567,25 +567,39 @@ public class GameUI {
                 .findFirst().orElse(null);
 
         if (entity == null) {
-            // We didn't find anything
-            // Maybe we should spawn something?
-            final double spawnVal = npcNoise.getScaledValue(location.getX(), location.getY());
-            final double spawnRate = game.getConfiguration().getNpcSpawnRate();
+            final int round = 50;
 
-            // If there IS an NPC at this location, return it,
-            // if there
-            if (spawnVal < spawnRate) {
-                // this location should spawn or will have spawned an NPC
-                if (game.getState().getWorld()
-                        .getAll(null, location).isEmpty()) {
-                    Person person = FamilyTreeGenerator.create();
-                    entity = Entities.createMonster(person.getName().toString()).copy()
-                            .setOrigin(location)
-                            .setLocation(location)
-                            .build();
-                    game.getState().getWorld().add(entity);
-                }
+            // spawn if not found..
+            // this is bad and doesn't take into consideration 'already spawned'
+            // concepts. this is just to try out outerworld actions.
+            if (location.getX() % round == 0
+                    && location.getY() % round == 0) {
+                Person person = FamilyTreeGenerator.create();
+                entity = Entities.createMonster(person.getName().toString())
+                        .setOrigin(location)
+                        .setLocation(location)
+                        .build();
+                game.getState().getWorld().add(entity);
             }
+
+//            final double spawnVal = npcNoise.getScaledValue(location.getX(), location.getY());
+//            final double spawnRate = game.getConfiguration().getNpcSpawnRate();
+//
+//            // If there IS an NPC at this location, return it,
+//            // if there
+//            if (spawnVal < spawnRate) {
+//                // this location should spawn or will have spawned an NPC
+//                if (game.getState().getWorld()
+//                        .getAll(null, location)
+//                        .isEmpty()) {
+//                    Person person = FamilyTreeGenerator.create();
+//                    entity = Entities.createMonster(person.getName().toString())
+//                            .setOrigin(location)
+//                            .setLocation(location)
+//                            .build();
+//                    game.getState().getWorld().add(entity);
+//                }
+//            }
         }
 
         return entity;

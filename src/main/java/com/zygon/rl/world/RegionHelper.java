@@ -169,7 +169,7 @@ public class RegionHelper {
                             // yucky special case
                             if (entity.equals(Entities.MONSTER)) {
                                 entity = Entities.createMonster(
-                                        FamilyTreeGenerator.create().getName().toString());
+                                        FamilyTreeGenerator.create().getName().toString()).build();
                             }
                             newRegion = newRegion.add(entity, regionOffsetLoc);
 

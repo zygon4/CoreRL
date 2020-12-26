@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -106,16 +107,32 @@ public class EntityManager {
     private final Map<UUID, Entity> entitiesByUuid = new HashMap<>();
     private final Map<String, Set<UUID>> entityUuidByAttribyuteName = new HashMap<>();
 
-    // Basic CRUD for entities..
-    public void delete(UUID uuid) {
-        Entity existing = get(uuid);
-        // remove from uuid map
-        entitiesByUuid.remove(uuid);
+    private static final Predicate<Entity> IS_NOT_DELETED = (ent) -> {
+        return ent.getAttribute(CommonAttributes.DELETED.name()) == null;
+    };
 
-        // remove from attribute maps
-        for (String attrName : existing.getAttributeNames()) {
-            entityUuidByAttribyuteName.get(attrName).remove(uuid);
+    // Basic CRUD for entities..
+    public void delete(UUID uuid, boolean erase) {
+        Entity existing = get(uuid);
+
+        if (erase) {
+            // remove from uuid map
+            entitiesByUuid.remove(uuid);
+
+            // remove from attribute maps
+            for (String attrName : existing.getAttributeNames()) {
+                entityUuidByAttribyuteName.get(attrName).remove(uuid);
+            }
+        } else {
+            // don't delete, just flag
+            save(existing.copy()
+                    .setAttributeValue(CommonAttributes.DELETED.name(), Boolean.TRUE.toString())
+                    .build());
         }
+    }
+
+    public void delete(UUID uuid) {
+        delete(uuid, false);
     }
 
     public Set<Entity> findAll(Query query) {
@@ -132,12 +149,14 @@ public class EntityManager {
                 // Get entities with attr=val
                 entities.addAll(entitiesWithAttr.stream()
                         .map(this::get)
+                        .filter(IS_NOT_DELETED)
                         .filter(ent -> ent.getAttribute(attrName).getValue().equals(attrValue))
                         .collect(Collectors.toSet()));
             } else {
                 // Get the entities that have this attribute e.g. "get all cursed"
                 entities.addAll(entitiesWithAttr.stream()
                         .map(this::get)
+                        .filter(IS_NOT_DELETED)
                         .collect(Collectors.toSet()));
             }
         }
@@ -153,6 +172,7 @@ public class EntityManager {
         Location queryLocation = query.getLocation();
         if (queryLocation != null) {
             entities.addAll(entitiesByUuid.values().stream()
+                    .filter(IS_NOT_DELETED)
                     .filter(ent -> ent.getLocation().equals(queryLocation))
                     .collect(Collectors.toSet()));
         }
@@ -163,6 +183,7 @@ public class EntityManager {
         Location queryOrigin = query.getOrigin();
         if (queryOrigin != null) {
             entities.addAll(entitiesByUuid.values().stream()
+                    .filter(IS_NOT_DELETED)
                     .filter(ent -> ent.getOrigin() != null && ent.getOrigin().equals(queryOrigin))
                     .collect(Collectors.toSet()));
         }
@@ -189,6 +210,5 @@ public class EntityManager {
             entityUuids.add(entity.getId());
         }
         return entitiesByUuid.put(entity.getId(), entity);
-
     }
 }

@@ -7,6 +7,7 @@ package com.zygon.rl.world;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -130,11 +131,11 @@ public class Entities {
                 .build();
     }
 
-    public static Entity createMonster(String name) {
+    public static Entity.Builder createMonster(String name) {
         return MONSTER.copy()
+                .setId(UUID.randomUUID())
                 .setName("MONSTER")
-                .setDescription("Monster")
-                .build();
+                .setDescription("Monster");
     }
 
     public static Entity createWindow() {

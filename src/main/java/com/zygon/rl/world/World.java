@@ -13,11 +13,6 @@ public class World {
 
     private final EntityManager entityManager = new EntityManager();
 
-    public void move(Entity entity, Location destination) {
-        entityManager.delete(entity.getId());
-        entityManager.save(entity.copy().setLocation(destination).build());
-    }
-
     public void add(Entity entity) {
         entityManager.save(entity);
     }
@@ -37,10 +32,19 @@ public class World {
 
     public Entity get(Location location) {
         Set<Entity> entities = getAll(location, null);
-        return entities == null ? null : entities.iterator().next();
+        return entities.isEmpty() ? null : entities.iterator().next();
     }
 
     public Entity get(UUID uuid) {
         return entityManager.get(uuid);
+    }
+
+    public void move(Entity entity, Location destination) {
+        entityManager.delete(entity.getId());
+        entityManager.save(entity.copy().setLocation(destination).build());
+    }
+
+    public void remove(Entity entity) {
+        entityManager.delete(entity.getId());
     }
 }

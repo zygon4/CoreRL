@@ -19,6 +19,7 @@ import com.zygon.rl.world.Attribute;
 import com.zygon.rl.world.BooleanAttribute;
 import com.zygon.rl.world.CommonAttributes;
 import com.zygon.rl.world.Entities;
+import com.zygon.rl.world.Entity;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.Player;
 import com.zygon.rl.world.World;
@@ -33,15 +34,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.hexworks.zircon.api.uievent.KeyCode.KEY_B;
-import static org.hexworks.zircon.api.uievent.KeyCode.NUMPAD_1;
-import static org.hexworks.zircon.api.uievent.KeyCode.NUMPAD_2;
-import static org.hexworks.zircon.api.uievent.KeyCode.NUMPAD_3;
-import static org.hexworks.zircon.api.uievent.KeyCode.NUMPAD_4;
-import static org.hexworks.zircon.api.uievent.KeyCode.NUMPAD_5;
-import static org.hexworks.zircon.api.uievent.KeyCode.NUMPAD_6;
-import static org.hexworks.zircon.api.uievent.KeyCode.NUMPAD_7;
-import static org.hexworks.zircon.api.uievent.KeyCode.NUMPAD_8;
-import static org.hexworks.zircon.api.uievent.KeyCode.NUMPAD_9;
 
 /**
  * This is a testing area until a new BloodRL2.0 project is made.
@@ -93,30 +85,28 @@ public class BloodRLMain {
     // the stack.
     private static final class BiteActionSupplier extends BaseInputHandler {
 
-        public BiteActionSupplier() {
+        private final UUID playerUuid;
+
+        public BiteActionSupplier(UUID playerUuid) {
             super(INPUTS_1_9);
+            this.playerUuid = playerUuid;
         }
 
         @Override
         public GameState apply(final GameState state, Input input) {
             GameState.Builder copy = state.copy();
 
-            KeyCode inputKeyCode = convert(input);
+            Entity player = state.getWorld().get(playerUuid);
+            Location playerLocation = player.getLocation();
+            Location destination = getRelativeLocation(playerLocation, input);
 
-            switch (inputKeyCode) {
-                case NUMPAD_5 -> {
-                    // special case
-                    System.out.println("Biting yourself");
-                    break;
-                }
-                case NUMPAD_1, NUMPAD_2, NUMPAD_3, NUMPAD_4, /* NOT 5*/
-                        NUMPAD_6, NUMPAD_7, NUMPAD_8, NUMPAD_9 ->
-                    // TODO: find valid target
-                    System.out.println("Biting " + input.getInput());
-                default -> {
-                    invalidInput(input);
-                }
-            }
+            Entity victim = state.getWorld().get(destination);
+
+            System.out.println("Biting " + victim.getName());
+
+            // TODO: biting is a special case attack
+            // needs combat resolution
+            state.getWorld().remove(victim);
 
             // Pop context either way
             return copy.removeInputContext().build();
@@ -208,7 +198,7 @@ public class BloodRLMain {
         // Compose "default" actions with the outer action
         Map<String, LayerInputHandler> of = Map.of(
                 "DEFAULT", composed,
-                "BITE", new BiteActionSupplier()
+                "BITE", new BiteActionSupplier(config.getPlayerUuid())
         );
 
         // need to compose defaults and customs
