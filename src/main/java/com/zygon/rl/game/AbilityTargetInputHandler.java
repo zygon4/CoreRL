@@ -4,6 +4,7 @@ import com.zygon.rl.world.Entity;
 import com.zygon.rl.world.character.Ability;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -40,14 +41,24 @@ public class AbilityTargetInputHandler extends BaseInputHandler {
         Entity target = targetsByInput.get(input);
 
         if (target != null) {
-            // TODO:
-            newState = ability.use(state);
+            newState = ability.use(state, Optional.of(target), Optional.empty());
         } else {
             invalidInput(input);
         }
 
-        return newState.copy()
-                .removeInputContext()
+        return popInputContext(newState);
+    }
+
+    @Override
+    public GameState handleInvalidInput(GameState state) {
+        return popInputContext(state);
+    }
+
+    private static GameState popInputContext(GameState state) {
+        return state.copy()
+                .removeInputContext()// ability target
+                .removeInputContext()// specific ability
+                .removeInputContext()// ability menu
                 .build();
     }
 }

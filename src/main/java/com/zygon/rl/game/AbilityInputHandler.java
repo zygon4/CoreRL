@@ -55,7 +55,7 @@ final class AbilityInputHandler extends BaseInputHandler {
             }
             case NONE ->
                 // no target, use ability and pop context.
-                newState = ability.use(state).copy()
+                newState = ability.use(state, null, null).copy()
                         .removeInputContext()
                         .build();
         }

@@ -2,6 +2,10 @@ package com.zygon.rl.world.character;
 
 // This is a bad package reference
 import com.zygon.rl.game.GameState;
+import com.zygon.rl.world.Entity;
+import com.zygon.rl.world.Location;
+
+import java.util.Optional;
 
 /**
  * Same as a skill.
@@ -42,7 +46,9 @@ public interface Ability {
      * Returns the GameState after using this ability.
      *
      * @param state
+     * @param targetEntity
+     * @param targetLocation
      * @return the GameState after using this ability.
      */
-    GameState use(GameState state); // TODO: location or entiity
+    GameState use(GameState state, Optional<Entity> targetEntity, Optional<Location> targetLocation);
 }

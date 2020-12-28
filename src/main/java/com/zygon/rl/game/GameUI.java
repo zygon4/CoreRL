@@ -6,8 +6,6 @@ import com.google.common.cache.LoadingCache;
 import com.stewsters.util.shadow.twoDimention.LitMap2d;
 import com.stewsters.util.shadow.twoDimention.ShadowCaster2d;
 import com.zygon.rl.util.NoiseUtil;
-import com.zygon.rl.util.rng.family.FamilyTreeGenerator;
-import com.zygon.rl.util.rng.family.Person;
 import com.zygon.rl.world.Attribute;
 import com.zygon.rl.world.CommonAttributes;
 import com.zygon.rl.world.DoubleAttribute;
@@ -572,16 +570,15 @@ public class GameUI {
             // spawn if not found..
             // this is bad and doesn't take into consideration 'already spawned'
             // concepts. this is just to try out outerworld actions.
-            if (location.getX() % round == 0
-                    && location.getY() % round == 0) {
-                Person person = FamilyTreeGenerator.create();
-                entity = Entities.createMonster(person.getName().toString())
-                        .setOrigin(location)
-                        .setLocation(location)
-                        .build();
-                game.getState().getWorld().add(entity);
-            }
-
+//            if (location.getX() % round == 0
+//                    && location.getY() % round == 0) {
+//                Person person = FamilyTreeGenerator.create();
+//                entity = Entities.createMonster(person.getName().toString())
+//                        .setOrigin(location)
+//                        .setLocation(location)
+//                        .build();
+//                game.getState().getWorld().add(entity);
+//            }
 //            final double spawnVal = npcNoise.getScaledValue(location.getX(), location.getY());
 //            final double spawnRate = game.getConfiguration().getNpcSpawnRate();
 //

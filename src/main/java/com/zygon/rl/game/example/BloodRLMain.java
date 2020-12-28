@@ -10,6 +10,9 @@ import com.zygon.rl.game.GameConfiguration;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.game.GameSystem;
 import com.zygon.rl.game.GameUI;
+import com.zygon.rl.util.rng.family.FamilyTreeGenerator;
+import com.zygon.rl.util.rng.family.Person;
+import com.zygon.rl.world.Entities;
 import com.zygon.rl.world.Entity;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
@@ -22,6 +25,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -68,24 +72,26 @@ public class BloodRLMain {
         }
 
         @Override
-        public GameState use(GameState state) {
+        public GameState use(GameState state, Optional<Entity> victim,
+                Optional<Location> targetLocation) {
 
             // TODO: receive target
-            Entity player = state.getWorld().get(playerUuid);
-            Location playerLocation = player.getLocation();
-//            Location destination = getRelativeLocation(playerLocation, input);
-//
-//            Entity victim = state.getWorld().get(destination);
-//
-//            System.out.println("Biting " + victim.getName());
-//
+            Entity playerEnt = state.getWorld().get(playerUuid);
+            CharacterTBD characterSheet = CharacterTBD.fromEntity(playerEnt);
+            // TODO: calculate bite stats and what happens to the player, etc.
+            // gain health,
+
+            if (victim.isEmpty()) {
+                // wtf?
+            } else {
+                System.out.println("Biting " + victim.get().getName());
+            }
+
 //            // TODO: biting is a special case attack
 //            // needs combat resolution
-//            state.getWorld().remove(victim);
-
+            state.getWorld().remove(victim.get());
             return state;
         }
-
     }
 
     /**
@@ -108,6 +114,8 @@ public class BloodRLMain {
         config.setPlayerUuid(UUID.randomUUID());
         config.setCustomAbilities(Map.of("Bite", new BiteAbility(config.getPlayerUuid())));
 
+        World world = new World();
+
         CharacterTBD pc = new CharacterTBD(
                 "Joe",
                 14,
@@ -122,8 +130,17 @@ public class BloodRLMain {
                 .setLocation(Location.create(0, 0))
                 .build();
 
-        World world = new World();
         world.add(playerEntity);
+
+        for (int i = -5; i < 5; i++) {
+            Person npc = FamilyTreeGenerator.create();
+            Entity npcEntity = Entities.createMonster(npc.getName().toString())
+                    .setOrigin(Location.create(i, 1))
+                    .setLocation(Location.create(i, 1))
+                    .build();
+
+            world.add(npcEntity);
+        }
 
         GameState initialState = GameState.builder(config)
                 .setWorld(world)

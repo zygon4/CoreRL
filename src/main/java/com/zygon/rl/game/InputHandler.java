@@ -3,7 +3,8 @@ package com.zygon.rl.game;
 import java.util.function.BiFunction;
 
 /**
- * This is the primary entry point for inputs.
+ * This is the primary entry point for inputs. It peeks at the top of the
+ * context stack and calls the handler.
  *
  * @author zygon
  */
@@ -22,7 +23,7 @@ public final class InputHandler implements BiFunction<GameState, Input, GameStat
         } else {
             logger.log(System.Logger.Level.INFO,
                     "Invalid input for " + state.getInputContext().peek().getName());
-            return state.copy().removeInputContext().build();
+            return handler.handleInvalidInput(state);
         }
     }
 }
