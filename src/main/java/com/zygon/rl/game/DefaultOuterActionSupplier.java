@@ -2,9 +2,13 @@ package com.zygon.rl.game;
 
 import com.zygon.rl.world.Entity;
 import com.zygon.rl.world.Location;
+import com.zygon.rl.world.character.Ability;
+import com.zygon.rl.world.character.CharacterTBD;
 import org.hexworks.zircon.api.uievent.KeyCode;
 
-import java.util.Objects;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_1;
 import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_2;
@@ -17,11 +21,16 @@ import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_9;
 
 public final class DefaultOuterActionSupplier extends BaseInputHandler {
 
-    private final GameConfiguration gameConfiguration;
+    private static final Set<Input> defaultKeyCodes = new HashSet<>();
+
+    static {
+        defaultKeyCodes.addAll(INPUTS_1_9);
+        defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_A.getCode()));
+        // TODO: other default inputs
+    }
 
     public DefaultOuterActionSupplier(GameConfiguration gameConfiguration) {
-        super(INPUTS_1_9);
-        this.gameConfiguration = Objects.requireNonNull(gameConfiguration);
+        super(gameConfiguration, defaultKeyCodes);
     }
 
     @Override
@@ -29,6 +38,33 @@ public final class DefaultOuterActionSupplier extends BaseInputHandler {
         GameState.Builder copy = state.copy();
         KeyCode inputKeyCode = convert(input);
         switch (inputKeyCode) {
+            // ability - present abilities
+            case KEY_A -> {
+                Entity playerEntity = getPlayer(state);
+                CharacterTBD character = CharacterTBD.fromEntity(playerEntity);
+
+                // As a (not terrible) hack, adding bite manually because it's
+                // not serialized using the Entity class (yet).
+                Set<Ability> abilities = new LinkedHashSet<>();
+                abilities.addAll(character.getAbilities());
+                abilities.add(getGameConfiguration().getCustomAbilities().get("Bite"));
+                character = character.set(abilities);
+                // Done with hack
+
+                AbilityInputHandler abilityHandler = AbilityInputHandler.create(
+                        getGameConfiguration(), character.getAbilities());
+
+                //  TODO: remove logging..
+                abilityHandler.getAbilitiesByKeyCode().forEach((i, a) -> {
+                    System.out.println(i.toString() + "->" + a.getName());
+                });
+
+                copy = copy.addInputContext(
+                        GameState.InputContext.builder()
+                                .setName("ABILITY")
+                                .setHandler(abilityHandler)
+                                .build());
+            }
             case NUMPAD_5, DIGIT_5 -> {
                 // TODO: log
                 //                    System.out.println("Waiting " + input.getInput());
@@ -38,7 +74,7 @@ public final class DefaultOuterActionSupplier extends BaseInputHandler {
             case NUMPAD_1, NUMPAD_2, NUMPAD_3, NUMPAD_4, /* NOT 5*/ NUMPAD_6, NUMPAD_7, NUMPAD_8, NUMPAD_9,
                  DIGIT_1, DIGIT_2, DIGIT_3, DIGIT_4, /* NOT 5*/ DIGIT_6, DIGIT_7, DIGIT_8, DIGIT_9 -> {
                 // TODO: check if location is available, check for bump actions
-                Entity player = state.getWorld().get(gameConfiguration.getPlayerUuid());
+                Entity player = getPlayer(state);
                 Location playerLocation = player.getLocation();
 
                 Location destination = getRelativeLocation(playerLocation, input);
@@ -51,5 +87,4 @@ public final class DefaultOuterActionSupplier extends BaseInputHandler {
         }
         return copy.build();
     }
-
 }

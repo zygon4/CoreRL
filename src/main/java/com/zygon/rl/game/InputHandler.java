@@ -1,36 +1,28 @@
 package com.zygon.rl.game;
 
-import java.util.Collections;
-import java.util.Map;
 import java.util.function.BiFunction;
 
 /**
- * This is the primary entry point for the game. It should include composed
- * handlers.
+ * This is the primary entry point for inputs.
  *
  * @author zygon
  */
 public final class InputHandler implements BiFunction<GameState, Input, GameState> {
 
-    // Would contain all of the state transition functions
-    private final Map<String, LayerInputHandler> stateFnByContextName;
-
-    public InputHandler(Map<String, LayerInputHandler> stateFnByContextName) {
-        this.stateFnByContextName = stateFnByContextName != null
-                ? Collections.unmodifiableMap(stateFnByContextName) : Collections.emptyMap();
-    }
+    private static final System.Logger logger = System.getLogger(InputHandler.class.getCanonicalName());
 
     @Override
     public final GameState apply(GameState state, Input input) {
 
-        String contextLayerName = state.getInputContext().peek().getName();
-        BiFunction<GameState, Input, GameState> stateFn = stateFnByContextName
-                .get(contextLayerName);
+        GameState.InputContext currentContext = state.getInputContext().peek();
+        LayerInputHandler handler = currentContext.getHandler();
 
-        if (stateFn != null) {
-            return stateFn.apply(state, input);
+        if (handler.getInputs().contains(input)) {
+            return handler.apply(state, input);
+        } else {
+            logger.log(System.Logger.Level.INFO,
+                    "Invalid input for " + state.getInputContext().peek().getName());
+            return state.copy().removeInputContext().build();
         }
-
-        throw new IllegalStateException("Unknown layer name: " + contextLayerName);
     }
 }

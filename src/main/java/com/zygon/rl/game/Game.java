@@ -12,17 +12,17 @@ import java.util.Objects;
  */
 public class Game {
 
+    private final InputHandler inputHandler = new InputHandler();
     private final List<GameSystem> gameSystems;
-    private final InputHandler inputHandler;
     private final GameConfiguration configuration;
     private final GameState state;
 
     private Game(Builder builder) {
         this.gameSystems = builder.gameSystems != null
                 ? Collections.unmodifiableList(builder.gameSystems) : Collections.emptyList();
-        this.inputHandler = Objects.requireNonNull(builder.inputHandler);
         this.configuration = Objects.requireNonNull(builder.configuration);
-        this.state = Objects.requireNonNull(builder.state);
+        this.state = builder.state != null
+                ? builder.state : GameState.builder(configuration).build();
     }
 
     public static Builder builder() {
@@ -61,10 +61,6 @@ public class Game {
         return gameSystems;
     }
 
-    private InputHandler getInputHandler() {
-        return inputHandler;
-    }
-
     /*pkg*/ GameConfiguration getConfiguration() {
         return configuration;
     }
@@ -76,7 +72,6 @@ public class Game {
     public static class Builder {
 
         private List<GameSystem> gameSystems = new ArrayList<>();
-        private InputHandler inputHandler;
         private GameConfiguration configuration;
         private GameState state;
 
@@ -86,7 +81,6 @@ public class Game {
 
         private Builder(Game game) {
             this.gameSystems.addAll(game.getGameSystems());
-            this.inputHandler = game.getInputHandler();
             this.configuration = game.getConfiguration();
             this.state = game.getState();
         }
@@ -96,11 +90,6 @@ public class Game {
                 this.gameSystems = new ArrayList<>();
             }
             this.gameSystems.add(gameSystem);
-            return this;
-        }
-
-        public Builder setInputHandler(InputHandler inputHandler) {
-            this.inputHandler = inputHandler;
             return this;
         }
 

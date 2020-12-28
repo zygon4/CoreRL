@@ -9,6 +9,7 @@ import java.util.Objects;
  *
  * @author zygon
  */
+@Deprecated // use world.character package
 public class Player extends EntityWrapper {
 
     private final List<Item> items;

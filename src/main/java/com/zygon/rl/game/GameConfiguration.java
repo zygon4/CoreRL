@@ -1,5 +1,8 @@
 package com.zygon.rl.game;
 
+import com.zygon.rl.world.character.Ability;
+
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -12,6 +15,8 @@ public class GameConfiguration {
     // people spawned, in a town?)
     private double npcSpawnRate = 0.01;
     private UUID playerUuid;
+    // Ability isn't serializable right now..
+    private Map<String, Ability> customAbilities;
 
     public String getGameName() {
         return gameName;
@@ -35,5 +40,13 @@ public class GameConfiguration {
 
     public void setNpcSpawnRate(double npcSpawnRate) {
         this.npcSpawnRate = npcSpawnRate;
+    }
+
+    public Map<String, Ability> getCustomAbilities() {
+        return customAbilities;
+    }
+
+    public void setCustomAbilities(Map<String, Ability> customAbilities) {
+        this.customAbilities = customAbilities;
     }
 }

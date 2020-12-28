@@ -5,12 +5,15 @@
  */
 package com.zygon.rl.game;
 
+import com.zygon.rl.world.Entity;
 import com.zygon.rl.world.Location;
 import org.hexworks.zircon.api.uievent.KeyCode;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_1;
@@ -68,9 +71,11 @@ public abstract class BaseInputHandler implements LayerInputHandler {
         }
     }
 
+    private final GameConfiguration gameConfiguration;
     private final Set<Input> inputs;
 
-    protected BaseInputHandler(Set<Input> inputs) {
+    protected BaseInputHandler(GameConfiguration gameConfiguration, Set<Input> inputs) {
+        this.gameConfiguration = Objects.requireNonNull(gameConfiguration);
         this.inputs = inputs != null
                 ? Collections.unmodifiableSet(inputs) : Collections.emptySet();
     }
@@ -88,6 +93,14 @@ public abstract class BaseInputHandler implements LayerInputHandler {
 
     protected final void invalidInput(Input input) {
         logger.log(System.Logger.Level.INFO, input);
+    }
+
+    protected final GameConfiguration getGameConfiguration() {
+        return gameConfiguration;
+    }
+
+    protected final Entity getPlayer(final GameState state) {
+        return state.getWorld().get(gameConfiguration.getPlayerUuid());
     }
 
     protected final Location getRelativeLocation(Location location, Input input) {
@@ -128,5 +141,20 @@ public abstract class BaseInputHandler implements LayerInputHandler {
         }
 
         return Location.create(nextX, nextY, nextZ);
+    }
+
+    // maps alphabet characters (ordered) as inputs to the elements provided.
+    // If more characters are needed, it'll pull them from the KeyCode enum.
+    protected static final <T> Map<Input, T> createAlphaInputs(Set<T> ts) {
+
+        Map<Input, T> inputs = new LinkedHashMap<>();
+        int index = KeyCode.KEY_A.getCode();
+
+        for (T t : ts) {
+            Input input = Input.valueOf(index++);
+            inputs.put(input, t);
+        }
+
+        return inputs;
     }
 }
