@@ -2,6 +2,7 @@ package com.zygon.rl.game;
 
 import com.zygon.rl.world.CommonAttributes;
 import com.zygon.rl.world.Entity;
+import com.zygon.rl.world.Location;
 import com.zygon.rl.world.character.Ability;
 
 import java.util.Map;
@@ -34,6 +35,20 @@ final class AbilityInputHandler extends BaseInputHandler {
         GameState newState = state;
 
         switch (ability.getTargeting()) {
+            case ADJACENT -> {
+                Entity player = getPlayer(state);
+                Set<Location> adjacentLocations = player.getLocation()
+                        .getNeighbors().stream().collect(Collectors.toSet());
+
+                newState = newState.copy()
+                        .addInputContext(GameState.InputContext.builder()
+                                .setName("TARGET")
+                                .setHandler(new AbilityDirectionInputHandler(
+                                        getGameConfiguration(), ability, getGameConfiguration().getPlayerUuid()))
+                                .setPrompt(GameState.InputContextPrompt.DIRECTION)
+                                .build())
+                        .build();
+            }
             case ADJACENT_LIVING -> {
                 // need to find all legal targets,
                 // should this code be preparing them? or asking for them
@@ -50,6 +65,7 @@ final class AbilityInputHandler extends BaseInputHandler {
                                 .setName("TARGET")
                                 .setHandler(AbilityTargetInputHandler.create(
                                         getGameConfiguration(), ability, livingAdjacents))
+                                .setPrompt(GameState.InputContextPrompt.LIST)
                                 .build())
                         .build();
             }
@@ -61,6 +77,12 @@ final class AbilityInputHandler extends BaseInputHandler {
         }
 
         return newState;
+    }
+
+    @Override
+    public String getDisplayText(Input input) {
+        Ability ability = abilitiesByKeyCode.get(input);
+        return ability.getName();
     }
 
     /*pkg*/ Map<Input, Ability> getAbilitiesByKeyCode() {

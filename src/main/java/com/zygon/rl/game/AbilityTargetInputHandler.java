@@ -54,6 +54,12 @@ public class AbilityTargetInputHandler extends BaseInputHandler {
         return popInputContext(state);
     }
 
+    @Override
+    public String getDisplayText(Input input) {
+        Entity entity = targetsByInput.get(input);
+        return entity.getName();
+    }
+
     private static GameState popInputContext(GameState state) {
         return state.copy()
                 .removeInputContext()// ability target

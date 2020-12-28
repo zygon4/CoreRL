@@ -63,6 +63,7 @@ public final class DefaultOuterActionSupplier extends BaseInputHandler {
                         GameState.InputContext.builder()
                                 .setName("ABILITY")
                                 .setHandler(abilityHandler)
+                                .setPrompt(GameState.InputContextPrompt.LIST)
                                 .build());
             }
             case NUMPAD_5, DIGIT_5 -> {
@@ -86,5 +87,18 @@ public final class DefaultOuterActionSupplier extends BaseInputHandler {
             }
         }
         return copy.build();
+    }
+
+    @Override
+    public String getDisplayText(Input input) {
+        KeyCode inputKeyCode = convert(input);
+        switch (inputKeyCode) {
+            case KEY_A -> {
+                return "Abilities";
+            }
+            default -> {
+                return inputKeyCode.name();
+            }
+        }
     }
 }

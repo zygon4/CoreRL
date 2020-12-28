@@ -68,28 +68,34 @@ public class BloodRLMain {
 
         @Override
         public Target getTargeting() {
-            return Target.ADJACENT_LIVING;
+            return Target.ADJACENT;
         }
 
         @Override
-        public GameState use(GameState state, Optional<Entity> victim,
-                Optional<Location> targetLocation) {
+        public GameState use(GameState state, Optional<Entity> empty,
+                Optional<Location> victimLocation) {
 
-            // TODO: receive target
             Entity playerEnt = state.getWorld().get(playerUuid);
             CharacterTBD characterSheet = CharacterTBD.fromEntity(playerEnt);
-            // TODO: calculate bite stats and what happens to the player, etc.
-            // gain health,
 
-            if (victim.isEmpty()) {
-                // wtf?
+            // TODO: add game log
+            Entity victim = state.getWorld().get(victimLocation.get());
+            if (victim != null) {
+                if (victim.getId() != playerUuid) {
+                    // TODO: biting is a special case attack
+                    // needs combat resolution
+                    // TODO: calculate bite stats and what happens to the player, etc.
+                    // gain health
+                    System.out.println("Biting " + victim.getName());
+                    state.getWorld().remove(victim);
+                } else {
+                    // special case future ability?
+                    System.out.println("Cannot bite yourself");
+                }
             } else {
-                System.out.println("Biting " + victim.get().getName());
+                System.out.println("Cannot bite that");
             }
 
-//            // TODO: biting is a special case attack
-//            // needs combat resolution
-            state.getWorld().remove(victim.get());
             return state;
         }
     }

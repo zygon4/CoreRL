@@ -10,7 +10,8 @@ import java.util.function.BiFunction;
  */
 public final class InputHandler implements BiFunction<GameState, Input, GameState> {
 
-    private static final System.Logger logger = System.getLogger(InputHandler.class.getCanonicalName());
+    private static final System.Logger logger = System.getLogger(
+            InputHandler.class.getCanonicalName());
 
     @Override
     public final GameState apply(GameState state, Input input) {

@@ -22,6 +22,14 @@ public interface LayerInputHandler extends BiFunction<GameState, Input, GameStat
     Set<Input> getInputs();
 
     /**
+     * Returns the display text for this input.
+     *
+     * @param input the input
+     * @return the display text for this input.
+     */
+    String getDisplayText(Input input);
+
+    /**
      * Returns the game state after an invalid input occurs.
      *
      * @param state

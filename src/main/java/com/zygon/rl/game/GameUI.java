@@ -29,6 +29,7 @@ import org.hexworks.zircon.api.component.Button;
 import org.hexworks.zircon.api.component.ColorTheme;
 import org.hexworks.zircon.api.component.Component;
 import org.hexworks.zircon.api.component.Fragment;
+import org.hexworks.zircon.api.component.Header;
 import org.hexworks.zircon.api.component.VBox;
 import org.hexworks.zircon.api.data.Position;
 import org.hexworks.zircon.api.data.Size;
@@ -49,6 +50,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -212,30 +214,8 @@ public class GameUI {
         public void onDock() {
             super.onDock();
 
-            tileGrid.processKeyboardEvents(KeyboardEventType.KEY_PRESSED,
-                    Functions.fromBiConsumer((event, phase) -> {
-                        System.out.println(event);
-                        Input input = Input.valueOf(event.getCode().getCode());
-
-                        long turnStart = System.nanoTime();
-                        game = game.turn(input);
-                        logger.log(System.Logger.Level.TRACE,
-                                "turn " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - turnStart));
-
-                        long updateGameScreen = System.nanoTime();
-                        updateGameScreen(gameScreenLayer, game);
-                        logger.log(System.Logger.Level.TRACE,
-                                "screen (ms) " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - updateGameScreen));
-
-                        updateSideBar(sideBar, game);
-                        // I didn't intend to leave this "delay" in here, but it's not a terrible idea..
-                        if (game.getState().getTurnCount() % 10 == 0) {
-                            updateMiniMap(miniMapLayer, game);
-                        }
-                    }));
-
             VBox gameScreen = Components.vbox()
-                    .withSize(tileGrid.getSize().getWidth() - SIDEBAR_SCREEN_WIDTH, tileGrid.getSize().getHeight())
+                    .withSize(tileGrid.getSize().getWidth() - SIDEBAR_SCREEN_WIDTH, tileGrid.getSize().getHeight() - 3)
                     .withDecorations(org.hexworks.zircon.api.ComponentDecorations.box(BoxType.DOUBLE))
                     .build();
             getScreen().addComponent(gameScreen);
@@ -258,6 +238,54 @@ public class GameUI {
             updateGameScreen(gameScreenLayer, game);
             updateSideBar(sideBar, game);
             updateMiniMap(miniMapLayer, game);
+
+            Header promptHeader = Components.header()
+                    .withSize(20, 1)
+                    .withPosition(1, gameScreen.getHeight() + 1)
+                    .build();
+            getScreen().addComponent(promptHeader);
+            promptHeader.setHidden(true);
+
+            tileGrid.processKeyboardEvents(KeyboardEventType.KEY_PRESSED,
+                    Functions.fromBiConsumer((event, phase) -> {
+                        System.out.println(event);
+                        Input input = Input.valueOf(event.getCode().getCode());
+
+                        long turnStart = System.nanoTime();
+                        game = game.turn(input);
+                        logger.log(System.Logger.Level.TRACE,
+                                "turn " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - turnStart));
+
+                        long updateGameScreen = System.nanoTime();
+                        updateGameScreen(gameScreenLayer, game);
+                        logger.log(System.Logger.Level.TRACE,
+                                "screen (ms) " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - updateGameScreen));
+
+                        GameState.InputContext inputCtx = game.getState().getInputContext().peek();
+                        promptHeader.setHidden(true);
+
+                        if (inputCtx.getPrompt() != GameState.InputContextPrompt.NONE) {
+                            switch (inputCtx.getPrompt()) {
+                                case DIRECTION:
+                                    promptHeader.setText("Which Direction?");
+                                    promptHeader.setHidden(false);
+                                    break;
+                                case LIST:
+                                    String list = inputCtx.getHandler().getInputs().stream()
+                                            .map(i -> i.toString() + ") " + inputCtx.getHandler().getDisplayText(i))
+                                            .collect(Collectors.joining("\n"));
+                                    promptHeader.setText(list);
+                                    promptHeader.setHidden(false);
+                                    break;
+                            }
+                        }
+
+                        updateSideBar(sideBar, game);
+                        // I didn't intend to leave this "delay" in here, but it's not a terrible idea..
+                        if (game.getState().getTurnCount() % 10 == 0) {
+                            updateMiniMap(miniMapLayer, game);
+                        }
+                    }));
         }
 
         private SideBar createSideBar(Position position, Game game) {
@@ -312,12 +340,12 @@ public class GameUI {
                     .setText("Health: " + player.getEntity().getAttribute("HEALTH").getValue());
         }
 
-        private void updateGameScreen(Layer gameScreenLayer, Game game) {
+        private void updateGameScreen(Layer gameScreen, Game game) {
 
             Location playerLocation = getPlayerLocation(game);
 
-            int xHalf = gameScreenLayer.getSize().getWidth() / 2;
-            int yHalf = gameScreenLayer.getSize().getHeight() / 2;
+            int xHalf = gameScreen.getSize().getWidth() / 2;
+            int yHalf = gameScreen.getSize().getHeight() / 2;
 
             // Note these are zero-based
             float[][] lightResistances = fovHelper.generateSimpleResistances(
@@ -335,8 +363,8 @@ public class GameUI {
 
             // zircon is BOTTOM-LEFT oriented
             // starting with 1 because of the border
-            for (int y = 1; y < gameScreenLayer.getHeight() - 1; y++) {
-                for (int x = 1; x < gameScreenLayer.getWidth() - 1; x++) {
+            for (int y = 1; y < gameScreen.getHeight() - 1; y++) {
+                for (int x = 1; x < gameScreen.getWidth() - 1; x++) {
 
                     int getX = playerLocation.getX() - xHalf + x;
                     int getY = playerLocation.getY() + yHalf - y;
@@ -359,7 +387,7 @@ public class GameUI {
                     if (locationLightLevelPct > .25) {
                         Entity entity = getTerrain(loc);
 
-                        Maybe<Tile> existingTile = gameScreenLayer.getTileAt(uiScreenPosition);
+                        Maybe<Tile> existingTile = gameScreen.getTileAt(uiScreenPosition);
                         Tile bottomTile = existingTile.get();
                         boolean drawTile = true;
 
@@ -372,7 +400,7 @@ public class GameUI {
                         }
 
                         if (drawTile) {
-                            gameScreenLayer.draw(bottomTile, uiScreenPosition);
+                            gameScreen.draw(bottomTile, uiScreenPosition);
                         }
 
                         // Not drawing player if they're in a shadow.. will this make sense?
@@ -385,10 +413,10 @@ public class GameUI {
                             }
                         }
                         if (topTile != null) {
-                            gameScreenLayer.draw(topTile, uiScreenPosition);
+                            gameScreen.draw(topTile, uiScreenPosition);
                         }
                     } else {
-                        gameScreenLayer.draw(BLANK_TILE, uiScreenPosition);
+                        gameScreen.draw(BLANK_TILE, uiScreenPosition);
                     }
                 }
             }

@@ -13,15 +13,28 @@ import java.util.Stack;
  */
 public class GameState {
 
+    public static enum InputContextPrompt {
+        DIRECTION,
+        LIST,
+        NONE
+    }
+
+    // TODO: This is going to need to hold more info to teach outsiders how to
+    // render this info. E.g. the ability menu needs to prompt for the specific
+    // ability actions with name/context for each ability. The targetting
+    // prompt needs to know the names/locations of each option, etc.
     public static class InputContext {
 
         // name is useful for logging only?
         private final String name;
         private final LayerInputHandler handler;
+        private final InputContextPrompt prompt;
 
         private InputContext(Builder builder) {
             this.name = Objects.requireNonNull(builder.name);
             this.handler = Objects.requireNonNull(builder.handler);
+            this.prompt = builder.prompt != null
+                    ? builder.prompt : GameState.InputContextPrompt.NONE;
         }
 
         public String getName() {
@@ -32,6 +45,10 @@ public class GameState {
             return handler;
         }
 
+        public InputContextPrompt getPrompt() {
+            return prompt;
+        }
+
         public static Builder builder() {
             return new Builder();
         }
@@ -40,6 +57,7 @@ public class GameState {
 
             private String name;
             private LayerInputHandler handler;
+            private InputContextPrompt prompt;
 
             public Builder setName(String name) {
                 this.name = name;
@@ -48,6 +66,11 @@ public class GameState {
 
             public Builder setHandler(LayerInputHandler handler) {
                 this.handler = handler;
+                return this;
+            }
+
+            public Builder setPrompt(InputContextPrompt prompt) {
+                this.prompt = prompt;
                 return this;
             }
 

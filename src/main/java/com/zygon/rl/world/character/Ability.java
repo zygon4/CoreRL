@@ -14,11 +14,11 @@ import java.util.Optional;
  */
 public interface Ability {
 
-    // TODO: single vs multiple, location e.g. ADJACENT, ROOM, RADIUS
     public enum Target {
+        ADJACENT,
         ADJACENT_LIVING,
         NONE,
-        RANGED
+        RANGED // range vs ranged
     }
 
     /**
