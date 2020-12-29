@@ -5,6 +5,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.stewsters.util.shadow.twoDimention.LitMap2d;
 import com.stewsters.util.shadow.twoDimention.ShadowCaster2d;
+import com.zygon.rl.util.Audio;
 import com.zygon.rl.util.NoiseUtil;
 import com.zygon.rl.world.Attribute;
 import com.zygon.rl.world.CommonAttributes;
@@ -15,6 +16,8 @@ import com.zygon.rl.world.Location;
 import com.zygon.rl.world.Player;
 import com.zygon.rl.world.World;
 import com.zygon.rl.world.WorldTile;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import org.hexworks.cobalt.datatypes.Maybe;
 import org.hexworks.zircon.api.CP437TilesetResources;
 import org.hexworks.zircon.api.ColorThemes;
@@ -43,7 +46,9 @@ import org.hexworks.zircon.api.uievent.UIEventResponse;
 import org.hexworks.zircon.api.view.base.BaseView;
 
 import java.awt.Color;
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -213,6 +218,16 @@ public class GameUI {
         @Override
         public void onDock() {
             super.onDock();
+
+            Path musicFile = game.getConfiguration().getMusicFile();
+            if (musicFile != null) {
+                try {
+                    Audio audio = new Audio(musicFile);
+                    audio.play();
+                } catch (IOException | LineUnavailableException | UnsupportedAudioFileException ex) {
+                    logger.log(System.Logger.Level.ERROR, "Unable to play music file: " + musicFile, ex);
+                }
+            }
 
             VBox gameScreen = Components.vbox()
                     .withSize(tileGrid.getSize().getWidth() - SIDEBAR_SCREEN_WIDTH, tileGrid.getSize().getHeight() - 3)

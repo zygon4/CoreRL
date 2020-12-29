@@ -8,6 +8,7 @@ repositories {
     // Use jcenter for resolving dependencies.
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
+    mavenCentral()
     maven {
         url = uri("https://jitpack.io")
     }
@@ -21,7 +22,7 @@ dependencies {
     implementation("com.google.guava:guava:30.0-jre")
     implementation("com.google.code.gson:gson:2.8.6")
 
-    implementation("org.apache.commons:commons-math3:3.6.1")
+    implementation("commons-io:commons-io:2.8.0")
 
     implementation("org.hexworks.zircon:zircon.core-jvm:2020.2.0-RELEASE")
     implementation("org.hexworks.zircon:zircon.jvm.swing:2020.2.0-RELEASE")

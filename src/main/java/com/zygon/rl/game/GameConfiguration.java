@@ -2,6 +2,7 @@ package com.zygon.rl.game;
 
 import com.zygon.rl.world.character.Ability;
 
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
 
@@ -15,6 +16,7 @@ public class GameConfiguration {
     // people spawned, in a town?)
     private double npcSpawnRate = 0.01;
     private UUID playerUuid;
+    private Path musicFile;
     // Ability isn't serializable right now..
     private Map<String, Ability> customAbilities;
 
@@ -32,6 +34,14 @@ public class GameConfiguration {
 
     public void setPlayerUuid(UUID playerUuid) {
         this.playerUuid = playerUuid;
+    }
+
+    public void setMusicFile(Path musicFile) {
+        this.musicFile = musicFile;
+    }
+
+    public Path getMusicFile() {
+        return musicFile;
     }
 
     public double getNpcSpawnRate() {

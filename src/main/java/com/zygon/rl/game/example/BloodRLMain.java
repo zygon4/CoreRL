@@ -23,8 +23,12 @@ import com.zygon.rl.world.character.Stats;
 import com.zygon.rl.world.character.Status;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import org.apache.commons.io.IOUtils;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -159,13 +163,18 @@ public class BloodRLMain {
             e.printStackTrace(System.err);
         });
 
-//        Audio audio = new Audio(Paths.get("/home/zygon/src/github/CoreRL/audio.wav"));
-//        audio.play();
-//
+        String strTmp = System.getProperty("java.io.tmpdir");
+        File absoluteFile = Path.of(strTmp, "bloodtheme.wav").toFile().getAbsoluteFile();
+        if (!absoluteFile.exists()) {
+            IOUtils.copy(BloodRLMain.class.getResourceAsStream("/audio.wav"),
+                    new FileOutputStream(absoluteFile));
+        }
+
         GameConfiguration config = new GameConfiguration();
         config.setGameName("BloodRL");
         config.setNpcSpawnRate(0.00000001);
         config.setPlayerUuid(UUID.randomUUID());
+        config.setMusicFile(absoluteFile.toPath());
         config.setCustomAbilities(Map.of("Bite", new BiteAbility(config.getPlayerUuid())));
 
         World world = new World();
