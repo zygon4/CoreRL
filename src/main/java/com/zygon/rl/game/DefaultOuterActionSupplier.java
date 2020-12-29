@@ -3,7 +3,7 @@ package com.zygon.rl.game;
 import com.zygon.rl.world.Entity;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.character.Ability;
-import com.zygon.rl.world.character.CharacterTBD;
+import com.zygon.rl.world.character.CharacterSheet;
 import org.hexworks.zircon.api.uievent.KeyCode;
 
 import java.util.Collections;
@@ -50,7 +50,7 @@ public final class DefaultOuterActionSupplier extends BaseInputHandler {
             // ability - present abilities
             case KEY_A -> {
                 Entity playerEntity = getPlayer(state);
-                CharacterTBD character = CharacterTBD.fromEntity(playerEntity);
+                CharacterSheet character = CharacterSheet.fromEntity(playerEntity);
 
                 // As a (not terrible) hack, adding bite manually because it's
                 // not serialized using the Entity class (yet).

@@ -17,7 +17,7 @@ import java.util.Set;
  *
  * @author zygon
  */
-public class CharacterTBD {
+public class CharacterSheet {
 
     private final String name;
     private final int age;
@@ -27,7 +27,7 @@ public class CharacterTBD {
     private final Set<Ability> abilities;
     private final Set<Spell> spells;
 
-    public CharacterTBD(String name, int age, Stats stats, Status status,
+    public CharacterSheet(String name, int age, Stats stats, Status status,
             Set<Ability> abilities, Set<Spell> spells) {
         this.name = name;
         this.age = age;
@@ -61,21 +61,21 @@ public class CharacterTBD {
         return spells;
     }
 
-    public CharacterTBD setAge(int age) {
-        return new CharacterTBD(name, age, stats, status, abilities, spells);
+    public CharacterSheet setAge(int age) {
+        return new CharacterSheet(name, age, stats, status, abilities, spells);
     }
 
-    public CharacterTBD set(int age) {
-        return new CharacterTBD(name, age, stats, status, abilities, spells);
+    public CharacterSheet set(int age) {
+        return new CharacterSheet(name, age, stats, status, abilities, spells);
     }
 
-    public CharacterTBD set(Set<Ability> abilities) {
-        return new CharacterTBD(name, age, stats, status, abilities, spells);
+    public CharacterSheet set(Set<Ability> abilities) {
+        return new CharacterSheet(name, age, stats, status, abilities, spells);
     }
 
-    public static CharacterTBD fromEntity(Entity entity) {
+    public static CharacterSheet fromEntity(Entity entity) {
         // TODO: finish conversion
-        return new CharacterTBD(
+        return new CharacterSheet(
                 entity.getName(),
                 14, new Stats(0, 0, 0, 0, 0),
                 new Status(0, Set.of()),

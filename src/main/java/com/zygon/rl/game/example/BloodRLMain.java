@@ -18,7 +18,7 @@ import com.zygon.rl.world.Entity;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
 import com.zygon.rl.world.character.Ability;
-import com.zygon.rl.world.character.CharacterTBD;
+import com.zygon.rl.world.character.CharacterSheet;
 import com.zygon.rl.world.character.Stats;
 import com.zygon.rl.world.character.Status;
 import javax.sound.sampled.LineUnavailableException;
@@ -128,7 +128,7 @@ public class BloodRLMain {
                 Optional<Location> victimLocation) {
 
             Entity playerEnt = state.getWorld().get(playerUuid);
-            CharacterTBD characterSheet = CharacterTBD.fromEntity(playerEnt);
+            CharacterSheet characterSheet = CharacterSheet.fromEntity(playerEnt);
 
             // TODO: add game log
             Entity victim = state.getWorld().get(victimLocation.get());
@@ -180,7 +180,7 @@ public class BloodRLMain {
 
         World world = new World();
 
-        CharacterTBD pc = new CharacterTBD(
+        CharacterSheet pc = new CharacterSheet(
                 "Joe",
                 14,
                 new Stats(10, 10, 16, 12, 12),
