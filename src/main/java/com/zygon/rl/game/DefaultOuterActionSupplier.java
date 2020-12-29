@@ -24,6 +24,7 @@ import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_9;
 
 public final class DefaultOuterActionSupplier extends BaseInputHandler {
 
+    private static final int DEFAULT_ACTION_TIME = 6; // seconds
     private static final Set<Input> defaultKeyCodes = new HashSet<>();
 
     static {
@@ -73,7 +74,8 @@ public final class DefaultOuterActionSupplier extends BaseInputHandler {
             case NUMPAD_5, DIGIT_5 -> {
                 // TODO: log
                 //                    System.out.println("Waiting " + input.getInput());
-                // TODO: needs a "tick the world" handle
+                copy.setWorld(state.getWorld()
+                        .setCalendar(state.getWorld().getCalendar().addTime(DEFAULT_ACTION_TIME)));
                 break;
             }
             case NUMPAD_1, NUMPAD_2, NUMPAD_3, NUMPAD_4, /* NOT 5*/ NUMPAD_6, NUMPAD_7, NUMPAD_8, NUMPAD_9,
@@ -84,6 +86,11 @@ public final class DefaultOuterActionSupplier extends BaseInputHandler {
 
                 Location destination = getRelativeLocation(playerLocation, input);
                 state.getWorld().move(player, destination);
+
+                // Same movement cost everywhere for now..
+                // Same movement speed, etc
+                copy.setWorld(state.getWorld()
+                        .setCalendar(state.getWorld().getCalendar().addTime(DEFAULT_ACTION_TIME)));
             }
             default -> {
                 invalidInput(input);

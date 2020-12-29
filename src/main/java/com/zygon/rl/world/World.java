@@ -12,7 +12,22 @@ import java.util.stream.Collectors;
  */
 public class World {
 
-    private final EntityManager entityManager = new EntityManager();
+    private final Calendar calendar;
+    private final EntityManager entityManager;
+
+    public World(Calendar calendar, EntityManager entityManager) {
+        this.calendar = calendar;
+        this.entityManager = entityManager;
+    }
+
+    public World(Calendar calendar) {
+        this(calendar, new EntityManager());
+    }
+
+    // this is fresh world only
+    public World() {
+        this(new Calendar(20));
+    }
 
     public void add(Entity entity) {
         entityManager.save(entity);
@@ -53,6 +68,10 @@ public class World {
         return entityManager.get(uuid);
     }
 
+    public Calendar getCalendar() {
+        return calendar;
+    }
+
     public void move(Entity entity, Location destination) {
         entityManager.delete(entity.getId());
         entityManager.save(entity.copy().setLocation(destination).build());
@@ -60,5 +79,9 @@ public class World {
 
     public void remove(Entity entity) {
         entityManager.delete(entity.getId());
+    }
+
+    public World setCalendar(Calendar calendar) {
+        return new World(calendar, entityManager);
     }
 }

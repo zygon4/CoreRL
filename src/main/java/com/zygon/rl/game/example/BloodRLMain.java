@@ -12,6 +12,7 @@ import com.zygon.rl.game.GameSystem;
 import com.zygon.rl.game.GameUI;
 import com.zygon.rl.util.rng.family.FamilyTreeGenerator;
 import com.zygon.rl.util.rng.family.Person;
+import com.zygon.rl.world.Calendar;
 import com.zygon.rl.world.CommonAttributes;
 import com.zygon.rl.world.Entities;
 import com.zygon.rl.world.Entity;
@@ -35,6 +36,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -45,14 +47,22 @@ import java.util.stream.Collectors;
 public class BloodRLMain {
 
     // TODO:
-    private static final class PlayerHealth extends GameSystem {
+    private static final class PlayerHunger extends GameSystem {
 
-        public PlayerHealth() {
+        private final UUID playerUuid;
+
+        public PlayerHunger(UUID playerUuid) {
+            this.playerUuid = playerUuid;
         }
 
+        // needs to take into account hunger OVER TIME, ie the game needs a
+        // world clock
         @Override
-        public GameState apply(GameState t) {
-            return t;
+        public GameState apply(GameState state) {
+            Entity playerEnt = state.getWorld().get(playerUuid);
+            Location player = playerEnt.getLocation();
+
+            return state;
         }
     }
 
@@ -140,6 +150,8 @@ public class BloodRLMain {
                     // gain health
                     System.out.println("Biting " + victim.getName());
                     state.getWorld().remove(victim);
+
+                    // resolve hunger attributes
                 } else {
                     // special case future ability?
                     System.out.println("Cannot bite yourself");
@@ -178,7 +190,7 @@ public class BloodRLMain {
         Ability bite = new BiteAbility(config.getPlayerUuid());
         config.setCustomAbilities(Set.of(bite));
 
-        World world = new World();
+        World world = new World(new Calendar(TimeUnit.HOURS.toSeconds(8), 10, 20));
 
         CharacterSheet pc = new CharacterSheet(
                 "Alucard",
@@ -210,7 +222,7 @@ public class BloodRLMain {
                 .build();
 
         Game game = Game.builder()
-                .addGameSystem(new PlayerHealth())
+                .addGameSystem(new PlayerHunger(config.getPlayerUuid()))
                 .addGameSystem(new NPCWalk(config.getPlayerUuid(), new Random()))
                 .setConfiguration(config)
                 .setState(initialState)

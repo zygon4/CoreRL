@@ -35,6 +35,7 @@ public interface Ability {
      *
      * @return the context when this ability is available.
      */
+    @Deprecated // used?
     String availableContext();
 
     /**

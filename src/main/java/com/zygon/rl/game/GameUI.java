@@ -307,6 +307,10 @@ public class GameUI {
             // TODO: creation method
             Map<String, Component> componentsByName = new LinkedHashMap<>();
 
+            componentsByName.put("world", Components.textArea()
+                    .withSize(SIDEBAR_SCREEN_WIDTH - 2, 4)
+                    .build());
+
             componentsByName.put("stats", Components.textArea()
                     .withSize(SIDEBAR_SCREEN_WIDTH - 2, 5)
                     .build());
@@ -356,6 +360,13 @@ public class GameUI {
             World world = game.getState().getWorld();
             Entity player = getPlayer(game);
             CharacterSheet playerSheet = CharacterSheet.fromEntity(player);
+
+            String worldText = "Day " + world.getCalendar().getDayOfYear()
+                    + ", year " + world.getCalendar().getYear();
+            worldText += "\ntime: " + world.getCalendar().getTime();
+            worldText += "\n" + world.getCalendar().getSeason().getDisplay();
+            ((TextArea) componentsByName.get("world"))
+                    .setText(worldText);
 
             // Gathering these attributes could be expensive.. should only
             // update when needed..
