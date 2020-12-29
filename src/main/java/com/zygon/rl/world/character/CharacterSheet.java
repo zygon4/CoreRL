@@ -1,8 +1,5 @@
 package com.zygon.rl.world.character;
 
-import com.zygon.rl.world.Attribute;
-import com.zygon.rl.world.BooleanAttribute;
-import com.zygon.rl.world.CommonAttributes;
 import com.zygon.rl.world.Entities;
 import com.zygon.rl.world.Entity;
 import com.zygon.rl.world.IntegerAttribute;
@@ -20,17 +17,15 @@ import java.util.Set;
 public class CharacterSheet {
 
     private final String name;
-    private final int age;
 
     private final Stats stats;
     private final Status status;
     private final Set<Ability> abilities;
     private final Set<Spell> spells;
 
-    public CharacterSheet(String name, int age, Stats stats, Status status,
+    public CharacterSheet(String name, Stats stats, Status status,
             Set<Ability> abilities, Set<Spell> spells) {
         this.name = name;
-        this.age = age;
         this.stats = stats;
         this.status = status;
         this.abilities = Collections.unmodifiableSet(abilities);
@@ -39,10 +34,6 @@ public class CharacterSheet {
 
     public String getName() {
         return name;
-    }
-
-    public int getAge() {
-        return age;
     }
 
     public Stats getStats() {
@@ -61,27 +52,18 @@ public class CharacterSheet {
         return spells;
     }
 
-    public CharacterSheet setAge(int age) {
-        return new CharacterSheet(name, age, stats, status, abilities, spells);
-    }
-
-    public CharacterSheet set(int age) {
-        return new CharacterSheet(name, age, stats, status, abilities, spells);
-    }
-
     public CharacterSheet set(Set<Ability> abilities) {
-        return new CharacterSheet(name, age, stats, status, abilities, spells);
+        return new CharacterSheet(name, stats, status, abilities, spells);
     }
 
     public static CharacterSheet fromEntity(Entity entity) {
         // TODO: finish conversion
         return new CharacterSheet(
                 entity.getName(),
-                14, new Stats(0, 0, 0, 0, 0),
-                new Status(0, Set.of()),
+                toStats(entity),
+                toStatus(entity),
                 Set.of(),
                 Set.of());
-
     }
 
     // doing a deep conversion will be a pain
@@ -91,21 +73,37 @@ public class CharacterSheet {
 
         // abilities??? are we using reflection now??
         //
-        return Entities.PLAYER
+        Entity.Builder builder = Entities.PLAYER
                 .copy()
                 //                .setId(config.getPlayerUuid())
                 .setName(getName())
-                .setDescription("fierce something")
-                //                .setLocation(Location.create(0, 0))
-                .addAttributes(IntegerAttribute.create(
-                        Attribute.builder()
-                                .setName(CommonAttributes.HEALTH.name())
-                                .setDescription("Health")
-                                .setValue(String.valueOf(getStatus().getHitPoints()))
-                                .build()))
-                .addAttributes(BooleanAttribute.create(Attribute.builder()
-                        .setName(CommonAttributes.LIVING.name()).build(), true))
-                .build();
+                .setDescription("fierce something");
+
+        getStatus().getAttributes().forEach(status -> {
+            builder.addAttributes(status);
+        });
+
+        getStats().getAttributes().forEach(stat -> {
+            builder.addAttributes(stat);
+        });
+
+        return builder.build();
+    }
+
+    private static Stats toStats(Entity entity) {
+        return new Stats(
+                IntegerAttribute.getValue(entity.getAttribute("STR")),
+                IntegerAttribute.getValue(entity.getAttribute("DEX")),
+                IntegerAttribute.getValue(entity.getAttribute("CON")),
+                IntegerAttribute.getValue(entity.getAttribute("INT")),
+                IntegerAttribute.getValue(entity.getAttribute("WIS")));
+    }
+
+    private static Status toStatus(Entity entity) {
+        return new Status(
+                IntegerAttribute.getValue(entity.getAttribute("Age")),
+                IntegerAttribute.getValue(entity.getAttribute("HP")),
+                Set.of());
     }
 
     // TODO: the rest of the setters as needed

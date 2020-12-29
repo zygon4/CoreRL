@@ -22,6 +22,14 @@ public class IntegerAttribute extends Attribute {
         return new IntegerAttribute(attribute);
     }
 
+    public static IntegerAttribute create(String name, String description, int value) {
+        return create(Attribute.builder()
+                .setName(name)
+                .setDescription(description)
+                .setValue(String.valueOf(value))
+                .build());
+    }
+
     public int getIntegerValue() {
         return value;
     }

@@ -1,5 +1,11 @@
 package com.zygon.rl.world.character;
 
+import com.zygon.rl.world.Attribute;
+import com.zygon.rl.world.IntegerAttribute;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 /**
  *
  * @author zygon
@@ -38,6 +44,18 @@ public class Stats {
 
     public int getWisdom() {
         return wisdom;
+    }
+
+    public Set<Attribute> getAttributes() {
+        Set<Attribute> stats = new LinkedHashSet<>();
+
+        stats.add(IntegerAttribute.create("STR", "Strength", strength));
+        stats.add(IntegerAttribute.create("DEX", "Dexterity", dexterity));
+        stats.add(IntegerAttribute.create("CON", "Constitution", constitution));
+        stats.add(IntegerAttribute.create("INT", "Intelligence", intelligence));
+        stats.add(IntegerAttribute.create("WIS", "Wisdom", wisdom));
+
+        return stats;
     }
 
     @Override

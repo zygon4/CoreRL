@@ -13,9 +13,9 @@ import com.zygon.rl.world.DoubleAttribute;
 import com.zygon.rl.world.Entities;
 import com.zygon.rl.world.Entity;
 import com.zygon.rl.world.Location;
-import com.zygon.rl.world.Player;
 import com.zygon.rl.world.World;
 import com.zygon.rl.world.WorldTile;
+import com.zygon.rl.world.character.CharacterSheet;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import org.hexworks.cobalt.datatypes.Maybe;
@@ -33,6 +33,7 @@ import org.hexworks.zircon.api.component.ColorTheme;
 import org.hexworks.zircon.api.component.Component;
 import org.hexworks.zircon.api.component.Fragment;
 import org.hexworks.zircon.api.component.Header;
+import org.hexworks.zircon.api.component.TextArea;
 import org.hexworks.zircon.api.component.VBox;
 import org.hexworks.zircon.api.data.Position;
 import org.hexworks.zircon.api.data.Size;
@@ -199,7 +200,6 @@ public class GameUI {
                         });
 
         private final TileGrid tileGrid;
-        private final ColorTheme colorTheme;
         private final FOVHelper fovHelper = new FOVHelper();
 
         private Game game;
@@ -211,7 +211,6 @@ public class GameUI {
             super(tileGrid, colorTheme);
 
             this.tileGrid = tileGrid;
-            this.colorTheme = colorTheme;
             this.game = game;
         }
 
@@ -308,12 +307,15 @@ public class GameUI {
             // TODO: creation method
             Map<String, Component> componentsByName = new LinkedHashMap<>();
 
-            componentsByName.put("health", Components.label()
+            componentsByName.put("stats", Components.textArea()
+                    .withSize(SIDEBAR_SCREEN_WIDTH - 2, 5)
+                    .build());
+
+            componentsByName.put("status", Components.label()
                     .withSize(SIDEBAR_SCREEN_WIDTH - 2, 1)
                     .build());
 
-            String playerName = game.getState().getWorld()
-                    .get(game.getConfiguration().getPlayerUuid()).getName();
+            String playerName = getPlayer(game).getName();
 
             return new SideBar(componentsByName,
                     Size.create(SIDEBAR_SCREEN_WIDTH,
@@ -322,9 +324,13 @@ public class GameUI {
                     playerName);
         }
 
-        private Location getPlayerLocation(Game game) {
+        private Entity getPlayer(Game game) {
             return game.getState().getWorld()
-                    .get(game.getConfiguration().getPlayerUuid()).getLocation();
+                    .get(game.getConfiguration().getPlayerUuid());
+        }
+
+        private Location getPlayerLocation(Game game) {
+            return getPlayer(game).getLocation();
         }
 
         private Tile toTile(Tile tile, Entity entity) {
@@ -348,11 +354,23 @@ public class GameUI {
             Map<String, Component> componentsByName = sideBar.getComponentsByName();
 
             World world = game.getState().getWorld();
-            Location playerLoc = getPlayerLocation(game);
-            Player player = Player.create(world.get(playerLoc)).build();
+            Entity player = getPlayer(game);
+            CharacterSheet playerSheet = CharacterSheet.fromEntity(player);
 
-            ((TextOverride) componentsByName.get("health"))
-                    .setText("Health: " + player.getEntity().getAttribute("HEALTH").getValue());
+            // Gathering these attributes could be expensive.. should only
+            // update when needed..
+            Set<Attribute> stats = playerSheet.getStats().getAttributes();
+            String statsText = stats.stream()
+                    .map(attr -> attr.getName() + ": " + attr.getValue())
+                    .collect(Collectors.joining("\n"));
+
+            ((TextArea) componentsByName.get("stats"))
+                    .setText(statsText);
+
+            ((TextOverride) componentsByName.get("status"))
+                    .setText("Age: " + playerSheet.getStatus().getAge() + "    "
+                            + "HP: " + playerSheet.getStatus().getHitPoints());
+
         }
 
         private void updateGameScreen(Layer gameScreen, Game game) {
@@ -458,16 +476,16 @@ public class GameUI {
     // this is a specific view
     private static final class TitleView extends BaseView {
 
+        private final GameView gameView;
         private final TileGrid tileGrid;
-        private final ColorTheme colorTheme;
         private final Game game;
 
         public TitleView(TileGrid tileGrid, ColorTheme colorTheme, Game game) {
             super(tileGrid, colorTheme);
 
             this.tileGrid = tileGrid;
-            this.colorTheme = colorTheme;
             this.game = game;
+            this.gameView = new GameView(this.tileGrid, colorTheme, this.game);
         }
 
         @Override
@@ -479,7 +497,7 @@ public class GameUI {
                     .withTileset(CP437TilesetResources.rexPaint16x16())
                     .build();
             startButton.handleMouseEvents(MouseEventType.MOUSE_CLICKED, (p1, p2) -> {
-                replaceWith(new GameView(tileGrid, colorTheme, game));
+                replaceWith(gameView);
                 return UIEventResponse.processed();
             });
             // TODO: store/load game
@@ -594,54 +612,12 @@ public class GameUI {
         }
     }
 
-    // need to answer: Is there an NPC there?
-    // if yes, return it
-    // but also: if there was supposed to be a NPC created at that location
-    // and it's not in existance, create it.
-    // If these overlap, then need to move one.
     private static Entity getNPC(Game game, Location location) {
 
         Set<Entity> entities = game.getState().getWorld().getAll(location, null);
 
-        Entity entity = entities.stream()
+        return entities.stream()
                 .filter(ent -> ent.getAttribute(CommonAttributes.NPC.name()) != null)
                 .findFirst().orElse(null);
-
-        if (entity == null) {
-            final int round = 50;
-
-            // spawn if not found..
-            // this is bad and doesn't take into consideration 'already spawned'
-            // concepts. this is just to try out outerworld actions.
-//            if (location.getX() % round == 0
-//                    && location.getY() % round == 0) {
-//                Person person = FamilyTreeGenerator.create();
-//                entity = Entities.createMonster(person.getName().toString())
-//                        .setOrigin(location)
-//                        .setLocation(location)
-//                        .build();
-//                game.getState().getWorld().add(entity);
-//            }
-//            final double spawnVal = npcNoise.getScaledValue(location.getX(), location.getY());
-//            final double spawnRate = game.getConfiguration().getNpcSpawnRate();
-//
-//            // If there IS an NPC at this location, return it,
-//            // if there
-//            if (spawnVal < spawnRate) {
-//                // this location should spawn or will have spawned an NPC
-//                if (game.getState().getWorld()
-//                        .getAll(null, location)
-//                        .isEmpty()) {
-//                    Person person = FamilyTreeGenerator.create();
-//                    entity = Entities.createMonster(person.getName().toString())
-//                            .setOrigin(location)
-//                            .setLocation(location)
-//                            .build();
-//                    game.getState().getWorld().add(entity);
-//                }
-//            }
-        }
-
-        return entity;
     }
 }

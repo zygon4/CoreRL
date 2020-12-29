@@ -10,7 +10,7 @@ import java.util.Optional;
 /**
  * Same as a skill.
  *
- * TODO: Costs for certain abilities?
+ * TODO: Costs for certain abilities, sound effects
  *
  * @author zygon
  */
