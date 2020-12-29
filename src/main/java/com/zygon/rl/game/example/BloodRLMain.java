@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
@@ -175,7 +174,9 @@ public class BloodRLMain {
         config.setGameName("BloodRL");
         config.setPlayerUuid(UUID.randomUUID());
         config.setMusicFile(themeFile.toPath());
-        config.setCustomAbilities(Map.of("Bite", new BiteAbility(config.getPlayerUuid())));
+
+        Ability bite = new BiteAbility(config.getPlayerUuid());
+        config.setCustomAbilities(Set.of(bite));
 
         World world = new World();
 
@@ -184,7 +185,7 @@ public class BloodRLMain {
                 14,
                 new Stats(10, 10, 16, 12, 12),
                 new Status(50, Set.of()),
-                Set.of(config.getCustomAbilities().get("Bite")),
+                Set.of(bite),
                 Set.of());
 
         Entity playerEntity = pc.toEntity();

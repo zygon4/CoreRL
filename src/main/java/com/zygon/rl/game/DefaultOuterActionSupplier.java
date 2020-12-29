@@ -6,9 +6,12 @@ import com.zygon.rl.world.character.Ability;
 import com.zygon.rl.world.character.CharacterTBD;
 import org.hexworks.zircon.api.uievent.KeyCode;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_1;
 import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_2;
@@ -29,8 +32,14 @@ public final class DefaultOuterActionSupplier extends BaseInputHandler {
         // TODO: other default inputs
     }
 
+    private final Map<String, Ability> abilitiesByName;
+
     public DefaultOuterActionSupplier(GameConfiguration gameConfiguration) {
         super(gameConfiguration, defaultKeyCodes);
+        this.abilitiesByName = gameConfiguration.getCustomAbilities() != null
+                ? gameConfiguration.getCustomAbilities().stream()
+                        .collect(Collectors.toMap(k -> k.getName(), v -> v))
+                : Collections.emptyMap();
     }
 
     @Override
@@ -47,17 +56,12 @@ public final class DefaultOuterActionSupplier extends BaseInputHandler {
                 // not serialized using the Entity class (yet).
                 Set<Ability> abilities = new LinkedHashSet<>();
                 abilities.addAll(character.getAbilities());
-                abilities.add(getGameConfiguration().getCustomAbilities().get("Bite"));
+                abilities.add(abilitiesByName.get("Bite"));
                 character = character.set(abilities);
                 // Done with hack
 
                 AbilityInputHandler abilityHandler = AbilityInputHandler.create(
                         getGameConfiguration(), character.getAbilities());
-
-                //  TODO: remove logging..
-                abilityHandler.getAbilitiesByKeyCode().forEach((i, a) -> {
-                    System.out.println(i.toString() + "->" + a.getName());
-                });
 
                 copy = copy.addInputContext(
                         GameState.InputContext.builder()

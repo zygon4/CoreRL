@@ -3,7 +3,7 @@ package com.zygon.rl.game;
 import com.zygon.rl.world.character.Ability;
 
 import java.nio.file.Path;
-import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -15,7 +15,7 @@ public class GameConfiguration {
     private UUID playerUuid;
     private Path musicFile;
     // Ability isn't serializable right now..
-    private Map<String, Ability> customAbilities;
+    private Set<Ability> customAbilities;
 
     public String getGameName() {
         return gameName;
@@ -41,11 +41,11 @@ public class GameConfiguration {
         return musicFile;
     }
 
-    public Map<String, Ability> getCustomAbilities() {
+    public Set<Ability> getCustomAbilities() {
         return customAbilities;
     }
 
-    public void setCustomAbilities(Map<String, Ability> customAbilities) {
+    public void setCustomAbilities(Set<Ability> customAbilities) {
         this.customAbilities = customAbilities;
     }
 }
