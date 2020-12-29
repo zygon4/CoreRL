@@ -10,6 +10,8 @@ import java.util.Optional;
 /**
  * Same as a skill.
  *
+ * TODO: Costs for certain abilities?
+ *
  * @author zygon
  */
 public interface Ability {

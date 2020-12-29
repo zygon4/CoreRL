@@ -42,14 +42,18 @@ public class Game {
     public Game turn(Input input) {
 
         //
-        // TODO: logging input would make the game re-playable
+        // TODO: logging input would make the game re-playable as long
+        // as the game systems used are seeded and consistent.
         //
-        // Apply the input
         GameState newState = inputHandler.apply(state, input);
 
-        // Apply the game systems in order
-        for (GameSystem gs : gameSystems) {
-            newState = gs.apply(newState);
+        // Apply the game systems in order when there is no game context
+        // happening. e.g. if the player is fiddling with menus, don't continue
+        // the systems.
+        if (newState.getInputContext().size() == 1) {
+            for (GameSystem gs : gameSystems) {
+                newState = gs.apply(newState);
+            }
         }
 
         return copy()

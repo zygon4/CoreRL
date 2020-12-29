@@ -3,9 +3,10 @@ package com.zygon.rl.world;
 import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
- * This is an ugly sweater on the ECS.
+ * This is an ugly sweater on the ECS, could really use some more structure.
  *
  * @author zygon
  */
@@ -24,6 +25,19 @@ public class World {
                         .setOrigin(origin)
                         .build());
         return entities == null ? Collections.emptySet() : Collections.unmodifiableSet(entities);
+    }
+
+    public Set<Entity> getAll(Location location, int radius) {
+        // This is a specific query for living beings.. could be more generic
+        Set<Entity> entities = entityManager.findAll(
+                EntityManager.Query.builder()
+                        .addAttribute(CommonAttributes.LIVING.name())
+                        .build()).stream()
+                .filter(ent -> ent.getLocation().getDistance(location) <= radius)
+                .collect(Collectors.toSet());
+
+        return entities == null
+                ? Collections.emptySet() : Collections.unmodifiableSet(entities);
     }
 
     public Set<Entity> getAll(Location location) {

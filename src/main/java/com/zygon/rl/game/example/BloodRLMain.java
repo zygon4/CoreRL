@@ -12,6 +12,7 @@ import com.zygon.rl.game.GameSystem;
 import com.zygon.rl.game.GameUI;
 import com.zygon.rl.util.rng.family.FamilyTreeGenerator;
 import com.zygon.rl.util.rng.family.Person;
+import com.zygon.rl.world.CommonAttributes;
 import com.zygon.rl.world.Entities;
 import com.zygon.rl.world.Entity;
 import com.zygon.rl.world.Location;
@@ -24,10 +25,14 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * This is a testing area until a new BloodRL2.0 project is made.
@@ -45,6 +50,50 @@ public class BloodRLMain {
         @Override
         public GameState apply(GameState t) {
             return t;
+        }
+    }
+
+    private static final class NPCWalk extends GameSystem {
+
+        private static final int REALITY_BUBBLE = 50;
+
+        private final UUID playerUuid;
+        private final Random random;
+
+        public NPCWalk(UUID playerUuid, Random random) {
+            this.playerUuid = playerUuid;
+            this.random = random;
+        }
+
+        @Override
+        public GameState apply(GameState state) {
+
+            Entity playerEnt = state.getWorld().get(playerUuid);
+            Location player = playerEnt.getLocation();
+            Set<Entity> closeNPCs = state.getWorld().getAll(playerEnt.getLocation(), REALITY_BUBBLE);
+
+            for (Entity npc : closeNPCs) {
+                if (!npc.getId().equals(playerUuid)) {
+                    // Random move pct
+                    if (random.nextDouble() > .75) {
+                        List<Location> neighboringLocations = npc.getLocation().getNeighbors().stream()
+                                .collect(Collectors.toList());
+                        Collections.shuffle(neighboringLocations);
+
+                        if (canMove(neighboringLocations.get(0), state.getWorld())) {
+                            state.getWorld().move(npc, neighboringLocations.get(0));
+                        }
+                    }
+                }
+            }
+
+            return state;
+        }
+
+        private boolean canMove(Location destination, World world) {
+            // TODO: terrain impassable as well.. using null is.. weird
+            Entity dest = world.get(destination);
+            return dest == null || dest.getAttribute(CommonAttributes.IMPASSABLE.name()) == null;
         }
     }
 
@@ -110,7 +159,6 @@ public class BloodRLMain {
             e.printStackTrace(System.err);
         });
 
-        // audio seems to slow the game down a lot??
 //        Audio audio = new Audio(Paths.get("/home/zygon/src/github/CoreRL/audio.wav"));
 //        audio.play();
 //
@@ -154,6 +202,7 @@ public class BloodRLMain {
 
         Game game = Game.builder()
                 .addGameSystem(new PlayerHealth())
+                .addGameSystem(new NPCWalk(config.getPlayerUuid(), new Random()))
                 .setConfiguration(config)
                 .setState(initialState)
                 .build();
