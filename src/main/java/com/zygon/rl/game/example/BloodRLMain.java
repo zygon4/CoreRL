@@ -181,7 +181,7 @@ public class BloodRLMain {
         World world = new World();
 
         CharacterSheet pc = new CharacterSheet(
-                "Joe",
+                "Alucard",
                 new Stats(10, 10, 16, 12, 12),
                 new Status(1, 8, Set.of()),
                 Set.of(bite),
