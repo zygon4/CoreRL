@@ -6,4 +6,6 @@ Can run with:
 ./gradlew run
 ```
 
-to launch the Swing game app
+to launch the Swing game app.
+
+Requires java 14!
