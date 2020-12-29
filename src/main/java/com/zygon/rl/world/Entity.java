@@ -92,6 +92,10 @@ public class Entity {
         return behaviors;
     }
 
+    public boolean hasAttribute(String name) {
+        return getAttribute(name) != null;
+    }
+
     @Override
     public int hashCode() {
         int hash = 7;

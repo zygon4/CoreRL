@@ -19,7 +19,9 @@ public enum WorldTile {
     }, Color.ORANGE),
     GRASS(Entities.GRASS, '.', Color.GREEN),
     TALL_GRASS(Entities.TALL_GRASS, '"', Color.GREEN),
-    MONSTER(Entities.MONSTER, 'm', Color.CYAN),
+    MONSTER(Entities.MONSTER, ' ', (t) -> {
+        return t.hasAttribute(CommonAttributes.NPC.name()) ? 'p' : 'm';
+    }, Color.CYAN),
     PUDDLE(Entities.PUDDLE, '~', Color.BLUE),
     PLAYER(Entities.PLAYER, '@', Color.MAGENTA),
     ROCK(Entities.ROCK, ',', Color.YELLOW),

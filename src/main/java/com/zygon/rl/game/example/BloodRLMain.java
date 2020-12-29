@@ -164,17 +164,17 @@ public class BloodRLMain {
         });
 
         String strTmp = System.getProperty("java.io.tmpdir");
-        File absoluteFile = Path.of(strTmp, "bloodtheme.wav").toFile().getAbsoluteFile();
-        if (!absoluteFile.exists()) {
+        // Lots of optionscbvsf or optimizing the audio file(s) into temp space
+        File themeFile = Path.of(strTmp, "bloodtheme.wav").toFile().getAbsoluteFile();
+        if (!themeFile.exists()) {
             IOUtils.copy(BloodRLMain.class.getResourceAsStream("/audio.wav"),
-                    new FileOutputStream(absoluteFile));
+                    new FileOutputStream(themeFile));
         }
 
         GameConfiguration config = new GameConfiguration();
         config.setGameName("BloodRL");
-        config.setNpcSpawnRate(0.00000001);
         config.setPlayerUuid(UUID.randomUUID());
-        config.setMusicFile(absoluteFile.toPath());
+        config.setMusicFile(themeFile.toPath());
         config.setCustomAbilities(Map.of("Bite", new BiteAbility(config.getPlayerUuid())));
 
         World world = new World();

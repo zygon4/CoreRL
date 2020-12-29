@@ -12,9 +12,6 @@ import java.util.UUID;
 public class GameConfiguration {
 
     private String gameName = "";
-    // this needs to take in account other factors like context (where are the
-    // people spawned, in a town?)
-    private double npcSpawnRate = 0.01;
     private UUID playerUuid;
     private Path musicFile;
     // Ability isn't serializable right now..
@@ -42,14 +39,6 @@ public class GameConfiguration {
 
     public Path getMusicFile() {
         return musicFile;
-    }
-
-    public double getNpcSpawnRate() {
-        return npcSpawnRate;
-    }
-
-    public void setNpcSpawnRate(double npcSpawnRate) {
-        this.npcSpawnRate = npcSpawnRate;
     }
 
     public Map<String, Ability> getCustomAbilities() {
