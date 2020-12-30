@@ -1,9 +1,9 @@
 package com.zygon.rl.world;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -13,19 +13,19 @@ import java.util.Set;
 public class Location {
 
     // singleton cache :/
-    private static final Map<Integer, Location> KNOWN_LOCATIONS = new HashMap<>();
+    private static final Map<String, Location> KNOWN_LOCATIONS = new HashMap<>();
 
     private final int x;
     private final int y;
     private final int z;
-    private final int hashCode;
+    private final String hash;
 
-    private Location(int x, int y, int z) {
+    private Location(int x, int y, int z, String hash) {
         this.x = x;
         this.y = y;
         this.z = z;
 
-        this.hashCode = createHashCode(false, this.x, this.y, this.z);
+        this.hash = hash;
     }
 
     public double getDistance(Location o) {
@@ -69,30 +69,22 @@ public class Location {
         return z;
     }
 
-    private static Location create(boolean useDisplayMethod, int x, int y, int z) {
-        int hash = createHashCode(useDisplayMethod, x, y, z);
+    public static Location create(int x, int y, int z) {
+        String hash = getDisplay(x, y, z);
         if (KNOWN_LOCATIONS.containsKey(hash)) {
             Location loc = KNOWN_LOCATIONS.get(hash);
 
             if (loc.getX() != x || loc.getY() != y) {
-                // hash collision, fallback to slower hashing method
-                if (useDisplayMethod) {
-                    // attemp to use backup hashcode failed..
-                    throw new IllegalStateException(loc.toString());
-                }
-                return create(true, x, y, z);
+                // hash collision
+                throw new IllegalStateException(loc.toString());
             }
 
             return loc;
         } else {
-            Location location = new Location(x, y, z);
+            Location location = new Location(x, y, z, hash);
             KNOWN_LOCATIONS.put(hash, location);
             return location;
         }
-    }
-
-    public static Location create(int x, int y, int z) {
-        return create(false, x, y, z);
     }
 
     public static Location create(int x, int y) {
@@ -115,7 +107,9 @@ public class Location {
 
     @Override
     public int hashCode() {
-        return hashCode;
+        int hash = 3;
+        hash = 53 * hash + Objects.hashCode(this.hash);
+        return hash;
     }
 
     @Override
@@ -125,10 +119,5 @@ public class Location {
 
     private static String getDisplay(int x, int y, int z) {
         return "[" + x + "," + y + "," + z + "]";
-    }
-
-    private static int createHashCode(boolean useDisplayMethod, int... coords) {
-        return !useDisplayMethod
-                ? Arrays.hashCode(coords) : getDisplay(coords[0], coords[1], coords[2]).hashCode();
     }
 }
