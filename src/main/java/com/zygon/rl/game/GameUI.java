@@ -316,7 +316,7 @@ public class GameUI {
                     .build());
 
             componentsByName.put("status", Components.label()
-                    .withSize(SIDEBAR_SCREEN_WIDTH - 2, 1)
+                    .withSize(SIDEBAR_SCREEN_WIDTH - 2, 5)
                     .build());
 
             String playerName = getPlayer(game).getName();
@@ -363,8 +363,8 @@ public class GameUI {
 
             String worldText = "Day " + world.getCalendar().getDayOfYear()
                     + ", year " + world.getCalendar().getYear();
-            worldText += "\ntime: " + world.getCalendar().getTime();
-            worldText += "\n" + world.getCalendar().getSeason().getDisplay();
+            worldText += "\n" + world.getCalendar().getTime()
+                    + "  " + world.getCalendar().getSeason().getDisplay();
             ((TextArea) componentsByName.get("world"))
                     .setText(worldText);
 
@@ -378,9 +378,13 @@ public class GameUI {
             ((TextArea) componentsByName.get("stats"))
                     .setText(statsText);
 
+            String status = playerSheet.getStatus().getEffects()
+                    .stream().collect(Collectors.joining(", "));
+
             ((TextOverride) componentsByName.get("status"))
                     .setText("Age: " + playerSheet.getStatus().getAge() + "    "
-                            + "HP: " + playerSheet.getStatus().getHitPoints());
+                            + "HP: " + playerSheet.getStatus().getHitPoints()
+                            + "\n" + status);
 
         }
 
@@ -532,11 +536,13 @@ public class GameUI {
         }
     }
 
+    private static final String POWERED_BY = "[powered by https://github.com/zygon4/CoreRL]";
+
     public void start() {
         //LibgdxApplications
         TileGrid tileGrid = SwingApplications.startTileGrid(
                 AppConfig.newBuilder()
-                        .withTitle(game.getConfiguration().getGameName())
+                        .withTitle(game.getConfiguration().getGameName() + "      " + POWERED_BY)
                         .withSize(Size.create(80, 60))
                         //                        .withDebugMode(true)
                         //                        .withDebugConfig(DebugConfig.newBuilder().withRelaxBoundsCheck(true).build())
