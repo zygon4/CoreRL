@@ -9,12 +9,10 @@ import com.zygon.rl.game.AttributeTimedAdjustmentSystem;
 import com.zygon.rl.game.Game;
 import com.zygon.rl.game.GameConfiguration;
 import com.zygon.rl.game.GameState;
-import com.zygon.rl.game.GameSystem;
 import com.zygon.rl.game.GameUI;
 import com.zygon.rl.util.rng.family.FamilyTreeGenerator;
 import com.zygon.rl.util.rng.family.Person;
 import com.zygon.rl.world.Calendar;
-import com.zygon.rl.world.CommonAttributes;
 import com.zygon.rl.world.Entities;
 import com.zygon.rl.world.Entity;
 import com.zygon.rl.world.IntegerAttribute;
@@ -32,14 +30,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * This is a testing area until a new BloodRL2.0 project is made.
@@ -47,51 +42,6 @@ import java.util.stream.Collectors;
  * @author zygon
  */
 public class BloodRLMain {
-
-    private static final class NPCWalk extends GameSystem {
-
-        private static final int REALITY_BUBBLE = 50;
-
-        private final UUID playerUuid;
-        private final Random random;
-
-        public NPCWalk(GameConfiguration gameConfiguration, Random random) {
-            super(gameConfiguration);
-            this.playerUuid = gameConfiguration.getPlayerUuid();
-            this.random = random;
-        }
-
-        @Override
-        public GameState apply(GameState state) {
-
-            Entity playerEnt = state.getWorld().get(playerUuid);
-            Location player = playerEnt.getLocation();
-            Set<Entity> closeNPCs = state.getWorld().getAll(playerEnt.getLocation(), REALITY_BUBBLE);
-
-            for (Entity npc : closeNPCs) {
-                if (!npc.getId().equals(playerUuid)) {
-                    // Random move pct
-                    if (random.nextDouble() > .75) {
-                        List<Location> neighboringLocations = npc.getLocation().getNeighbors().stream()
-                                .collect(Collectors.toList());
-                        Collections.shuffle(neighboringLocations);
-
-                        if (canMove(neighboringLocations.get(0), state.getWorld())) {
-                            state.getWorld().move(npc, neighboringLocations.get(0));
-                        }
-                    }
-                }
-            }
-
-            return state;
-        }
-
-        private boolean canMove(Location destination, World world) {
-            // TODO: terrain impassable as well.. using null is.. weird
-            Entity dest = world.get(destination);
-            return dest == null || dest.getAttribute(CommonAttributes.IMPASSABLE.name()) == null;
-        }
-    }
 
     private static final class BiteAbility implements Ability {
 
@@ -180,6 +130,7 @@ public class BloodRLMain {
         config.setGameName("BloodRL");
         config.setPlayerUuid(UUID.randomUUID());
         config.setMusicFile(themeFile.toPath());
+        config.setRandom(new Random());
 
         Ability bite = new BiteAbility(config.getPlayerUuid());
         config.setCustomAbilities(Set.of(bite));
@@ -231,7 +182,6 @@ public class BloodRLMain {
                                 return null;
                             }
                         }))
-                .addGameSystem(new NPCWalk(config, new Random()))
                 .setState(initialState)
                 .build();
 

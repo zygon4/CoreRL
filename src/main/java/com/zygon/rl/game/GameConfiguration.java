@@ -3,6 +3,7 @@ package com.zygon.rl.game;
 import com.zygon.rl.world.character.Ability;
 
 import java.nio.file.Path;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
@@ -16,6 +17,7 @@ public class GameConfiguration {
     private Path musicFile;
     // Ability isn't serializable right now..
     private Set<Ability> customAbilities;
+    private Random random;
 
     public String getGameName() {
         return gameName;
@@ -47,5 +49,13 @@ public class GameConfiguration {
 
     public void setCustomAbilities(Set<Ability> customAbilities) {
         this.customAbilities = customAbilities;
+    }
+
+    public Random getRandom() {
+        return random;
+    }
+
+    public void setRandom(Random random) {
+        this.random = random;
     }
 }
