@@ -28,7 +28,7 @@ public class Calendar {
     private static final long SEC_IN_DAY = TimeUnit.HOURS.toSeconds(24);
 
     private final long seconds; // since midnight
-    private final int day; // since begining of calendar
+    private final int day; // TOTAL since begining of calendar
     private final int daysInYear;
 
     public Calendar(long seconds, int day, int daysInYear) {
@@ -63,6 +63,26 @@ public class Calendar {
 
     public long getTotalSecondsOfDay() {
         return seconds;
+    }
+
+    /**
+     * Returns the difference in seconds between the current calendar and the
+     * 'old' one.
+     *
+     * @param old calendar
+     * @return
+     */
+    public long getDifferenceSeconds(Calendar old) {
+        if (getDaysInYear() != old.getDaysInYear()) {
+            throw new IllegalArgumentException();
+        }
+        int yearDiff = getYear() - old.getYear();
+        int dayDiff = getDayOfYear() - old.getDayOfYear();
+        long secondDiff = getTotalSecondsOfDay() - old.getTotalSecondsOfDay();
+
+        return TimeUnit.DAYS.toSeconds(yearDiff * getDaysInYear())
+                + TimeUnit.DAYS.toSeconds(dayDiff)
+                + secondDiff;
     }
 
     public Season getSeason() {

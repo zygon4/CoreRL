@@ -3,6 +3,7 @@ package com.zygon.rl.world.character;
 import com.zygon.rl.world.Attribute;
 import com.zygon.rl.world.IntegerAttribute;
 
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -46,15 +47,27 @@ public class Status {
         return new Status(age, hitPoints + hps, effects);
     }
 
+    public Status addEffect(String effect) {
+        Set<String> effects = new HashSet<>(this.effects);
+        effects.add(effect);
+        return new Status(age, hitPoints, effects);
+    }
+
+    public Status removeEffect(String effect) {
+        Set<String> effects = new HashSet<>(this.effects);
+        effects.remove(effect);
+        return new Status(age, hitPoints, effects);
+    }
+
     public Set<Attribute> getAttributes() {
         Set<Attribute> stats = new LinkedHashSet<>();
 
         stats.add(IntegerAttribute.create("Age", "Age", getAge()));
         stats.add(IntegerAttribute.create("HP", "Hit Points", getHitPoints()));
-        // TODO: status effects
+        effects.forEach(effect -> {
+            stats.add(Attribute.builder().setName(effect).build());
+        });
 
         return stats;
     }
-
-    // status effects tbd
 }

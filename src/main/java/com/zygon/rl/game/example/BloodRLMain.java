@@ -5,6 +5,7 @@
  */
 package com.zygon.rl.game.example;
 
+import com.zygon.rl.game.AttributeTimedAdjustmentSystem;
 import com.zygon.rl.game.Game;
 import com.zygon.rl.game.GameConfiguration;
 import com.zygon.rl.game.GameState;
@@ -16,6 +17,7 @@ import com.zygon.rl.world.Calendar;
 import com.zygon.rl.world.CommonAttributes;
 import com.zygon.rl.world.Entities;
 import com.zygon.rl.world.Entity;
+import com.zygon.rl.world.IntegerAttribute;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
 import com.zygon.rl.world.character.Ability;
@@ -46,26 +48,6 @@ import java.util.stream.Collectors;
  */
 public class BloodRLMain {
 
-    // TODO:
-    private static final class PlayerHunger extends GameSystem {
-
-        private final UUID playerUuid;
-
-        public PlayerHunger(UUID playerUuid) {
-            this.playerUuid = playerUuid;
-        }
-
-        // needs to take into account hunger OVER TIME, ie the game needs a
-        // world clock
-        @Override
-        public GameState apply(GameState state) {
-            Entity playerEnt = state.getWorld().get(playerUuid);
-            Location player = playerEnt.getLocation();
-
-            return state;
-        }
-    }
-
     private static final class NPCWalk extends GameSystem {
 
         private static final int REALITY_BUBBLE = 50;
@@ -73,8 +55,9 @@ public class BloodRLMain {
         private final UUID playerUuid;
         private final Random random;
 
-        public NPCWalk(UUID playerUuid, Random random) {
-            this.playerUuid = playerUuid;
+        public NPCWalk(GameConfiguration gameConfiguration, Random random) {
+            super(gameConfiguration);
+            this.playerUuid = gameConfiguration.getPlayerUuid();
             this.random = random;
         }
 
@@ -140,6 +123,8 @@ public class BloodRLMain {
             Entity playerEnt = state.getWorld().get(playerUuid);
             CharacterSheet characterSheet = CharacterSheet.fromEntity(playerEnt);
 
+            GameState.Builder copy = state.copy();
+
             // TODO: add game log
             Entity victim = state.getWorld().get(victimLocation.get());
             if (victim != null) {
@@ -151,7 +136,16 @@ public class BloodRLMain {
                     System.out.println("Biting " + victim.getName());
                     state.getWorld().remove(victim);
 
-                    // resolve hunger attributes
+                    IntegerAttribute hungerLevel = IntegerAttribute.create(
+                            playerEnt.getAttribute("HUNGER_CLOCK"));
+
+                    // this is very very clunky to adjust a scalar attribute..
+                    state.getWorld().add(playerEnt.copy()
+                            .setAttributeValue("HUNGER_CLOCK", String.valueOf(
+                                    hungerLevel.getIntegerValue() - 10))
+                            .build());
+                    copy.setWorld(state.getWorld()
+                            .setCalendar(state.getWorld().getCalendar().addTime(30)));
                 } else {
                     // special case future ability?
                     System.out.println("Cannot bite yourself");
@@ -160,7 +154,7 @@ public class BloodRLMain {
                 System.out.println("Cannot bite that");
             }
 
-            return state;
+            return copy.build();
         }
     }
 
@@ -190,12 +184,14 @@ public class BloodRLMain {
         Ability bite = new BiteAbility(config.getPlayerUuid());
         config.setCustomAbilities(Set.of(bite));
 
-        World world = new World(new Calendar(TimeUnit.HOURS.toSeconds(8), 10, 20));
+        World world = new World(new Calendar(
+                TimeUnit.HOURS.toSeconds(10), 10, 20));
 
         CharacterSheet pc = new CharacterSheet(
                 "Alucard",
+                "He's cool",
                 new Stats(10, 10, 16, 12, 12),
-                new Status(1, 8, Set.of()),
+                new Status(19, 8, Set.of()),
                 Set.of(bite),
                 Set.of());
 
@@ -203,6 +199,8 @@ public class BloodRLMain {
         playerEntity = playerEntity.copy()
                 .setId(config.getPlayerUuid())
                 .setLocation(Location.create(0, 0))
+                // TODO: initial hunger based on starting scenario
+                .setAttributeValue("HUNGER_CLOCK", String.valueOf(8))
                 .build();
 
         world.add(playerEntity);
@@ -221,10 +219,19 @@ public class BloodRLMain {
                 .setWorld(world)
                 .build();
 
-        Game game = Game.builder()
-                .addGameSystem(new PlayerHunger(config.getPlayerUuid()))
-                .addGameSystem(new NPCWalk(config.getPlayerUuid(), new Random()))
-                .setConfiguration(config)
+        Game game = Game.builder(config)
+                .addGameSystem(new AttributeTimedAdjustmentSystem(config, "HUNGER_CLOCK",
+                        TimeUnit.HOURS.toSeconds(1), gs -> 1l,
+                        hungerValue -> {
+                            if (hungerValue < 0) {
+                                return "FULL";
+                            } else if (hungerValue > 99) {
+                                return "HUNGRY";
+                            } else {
+                                return null;
+                            }
+                        }))
+                .addGameSystem(new NPCWalk(config, new Random()))
                 .setState(initialState)
                 .build();
 

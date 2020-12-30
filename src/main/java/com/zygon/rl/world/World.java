@@ -3,6 +3,7 @@ package com.zygon.rl.world;
 import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -26,7 +27,7 @@ public class World {
 
     // this is fresh world only
     public World() {
-        this(new Calendar(20));
+        this(new Calendar(20).addTime(TimeUnit.DAYS.toSeconds(1000)));
     }
 
     public void add(Entity entity) {

@@ -6,6 +6,10 @@ package com.zygon.rl.game;
  */
 /*pkg*/ final class DefaultGameSystem extends GameSystem {
 
+    public DefaultGameSystem(GameConfiguration gameConfiguration) {
+        super(gameConfiguration);
+    }
+
     @Override
     public GameState apply(GameState state) {
         return state.copy()

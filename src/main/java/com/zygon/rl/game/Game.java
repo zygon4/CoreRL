@@ -25,8 +25,8 @@ public class Game {
                 ? builder.state : GameState.builder(configuration).build();
     }
 
-    public static Builder builder() {
-        return new Builder();
+    public static Builder builder(GameConfiguration gameConfiguration) {
+        return new Builder(gameConfiguration);
     }
 
     public Builder copy() {
@@ -79,8 +79,9 @@ public class Game {
         private GameConfiguration configuration;
         private GameState state;
 
-        private Builder() {
-            gameSystems.add(new DefaultGameSystem());
+        private Builder(GameConfiguration gameConfiguration) {
+            this.gameSystems.add(new DefaultGameSystem(gameConfiguration));
+            this.configuration = gameConfiguration;
         }
 
         private Builder(Game game) {
@@ -94,11 +95,6 @@ public class Game {
                 this.gameSystems = new ArrayList<>();
             }
             this.gameSystems.add(gameSystem);
-            return this;
-        }
-
-        public Builder setConfiguration(GameConfiguration configuration) {
-            this.configuration = configuration;
             return this;
         }
 
