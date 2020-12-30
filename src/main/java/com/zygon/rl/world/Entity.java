@@ -43,7 +43,7 @@ public class Entity {
     public Entity add(Attribute attribute) {
         Map<String, Attribute> attrs = new HashMap<>(attributes);
         attrs.put(attribute.getName(), attribute);
-        return copy().setAttributes(attributes).build();
+        return copy().setAttributes(attrs).build();
     }
 
     public Entity add(Behavior behavior) {
@@ -94,6 +94,12 @@ public class Entity {
 
     public boolean hasAttribute(String name) {
         return getAttribute(name) != null;
+    }
+
+    public Entity remove(String attributeName) {
+        Map<String, Attribute> attrs = new HashMap<>(attributes);
+        attrs.remove(attributeName);
+        return copy().setAttributes(attrs).build();
     }
 
     @Override
