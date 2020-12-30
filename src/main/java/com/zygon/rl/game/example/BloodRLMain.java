@@ -136,7 +136,7 @@ public class BloodRLMain {
         config.setCustomAbilities(Set.of(bite));
 
         World world = new World(new Calendar(
-                TimeUnit.HOURS.toSeconds(10), 10, 20));
+                TimeUnit.HOURS.toSeconds(10), 20 * 1680, 20));
 
         CharacterSheet pc = new CharacterSheet(
                 "Alucard",
