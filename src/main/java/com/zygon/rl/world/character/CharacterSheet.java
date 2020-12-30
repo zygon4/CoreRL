@@ -6,6 +6,7 @@ import com.zygon.rl.world.IntegerAttribute;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Player or NPC
@@ -16,16 +17,27 @@ import java.util.Set;
  */
 public class CharacterSheet {
 
+    // This is maybe a little hokey?
+    public static final String STATUS_PREFIX = "CHAR_STATUS_";
+
+    // TODO: what do to about marshalling the entity to a character sheet?
+    // this doesn't want to have all of the fields, it would rather
+    // hold onto the Entity object but I worry about cache invalidation.
     private final String name;
+//    private final UUID id;
+    private final String description;
+//    private final Location origin;
+//    private final Location location;
 
     private final Stats stats;
     private final Status status;
     private final Set<Ability> abilities;
     private final Set<Spell> spells;
 
-    public CharacterSheet(String name, Stats stats, Status status,
+    public CharacterSheet(String name, String description, Stats stats, Status status,
             Set<Ability> abilities, Set<Spell> spells) {
         this.name = name;
+        this.description = description;
         this.stats = stats;
         this.status = status;
         this.abilities = Collections.unmodifiableSet(abilities);
@@ -34,6 +46,10 @@ public class CharacterSheet {
 
     public String getName() {
         return name;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public Stats getStats() {
@@ -52,23 +68,25 @@ public class CharacterSheet {
         return spells;
     }
 
+    public CharacterSheet set(Status status) {
+        return new CharacterSheet(name, description, stats, status, abilities, spells);
+    }
+
     public CharacterSheet set(Set<Ability> abilities) {
-        return new CharacterSheet(name, stats, status, abilities, spells);
+        return new CharacterSheet(name, description, stats, status, abilities, spells);
     }
 
     public static CharacterSheet fromEntity(Entity entity) {
         // TODO: finish conversion
         return new CharacterSheet(
                 entity.getName(),
+                entity.getDescription(),
                 toStats(entity),
                 toStatus(entity),
                 Set.of(),
                 Set.of());
     }
 
-    // doing a deep conversion will be a pain
-    // need to have some tools/functions to make this easier.
-    // e.g. convert the entire status object into a set of attributes
     public Entity toEntity() {
 
         // abilities??? are we using reflection now??
@@ -77,6 +95,7 @@ public class CharacterSheet {
                 .copy()
                 //                .setId(config.getPlayerUuid())
                 .setName(getName())
+                .setDescription(getDescription())
                 .setDescription("fierce something");
 
         getStatus().getAttributes().forEach(status -> {
@@ -103,7 +122,10 @@ public class CharacterSheet {
         return new Status(
                 IntegerAttribute.getValue(entity.getAttribute("Age")),
                 IntegerAttribute.getValue(entity.getAttribute("HP")),
-                Set.of());
+                entity.getAttributeNames().stream()
+                        .filter(attrName -> attrName.startsWith(STATUS_PREFIX))
+                        .map(attrName -> entity.getAttributeValue(attrName))
+                        .collect(Collectors.toSet()));
     }
 
     // TODO: the rest of the setters as needed
