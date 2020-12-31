@@ -328,6 +328,57 @@ public class GameUI {
                     playerName);
         }
 
+        private static int getFoVForce(Game game) {
+            // casting is sad but it's safe
+            int hour = (int) game.getState().getWorld()
+                    .getCalendar().getHourOfDay();
+            int fov = 0;
+
+            // Can possibly do some clever math to convert the hour so it can
+            // be used with a single switch value. Maybe if x > 12 ? 24 - x : x
+            switch (hour) {
+                case 11, 12 -> {
+                    fov = 50;
+                }
+                case 10, 13 -> {
+                    fov = 50;
+                }
+                case 9, 14 -> {
+                    fov = 50;
+                }
+                case 8, 15 -> {
+                    fov = 45;
+                }
+                case 7, 16 -> {
+                    fov = 40;
+                }
+                case 6, 17 -> {
+                    fov = 30;
+                }
+                case 5, 18 -> {
+                    fov = 20;
+                }
+                case 4, 19 -> {
+                    fov = 15;
+                }
+                case 3, 20 -> {
+                    fov = 10;
+                }
+                case 2, 21 -> {
+                    fov = 7;
+                }
+                case 1, 22 -> {
+                    fov = 5;
+                }
+                case 0, 23 -> {
+                    fov = 2;
+                }
+            }
+
+            // TODO: modified by character stats, status, traits
+            return fov;
+        }
+
         private Entity getPlayer(Game game) {
             return game.getState().getWorld()
                     .get(game.getConfiguration().getPlayerUuid());
@@ -403,8 +454,9 @@ public class GameUI {
             LitMap2d lightMap = new LitMap2DImpl(lightResistances);
             ShadowCaster2d shadowCaster = new ShadowCaster2d(lightMap);
 
+            long fovForce = getFoVForce(game);
             try {
-                shadowCaster.recalculateFOV(lightMap.getXSize() / 2, lightMap.getYSize() / 2, 50, .5f);
+                shadowCaster.recalculateFOV(lightMap.getXSize() / 2, lightMap.getYSize() / 2, fovForce, .5f);
             } catch (java.lang.ArrayIndexOutOfBoundsException aioob) {
                 throw new RuntimeException(aioob);
             }
