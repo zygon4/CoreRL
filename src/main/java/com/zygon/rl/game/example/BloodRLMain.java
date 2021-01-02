@@ -71,7 +71,6 @@ public class BloodRLMain {
                 Optional<Location> victimLocation) {
 
             Entity playerEnt = state.getWorld().get(playerUuid);
-            CharacterSheet characterSheet = CharacterSheet.fromEntity(playerEnt);
 
             GameState.Builder copy = state.copy();
 
@@ -135,8 +134,10 @@ public class BloodRLMain {
         Ability bite = new BiteAbility(config.getPlayerUuid());
         config.setCustomAbilities(Set.of(bite));
 
+        int daysPerYear = 20;
+        int startingYear = 1208;
         World world = new World(new Calendar(
-                TimeUnit.HOURS.toSeconds(3), 20 * 1208, 20));
+                TimeUnit.HOURS.toSeconds(7), startingYear * daysPerYear, daysPerYear));
 
         CharacterSheet pc = new CharacterSheet(
                 "Alucard",
@@ -151,7 +152,7 @@ public class BloodRLMain {
                 .setId(config.getPlayerUuid())
                 .setLocation(Location.create(0, 0))
                 // TODO: initial hunger based on starting scenario
-                .setAttributeValue("HUNGER_CLOCK", String.valueOf(8))
+                .setAttributeValue("HUNGER_CLOCK", String.valueOf(150))
                 .build();
 
         world.add(playerEntity);
