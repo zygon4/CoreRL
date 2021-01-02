@@ -22,7 +22,7 @@ import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_7;
 import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_8;
 import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_9;
 
-public final class DefaultOuterActionSupplier extends BaseInputHandler {
+public final class DefaultOuterInputHandler extends BaseInputHandler {
 
     private static final int DEFAULT_ACTION_TIME = 6; // seconds
     private static final Set<Input> defaultKeyCodes = new HashSet<>();
@@ -38,7 +38,7 @@ public final class DefaultOuterActionSupplier extends BaseInputHandler {
 
     private final Map<String, Ability> abilitiesByName;
 
-    public DefaultOuterActionSupplier(GameConfiguration gameConfiguration) {
+    public DefaultOuterInputHandler(GameConfiguration gameConfiguration) {
         super(gameConfiguration, defaultKeyCodes);
         this.abilitiesByName = gameConfiguration.getCustomAbilities() != null
                 ? gameConfiguration.getCustomAbilities().stream()

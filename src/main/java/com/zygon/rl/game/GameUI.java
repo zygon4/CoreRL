@@ -325,37 +325,6 @@ public class GameUI {
             }
         }
 
-        private static final class Dialog implements ModalFragment<ModalResult> {
-
-            private final Screen screen;
-            private final Container container;
-
-            public Dialog(Screen screen, Container container) {
-                this.screen = screen;
-                this.container = container;
-            }
-
-            @Override
-            public Modal<ModalResult> getRoot() {
-                Modal<ModalResult> modal = ModalBuilder.newBuilder()
-                        .withComponent(container)
-                        .withParentSize(screen.getSize())
-                        .build();
-
-                modal.handleKeyboardEvents(KeyboardEventType.KEY_PRESSED,
-                        (event, phase) -> {
-                            if (event.getCode() == KeyCode.ESCAPE) {
-                                modal.close(EmptyModalResult.INSTANCE);
-                                return UIEventResponse.processed();
-                            } else {
-                                return UIEventResponse.pass();
-                            }
-                        });
-
-                return modal;
-            }
-        }
-
         private SideBar createSideBar(Position position, Game game) {
 
             // TODO: creation method
@@ -610,6 +579,37 @@ public class GameUI {
         }
     }
 
+    private static final class Dialog implements ModalFragment<ModalResult> {
+
+        private final Screen screen;
+        private final Container container;
+
+        public Dialog(Screen screen, Container container) {
+            this.screen = screen;
+            this.container = container;
+        }
+
+        @Override
+        public Modal<ModalResult> getRoot() {
+            Modal<ModalResult> modal = ModalBuilder.newBuilder()
+                    .withComponent(container)
+                    .withParentSize(screen.getSize())
+                    .build();
+
+            modal.handleKeyboardEvents(KeyboardEventType.KEY_PRESSED,
+                    (event, phase) -> {
+                        if (event.getCode() == KeyCode.ESCAPE) {
+                            modal.close(EmptyModalResult.INSTANCE);
+                            return UIEventResponse.processed();
+                        } else {
+                            return UIEventResponse.pass();
+                        }
+                    });
+
+            return modal;
+        }
+    }
+
     // this is a specific view
     private static final class TitleView extends BaseView {
 
@@ -656,32 +656,8 @@ public class GameUI {
                 return UIEventResponse.processed();
             });
 
-            // this is for develop only
-            Button pop = Components.button()
-                    .withText("POP")
-                    .withAlignmentAround(quitButton, ComponentAlignment.BOTTOM_CENTER)
-                    .withTileset(CP437TilesetResources.rexPaint16x16())
-                    .build();
-
-            pop.handleMouseEvents(MouseEventType.MOUSE_CLICKED, (p1, p2) -> {
-                Panel modalPanel = Components.panel()
-                        .withSize(10, 3)
-                        .withAlignmentWithin(tileGrid, ComponentAlignment.CENTER)
-                        .withDecorations(
-                                org.hexworks.zircon.api.ComponentDecorations.box(BoxType.SINGLE, "moooode"))
-                        .build();
-
-                modalPanel.addComponent(Components.label()
-                        .withText("foobar")
-                        .build());
-
-                getScreen().openModal(new GameView.Dialog(getScreen(), modalPanel));
-                return UIEventResponse.processed();
-            });
-
             titleMenuPanel.addComponent(startButton);
             titleMenuPanel.addComponent(quitButton);
-            titleMenuPanel.addComponent(pop);
             getScreen().addComponent(titleMenuPanel);
         }
     }
@@ -720,10 +696,37 @@ public class GameUI {
                 replaceWith(gameView);
                 return UIEventResponse.processed();
             });
+
+            // this is for develop only
+            Button controlsButton = Components.button()
+                    .withText("CONTROLS")
+                    .withAlignmentAround(continueButton, ComponentAlignment.BOTTOM_CENTER)
+                    .withTileset(CP437TilesetResources.rexPaint16x16())
+                    .build();
+
+            controlsButton.handleMouseEvents(MouseEventType.MOUSE_CLICKED, (p1, p2) -> {
+                Panel modalPanel = Components.panel()
+                        .withSize(50, 7)
+                        .withAlignmentWithin(titleMenuPanel, ComponentAlignment.CENTER)
+                        .withDecorations(
+                                org.hexworks.zircon.api.ComponentDecorations.box(BoxType.SINGLE))
+                        .build();
+
+                // TODO: these should be pulled from the default input handler as
+                // self-organizing help content
+                modalPanel.addComponent(Components.textBox(45)
+                        .addHeader("1,2,3,5,6,7,8,9 - movement")
+                        .addHeader("a               - view abilities")
+                        .build());
+
+                getScreen().openModal(new Dialog(getScreen(), modalPanel));
+                return UIEventResponse.processed();
+            });
+
             // TODO: store/load game
             Button quitButton = Components.button()
                     .withText("QUIT")
-                    .withAlignmentAround(continueButton, ComponentAlignment.BOTTOM_CENTER)
+                    .withAlignmentAround(controlsButton, ComponentAlignment.BOTTOM_CENTER)
                     .withTileset(CP437TilesetResources.rexPaint16x16())
                     .build();
             quitButton.handleMouseEvents(MouseEventType.MOUSE_CLICKED, (p1, p2) -> {
@@ -732,6 +735,7 @@ public class GameUI {
             });
 
             titleMenuPanel.addComponent(continueButton);
+            titleMenuPanel.addComponent(controlsButton);
             titleMenuPanel.addComponent(quitButton);
             getScreen().addComponent(titleMenuPanel);
         }

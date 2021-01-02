@@ -66,7 +66,8 @@ public enum WorldTile {
     }
 
     public char getGlyph(Entity entity) {
-        return getGlyphFn == null ? glyph : getGlyphFn.apply(entity);
+        return getGlyphFn == null
+                ? glyph : getGlyphFn.apply(entity).charValue();
     }
 
     public static WorldTile get(String entityName) {

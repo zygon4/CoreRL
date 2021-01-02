@@ -95,7 +95,7 @@ public class GameState {
         if (stackCopy.isEmpty()) {
             stackCopy.add(GameState.InputContext.builder()
                     .setName("DEFAULT")
-                    .setHandler(new DefaultOuterActionSupplier(builder.gameConfiguration))
+                    .setHandler(new DefaultOuterInputHandler(builder.gameConfiguration))
                     .build());
         }
         this.turnCount = builder.turnCount;
