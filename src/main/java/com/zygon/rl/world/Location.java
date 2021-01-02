@@ -1,7 +1,7 @@
 package com.zygon.rl.world;
 
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -12,8 +12,13 @@ import java.util.Set;
  */
 public class Location {
 
-    // singleton cache :/
-    private static final Map<String, Location> KNOWN_LOCATIONS = new HashMap<>();
+    // singleton cache
+    private static final Map<String, Location> KNOWN_LOCATIONS = new LinkedHashMap<>() {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<String, Location> eldest) {
+            return size() > 1024;
+        }
+    };
 
     private final int x;
     private final int y;
