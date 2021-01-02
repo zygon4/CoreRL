@@ -123,8 +123,15 @@ public class Calendar {
         return new Calendar(calcSeconds, calcDay, daysInYear);
     }
 
+    // TODO: 24 vs 12 hour clock
     public String getTime() {
-        return (getHourOfDay() + ":") + (getMinuteOfHour() > 9
+        String time = (getHourOfDay() + ":") + (getMinuteOfHour() > 9
                 ? String.valueOf(getMinuteOfHour()) : ("0" + getMinuteOfHour()));
+
+        if (getHourOfDay() < 12) {
+            time += " AM";
+        }
+
+        return time;
     }
 }
