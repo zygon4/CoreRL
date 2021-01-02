@@ -16,6 +16,7 @@ public class GameState {
     public static enum InputContextPrompt {
         DIRECTION,
         LIST,
+        MODAL,
         NONE
     }
 
