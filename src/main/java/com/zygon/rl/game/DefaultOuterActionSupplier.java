@@ -28,9 +28,12 @@ public final class DefaultOuterActionSupplier extends BaseInputHandler {
     private static final Set<Input> defaultKeyCodes = new HashSet<>();
 
     static {
+        // Movement keys
         defaultKeyCodes.addAll(INPUTS_1_9);
+        // 'A' for abilities
         defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_A.getCode()));
-        // TODO: other default inputs
+        // ESC for game menu
+        defaultKeyCodes.add(Input.valueOf(KeyCode.ESCAPE.getCode()));
     }
 
     private final Map<String, Ability> abilitiesByName;
@@ -48,6 +51,14 @@ public final class DefaultOuterActionSupplier extends BaseInputHandler {
         GameState.Builder copy = state.copy();
         KeyCode inputKeyCode = convert(input);
         switch (inputKeyCode) {
+            case ESCAPE -> {
+                copy = copy.addInputContext(
+                        GameState.InputContext.builder()
+                                .setName("GAME_MENU")
+                                .setHandler(new ModalInputHandler(getGameConfiguration()))
+                                .setPrompt(GameState.InputContextPrompt.MODAL)
+                                .build());
+            }
             // ability - present abilities
             case KEY_A -> {
                 Entity playerEntity = getPlayer(state);

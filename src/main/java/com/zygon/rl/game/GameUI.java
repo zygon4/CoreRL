@@ -26,25 +26,35 @@ import org.hexworks.zircon.api.Functions;
 import org.hexworks.zircon.api.SwingApplications;
 import org.hexworks.zircon.api.application.AppConfig;
 import org.hexworks.zircon.api.behavior.TextOverride;
+import org.hexworks.zircon.api.builder.component.ModalBuilder;
 import org.hexworks.zircon.api.color.ANSITileColor;
 import org.hexworks.zircon.api.color.TileColor;
 import org.hexworks.zircon.api.component.Button;
 import org.hexworks.zircon.api.component.ColorTheme;
 import org.hexworks.zircon.api.component.Component;
+import org.hexworks.zircon.api.component.ComponentAlignment;
+import org.hexworks.zircon.api.component.Container;
 import org.hexworks.zircon.api.component.Fragment;
 import org.hexworks.zircon.api.component.Header;
+import org.hexworks.zircon.api.component.Panel;
 import org.hexworks.zircon.api.component.TextArea;
 import org.hexworks.zircon.api.component.VBox;
+import org.hexworks.zircon.api.component.modal.Modal;
+import org.hexworks.zircon.api.component.modal.ModalFragment;
+import org.hexworks.zircon.api.component.modal.ModalResult;
 import org.hexworks.zircon.api.data.Position;
 import org.hexworks.zircon.api.data.Size;
 import org.hexworks.zircon.api.data.Tile;
 import org.hexworks.zircon.api.graphics.BoxType;
 import org.hexworks.zircon.api.graphics.Layer;
 import org.hexworks.zircon.api.grid.TileGrid;
+import org.hexworks.zircon.api.screen.Screen;
+import org.hexworks.zircon.api.uievent.KeyCode;
 import org.hexworks.zircon.api.uievent.KeyboardEventType;
 import org.hexworks.zircon.api.uievent.MouseEventType;
 import org.hexworks.zircon.api.uievent.UIEventResponse;
 import org.hexworks.zircon.api.view.base.BaseView;
+import org.hexworks.zircon.internal.component.modal.EmptyModalResult;
 
 import java.awt.Color;
 import java.io.IOException;
@@ -206,6 +216,7 @@ public class GameUI {
         private Layer gameScreenLayer = null;
         private SideBar sideBar = null;
         private Layer miniMapLayer = null;
+        private boolean initialized = false;
 
         public GameView(TileGrid tileGrid, ColorTheme colorTheme, Game game) {
             super(tileGrid, colorTheme);
@@ -214,92 +225,134 @@ public class GameUI {
             this.game = game;
         }
 
+        protected TileGrid getTileGrid() {
+            return tileGrid;
+        }
+
         @Override
         public void onDock() {
             super.onDock();
 
-            Path musicFile = game.getConfiguration().getMusicFile();
-            if (musicFile != null) {
-                try {
-                    Audio audio = new Audio(musicFile);
-                    audio.play();
-                } catch (IOException | LineUnavailableException | UnsupportedAudioFileException ex) {
-                    logger.log(System.Logger.Level.ERROR, "Unable to play music file: " + musicFile, ex);
+            if (!initialized) {
+                Path musicFile = game.getConfiguration().getMusicFile();
+                if (musicFile != null) {
+                    try {
+                        Audio audio = new Audio(musicFile);
+                        audio.play();
+                    } catch (IOException | LineUnavailableException | UnsupportedAudioFileException ex) {
+                        logger.log(System.Logger.Level.ERROR, "Unable to play music file: " + musicFile, ex);
+                    }
                 }
+
+                VBox gameScreen = Components.vbox()
+                        .withSize(tileGrid.getSize().getWidth() - SIDEBAR_SCREEN_WIDTH, tileGrid.getSize().getHeight() - 3)
+                        .withDecorations(org.hexworks.zircon.api.ComponentDecorations.box(BoxType.DOUBLE))
+                        .withAlignmentWithin(tileGrid, ComponentAlignment.TOP_LEFT)
+                        .build();
+                getScreen().addComponent(gameScreen);
+
+                sideBar = createSideBar(Position.create(gameScreen.getWidth(), 0), game);
+                getScreen().addFragment(sideBar);
+
+                miniMapLayer = Layer.newBuilder()
+                        .withSize(SIDEBAR_SCREEN_WIDTH, SIDEBAR_SCREEN_WIDTH)
+                        .withOffset(gameScreen.getSize().getWidth() + 1, sideBar.getRoot().getHeight() + 1)
+                        .build();
+                getScreen().addLayer(miniMapLayer);
+
+                gameScreenLayer = Layer.newBuilder()
+                        .withSize(gameScreen.getSize())
+                        .build();
+
+                getScreen().addLayer(gameScreenLayer);
+
+                updateGameScreen(gameScreenLayer, game);
+                updateSideBar(sideBar, game);
+                updateMiniMap(miniMapLayer, game);
+
+                Header promptHeader = Components.header()
+                        .withSize(20, 1)
+                        .withPosition(1, gameScreen.getHeight() + 1)
+                        .build();
+                getScreen().addComponent(promptHeader);
+                promptHeader.setHidden(true);
+
+                tileGrid.processKeyboardEvents(KeyboardEventType.KEY_PRESSED,
+                        Functions.fromBiConsumer((event, phase) -> {
+                            Input input = Input.valueOf(event.getCode().getCode());
+
+                            long turnStart = System.nanoTime();
+                            game = game.turn(input);
+                            logger.log(System.Logger.Level.TRACE,
+                                    "turn " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - turnStart));
+
+                            long updateGameScreen = System.nanoTime();
+                            updateGameScreen(gameScreenLayer, game);
+                            logger.log(System.Logger.Level.TRACE,
+                                    "screen (ms) " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - updateGameScreen));
+
+                            GameState.InputContext inputCtx = game.getState().getInputContext().peek();
+                            promptHeader.setHidden(true);
+
+                            if (inputCtx.getPrompt() != GameState.InputContextPrompt.NONE) {
+                                switch (inputCtx.getPrompt()) {
+                                    case DIRECTION:
+                                        // TODO: modal for direction? I think it's more generic?
+                                        promptHeader.setText("Which Direction?");
+                                        promptHeader.setHidden(false);
+                                        break;
+                                    case LIST:
+                                        String list = inputCtx.getHandler().getInputs().stream()
+                                                .map(i -> i.toString() + ") " + inputCtx.getHandler().getDisplayText(i))
+                                                .collect(Collectors.joining("\n"));
+                                        promptHeader.setText(list);
+                                        promptHeader.setHidden(false);
+                                        break;
+                                    case MODAL:
+                                        replaceWith(new HelpView(this, game));
+                                        break;
+                                }
+                            }
+
+                            updateSideBar(sideBar, game);
+                            // I didn't intend to leave this "delay" in here, but it's not a terrible idea..
+                            if (game.getState().getTurnCount() % 10 == 0) {
+                                updateMiniMap(miniMapLayer, game);
+                            }
+                        }));
+                initialized = true;
+            }
+        }
+
+        private static final class Dialog implements ModalFragment<ModalResult> {
+
+            private final Screen screen;
+            private final Container container;
+
+            public Dialog(Screen screen, Container container) {
+                this.screen = screen;
+                this.container = container;
             }
 
-            VBox gameScreen = Components.vbox()
-                    .withSize(tileGrid.getSize().getWidth() - SIDEBAR_SCREEN_WIDTH, tileGrid.getSize().getHeight() - 3)
-                    .withDecorations(org.hexworks.zircon.api.ComponentDecorations.box(BoxType.DOUBLE))
-                    .build();
-            getScreen().addComponent(gameScreen);
+            @Override
+            public Modal<ModalResult> getRoot() {
+                Modal<ModalResult> modal = ModalBuilder.newBuilder()
+                        .withComponent(container)
+                        .withParentSize(screen.getSize())
+                        .build();
 
-            sideBar = createSideBar(Position.create(gameScreen.getWidth(), 0), game);
-            getScreen().addFragment(sideBar);
-
-            miniMapLayer = Layer.newBuilder()
-                    .withSize(SIDEBAR_SCREEN_WIDTH, SIDEBAR_SCREEN_WIDTH)
-                    .withOffset(gameScreen.getSize().getWidth() + 1, sideBar.getRoot().getHeight() + 1)
-                    .build();
-            getScreen().addLayer(miniMapLayer);
-
-            gameScreenLayer = Layer.newBuilder()
-                    .withSize(gameScreen.getSize())
-                    .build();
-
-            getScreen().addLayer(gameScreenLayer);
-
-            updateGameScreen(gameScreenLayer, game);
-            updateSideBar(sideBar, game);
-            updateMiniMap(miniMapLayer, game);
-
-            Header promptHeader = Components.header()
-                    .withSize(20, 1)
-                    .withPosition(1, gameScreen.getHeight() + 1)
-                    .build();
-            getScreen().addComponent(promptHeader);
-            promptHeader.setHidden(true);
-
-            tileGrid.processKeyboardEvents(KeyboardEventType.KEY_PRESSED,
-                    Functions.fromBiConsumer((event, phase) -> {
-                        System.out.println(event);
-                        Input input = Input.valueOf(event.getCode().getCode());
-
-                        long turnStart = System.nanoTime();
-                        game = game.turn(input);
-                        logger.log(System.Logger.Level.TRACE,
-                                "turn " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - turnStart));
-
-                        long updateGameScreen = System.nanoTime();
-                        updateGameScreen(gameScreenLayer, game);
-                        logger.log(System.Logger.Level.TRACE,
-                                "screen (ms) " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - updateGameScreen));
-
-                        GameState.InputContext inputCtx = game.getState().getInputContext().peek();
-                        promptHeader.setHidden(true);
-
-                        if (inputCtx.getPrompt() != GameState.InputContextPrompt.NONE) {
-                            switch (inputCtx.getPrompt()) {
-                                case DIRECTION:
-                                    promptHeader.setText("Which Direction?");
-                                    promptHeader.setHidden(false);
-                                    break;
-                                case LIST:
-                                    String list = inputCtx.getHandler().getInputs().stream()
-                                            .map(i -> i.toString() + ") " + inputCtx.getHandler().getDisplayText(i))
-                                            .collect(Collectors.joining("\n"));
-                                    promptHeader.setText(list);
-                                    promptHeader.setHidden(false);
-                                    break;
+                modal.handleKeyboardEvents(KeyboardEventType.KEY_PRESSED,
+                        (event, phase) -> {
+                            if (event.getCode() == KeyCode.ESCAPE) {
+                                modal.close(EmptyModalResult.INSTANCE);
+                                return UIEventResponse.processed();
+                            } else {
+                                return UIEventResponse.pass();
                             }
-                        }
+                        });
 
-                        updateSideBar(sideBar, game);
-                        // I didn't intend to leave this "delay" in here, but it's not a terrible idea..
-                        if (game.getState().getTurnCount() % 10 == 0) {
-                            updateMiniMap(miniMapLayer, game);
-                        }
-                    }));
+                return modal;
+            }
         }
 
         private SideBar createSideBar(Position position, Game game) {
@@ -543,9 +596,9 @@ public class GameUI {
     // this is a specific view
     private static final class TitleView extends BaseView {
 
-        private final GameView gameView;
         private final TileGrid tileGrid;
         private final Game game;
+        private final GameView gameView;
 
         public TitleView(TileGrid tileGrid, ColorTheme colorTheme, Game game) {
             super(tileGrid, colorTheme);
@@ -559,8 +612,16 @@ public class GameUI {
         public void onDock() {
             super.onDock();
 
+            Panel titleMenuPanel = Components.panel()
+                    .withSize(tileGrid.getSize())
+                    .withDecorations(
+                            org.hexworks.zircon.api.ComponentDecorations.box(BoxType.DOUBLE,
+                                    game.getConfiguration().getGameName()))
+                    .build();
+
             Button startButton = Components.button()
                     .withText("NEW GAME")
+                    .withAlignmentWithin(titleMenuPanel, ComponentAlignment.CENTER)
                     .withTileset(CP437TilesetResources.rexPaint16x16())
                     .build();
             startButton.handleMouseEvents(MouseEventType.MOUSE_CLICKED, (p1, p2) -> {
@@ -570,6 +631,7 @@ public class GameUI {
             // TODO: store/load game
             Button quitButton = Components.button()
                     .withText("QUIT")
+                    .withAlignmentAround(startButton, ComponentAlignment.BOTTOM_CENTER)
                     .withTileset(CP437TilesetResources.rexPaint16x16())
                     .build();
             quitButton.handleMouseEvents(MouseEventType.MOUSE_CLICKED, (p1, p2) -> {
@@ -577,14 +639,84 @@ public class GameUI {
                 return UIEventResponse.processed();
             });
 
-            Map<String, Component> startMenuComponents = new LinkedHashMap<>();
-            startMenuComponents.put("start", startButton);
-            startMenuComponents.put("quit", quitButton);
+            // this is for develop only
+            Button pop = Components.button()
+                    .withText("POP")
+                    .withAlignmentAround(quitButton, ComponentAlignment.BOTTOM_CENTER)
+                    .withTileset(CP437TilesetResources.rexPaint16x16())
+                    .build();
 
-            getScreen().addFragment(
-                    new SideBar(startMenuComponents,
-                            tileGrid.getSize(), Position.create(0, 0), game.getConfiguration().getGameName())
-            );
+            pop.handleMouseEvents(MouseEventType.MOUSE_CLICKED, (p1, p2) -> {
+                Panel modalPanel = Components.panel()
+                        .withSize(10, 3)
+                        .withAlignmentWithin(tileGrid, ComponentAlignment.CENTER)
+                        .withDecorations(
+                                org.hexworks.zircon.api.ComponentDecorations.box(BoxType.SINGLE, "moooode"))
+                        .build();
+
+                modalPanel.addComponent(Components.label()
+                        .withText("foobar")
+                        .build());
+
+                getScreen().openModal(new GameView.Dialog(getScreen(), modalPanel));
+                return UIEventResponse.processed();
+            });
+
+            titleMenuPanel.addComponent(startButton);
+            titleMenuPanel.addComponent(quitButton);
+            titleMenuPanel.addComponent(pop);
+            getScreen().addComponent(titleMenuPanel);
+        }
+    }
+
+    // Game menu/help view, not associated with the game's input handlers
+    // This is similar to the TitleView *for now* but it should evolve
+    // TODO: add a 'show commands' button
+    private static final class HelpView extends BaseView {
+
+        private final GameView gameView;
+        private final Game game;
+
+        public HelpView(GameView gameView, Game game) {
+            super(gameView.getTileGrid(), gameView.getTheme());
+            this.gameView = gameView;
+            this.game = game;
+        }
+
+        @Override
+        public void onDock() {
+            super.onDock();
+
+            Panel titleMenuPanel = Components.panel()
+                    .withSize(gameView.getTileGrid().getSize())
+                    .withDecorations(
+                            org.hexworks.zircon.api.ComponentDecorations.box(BoxType.DOUBLE,
+                                    game.getConfiguration().getGameName()))
+                    .build();
+
+            Button continueButton = Components.button()
+                    .withText("CONTINUE")
+                    .withAlignmentWithin(titleMenuPanel, ComponentAlignment.CENTER)
+                    .withTileset(CP437TilesetResources.rexPaint16x16())
+                    .build();
+            continueButton.handleMouseEvents(MouseEventType.MOUSE_CLICKED, (p1, p2) -> {
+                replaceWith(gameView);
+                return UIEventResponse.processed();
+            });
+            // TODO: store/load game
+            Button quitButton = Components.button()
+                    .withText("QUIT")
+                    .withAlignmentAround(continueButton, ComponentAlignment.BOTTOM_CENTER)
+                    .withTileset(CP437TilesetResources.rexPaint16x16())
+                    .build();
+            quitButton.handleMouseEvents(MouseEventType.MOUSE_CLICKED, (p1, p2) -> {
+                System.exit(0);
+                return UIEventResponse.processed();
+            });
+
+            titleMenuPanel.addComponent(continueButton);
+            titleMenuPanel.addComponent(quitButton);
+            getScreen().addComponent(titleMenuPanel);
         }
     }
 
