@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.function.BiFunction;
 
 /**
+ * "Layer" just meaning it's stacked with other input handlers in the context.
+ * There's probably a better name.
  *
  * @author zygon
  */
