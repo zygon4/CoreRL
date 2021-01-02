@@ -83,7 +83,7 @@ public class BloodRLMain {
                     // needs combat resolution
                     // TODO: calculate bite stats and what happens to the player, etc.
                     // gain health
-                    System.out.println("Biting " + victim.getName());
+                    copy.addLog("You feed on the blood of " + victim.getName());
                     state.getWorld().remove(victim);
 
                     IntegerAttribute hungerLevel = IntegerAttribute.create(
@@ -98,10 +98,10 @@ public class BloodRLMain {
                             .setCalendar(state.getWorld().getCalendar().addTime(30)));
                 } else {
                     // special case future ability?
-                    System.out.println("Cannot bite yourself");
+                    copy.addLog("Cannot bite yourself");
                 }
             } else {
-                System.out.println("Cannot bite that");
+                copy.addLog("Cannot bite that");
             }
 
             return copy.build();

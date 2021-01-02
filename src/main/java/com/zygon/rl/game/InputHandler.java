@@ -22,9 +22,11 @@ public final class InputHandler implements BiFunction<GameState, Input, GameStat
         if (handler.getInputs().contains(input)) {
             return handler.apply(state, input);
         } else {
-            logger.log(System.Logger.Level.INFO,
-                    "Invalid input for " + state.getInputContext().peek().getName());
-            return handler.handleInvalidInput(state);
+            String errMessage = "Invalid input for "
+                    + state.getInputContext().peek().getName();
+
+            logger.log(System.Logger.Level.INFO, errMessage);
+            return handler.handleInvalidInput(state.log(errMessage));
         }
     }
 }

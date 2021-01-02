@@ -82,6 +82,7 @@ public class GameState {
     }
 
     private final int turnCount;
+    private final GameLog gameLog;
     private final Stack<InputContext> inputContext;
     private final World world;
     private final GameConfiguration gameConfiguration;
@@ -98,6 +99,7 @@ public class GameState {
                     .build());
         }
         this.turnCount = builder.turnCount;
+        this.gameLog = builder.gameLog != null ? builder.gameLog : new GameLog();
         this.inputContext = stackCopy;
         this.world = builder.world;
         this.gameConfiguration = builder.gameConfiguration;
@@ -109,6 +111,10 @@ public class GameState {
 
     public Builder copy() {
         return new Builder(this);
+    }
+
+    public GameLog getLog() {
+        return gameLog;
     }
 
     public Stack<InputContext> getInputContext() {
@@ -123,6 +129,10 @@ public class GameState {
         return world;
     }
 
+    public GameState log(String message) {
+        return copy().addLog(message).build();
+    }
+
     // private!!!!
     private GameConfiguration getGameConfiguration() {
         return gameConfiguration;
@@ -131,6 +141,7 @@ public class GameState {
     public static class Builder {
 
         private int turnCount = 0;
+        private GameLog gameLog;
         private Stack<InputContext> inputContext;
         private World world;
         private GameConfiguration gameConfiguration;
@@ -141,9 +152,18 @@ public class GameState {
 
         private Builder(GameState gameState) {
             this.turnCount = gameState.getTurnCount();
+            this.gameLog = gameState.getLog();
             this.inputContext = gameState.getInputContext();
             this.world = gameState.getWorld();
             this.gameConfiguration = gameState.getGameConfiguration();
+        }
+
+        public Builder addLog(String message) {
+            if (this.gameLog == null) {
+                this.gameLog = new GameLog();
+            }
+            this.gameLog = this.gameLog.add(message);
+            return this;
         }
 
         public Builder addInputContext(InputContext inputContext) {

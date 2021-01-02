@@ -36,6 +36,7 @@ import org.hexworks.zircon.api.component.ComponentAlignment;
 import org.hexworks.zircon.api.component.Container;
 import org.hexworks.zircon.api.component.Fragment;
 import org.hexworks.zircon.api.component.Header;
+import org.hexworks.zircon.api.component.LogArea;
 import org.hexworks.zircon.api.component.Panel;
 import org.hexworks.zircon.api.component.TextArea;
 import org.hexworks.zircon.api.component.VBox;
@@ -372,6 +373,15 @@ public class GameUI {
                     .withSize(SIDEBAR_SCREEN_WIDTH - 2, 5)
                     .build());
 
+            // TODO: full screen log area (view?) to see/search all
+            LogArea logArea = Components.logArea()
+                    .withSize(SIDEBAR_SCREEN_WIDTH - 2, 20)
+                    .withColorTheme(ColorThemes.ammo())
+                    .withLogRowHistorySize(5)
+                    .build();
+
+            componentsByName.put("log", logArea);
+
             String playerName = getPlayer(game).getName();
 
             return new SideBar(componentsByName,
@@ -490,6 +500,13 @@ public class GameUI {
                             + "HP: " + playerSheet.getStatus().getHitPoints()
                             + "\n" + status);
 
+            LogArea logArea = (LogArea) componentsByName.get("log");
+            // TODO: probably expensive to clear/repaint?
+            logArea.clear();
+
+            for (String recent : game.getState().getLog().getRecent(5)) {
+                logArea.addHeader(recent, false);
+            }
         }
 
         private void updateGameScreen(Layer gameScreen, Game game) {
