@@ -706,7 +706,7 @@ public class GameUI {
 
             controlsButton.handleMouseEvents(MouseEventType.MOUSE_CLICKED, (p1, p2) -> {
                 Panel modalPanel = Components.panel()
-                        .withSize(50, 7)
+                        .withSize(50, 5)
                         .withAlignmentWithin(titleMenuPanel, ComponentAlignment.CENTER)
                         .withDecorations(
                                 org.hexworks.zircon.api.ComponentDecorations.box(BoxType.SINGLE))
@@ -715,8 +715,9 @@ public class GameUI {
                 // TODO: these should be pulled from the default input handler as
                 // self-organizing help content
                 modalPanel.addComponent(Components.textBox(45)
-                        .addHeader("1,2,3,5,6,7,8,9 - movement")
-                        .addHeader("a               - view abilities")
+                        .addHeader("1,2,3,5,6,7,8,9 - movement", false)
+                        .addHeader("a               - view abilities", false)
+                        .addHeader("esc             - game menu", false)
                         .build());
 
                 getScreen().openModal(new Dialog(getScreen(), modalPanel));
