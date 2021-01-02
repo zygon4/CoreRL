@@ -172,8 +172,10 @@ public class BloodRLMain {
                 .build();
 
         Game game = Game.builder(config)
-                .addGameSystem(new AttributeTimedAdjustmentSystem(config, "HUNGER_CLOCK",
-                        TimeUnit.HOURS.toSeconds(1), gs -> 1l,
+                .addGameSystem(new AttributeTimedAdjustmentSystem(config,
+                        "HUNGER_CLOCK",
+                        TimeUnit.HOURS.toSeconds(1),
+                        gs -> 1l,
                         hungerValue -> {
                             if (hungerValue < 0) {
                                 return "FULL";

@@ -77,6 +77,28 @@ public class GameUI {
 
     private static final System.Logger logger = System.getLogger(GameUI.class.getCanonicalName());
 
+    private final Game game;
+
+    public GameUI(Game game) {
+        this.game = game;
+    }
+
+    public void start() {
+        //LibgdxApplications
+        TileGrid tileGrid = SwingApplications.startTileGrid(
+                AppConfig.newBuilder()
+                        .withTitle(game.getConfiguration().getGameName() + "      " + POWERED_BY)
+                        .withSize(Size.create(80, 60))
+                        //                        .withDebugMode(true)
+                        //                        .withDebugConfig(DebugConfig.newBuilder().withRelaxBoundsCheck(true).build())
+                        .withDefaultTileset(CP437TilesetResources.rexPaint16x16())
+                        .build());
+
+        TitleView titleView = new TitleView(tileGrid, ColorThemes.afterDark(), game);
+
+        titleView.dock();
+    }
+
     private static class FOVHelper {
 
         public static final String VIEW_BLOCK_NAME = CommonAttributes.VIEW_BLOCK.name();
@@ -151,12 +173,6 @@ public class GameUI {
             // Inversed Y because the zircon screen's columns are bottom left, not top left
             this.light[currentX][this.light[0].length - currentY] = bright;
         }
-    }
-
-    private final Game game;
-
-    public GameUI(Game game) {
-        this.game = game;
     }
 
     private static final class SideBar implements Fragment {
@@ -469,6 +485,7 @@ public class GameUI {
                             + "HP: " + playerSheet.getStatus().getHitPoints()
                             + "\n" + status);
 
+            // TODO: list NPCs nearby
             LogArea logArea = (LogArea) componentsByName.get("log");
             // TODO: probably expensive to clear/repaint?
             logArea.clear();
@@ -743,22 +760,6 @@ public class GameUI {
     }
 
     private static final String POWERED_BY = "[powered by https://github.com/zygon4/CoreRL]";
-
-    public void start() {
-        //LibgdxApplications
-        TileGrid tileGrid = SwingApplications.startTileGrid(
-                AppConfig.newBuilder()
-                        .withTitle(game.getConfiguration().getGameName() + "      " + POWERED_BY)
-                        .withSize(Size.create(80, 60))
-                        //                        .withDebugMode(true)
-                        //                        .withDebugConfig(DebugConfig.newBuilder().withRelaxBoundsCheck(true).build())
-                        .withDefaultTileset(CP437TilesetResources.rexPaint16x16())
-                        .build());
-
-        TitleView titleView = new TitleView(tileGrid, ColorThemes.afterDark(), game);
-
-        titleView.dock();
-    }
 
     private static TileColor convert(Color color) {
         return TileColor.create(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
