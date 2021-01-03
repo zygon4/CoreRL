@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Goals: hold data, be serializable
@@ -11,6 +12,8 @@ import java.util.Objects;
  * @author zygon
  */
 public class Game {
+
+    private static final System.Logger logger = System.getLogger(Game.class.getCanonicalName());
 
     private final InputHandler inputHandler = new InputHandler();
     private final List<GameSystem> gameSystems;
@@ -52,7 +55,11 @@ public class Game {
         // the systems.
         if (newState.getInputContext().size() == 1) {
             for (GameSystem gs : gameSystems) {
+                long gameSystemStart = System.nanoTime();
                 newState = gs.apply(newState);
+                // If they need a name to distinguish, can add later
+                logger.log(System.Logger.Level.TRACE, "Game system " + gs.getClass().getCanonicalName()
+                        + " " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - gameSystemStart));
             }
         }
 

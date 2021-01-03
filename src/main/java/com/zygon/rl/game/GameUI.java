@@ -305,12 +305,12 @@ public class GameUI {
                             long turnStart = System.nanoTime();
                             game = game.turn(input);
                             logger.log(System.Logger.Level.TRACE,
-                                    "turn " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - turnStart));
+                                    "turn (ms) " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - turnStart));
 
                             long updateGameScreen = System.nanoTime();
                             updateGameScreen(gameScreenLayer, game);
                             logger.log(System.Logger.Level.TRACE,
-                                    "screen (ms) " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - updateGameScreen));
+                                    "game screen (ms) " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - updateGameScreen));
 
                             GameState.InputContext inputCtx = game.getState().getInputContext().peek();
                             promptHeader.setHidden(true);
@@ -365,7 +365,6 @@ public class GameUI {
             // TODO: full screen log area (view?) to see/search all
             LogArea logArea = Components.logArea()
                     .withSize(SIDEBAR_SCREEN_WIDTH - 2, 20)
-                    .withColorTheme(ColorThemes.ammo())
                     .withLogRowHistorySize(5)
                     .build();
 
@@ -490,13 +489,13 @@ public class GameUI {
                             + "\n" + status);
 
             // TODO: list NPCs nearby
-            LogArea logArea = (LogArea) componentsByName.get("log");
-            // TODO: probably expensive to clear/repaint?
-            logArea.clear();
-
-            for (String recent : game.getState().getLog().getRecent(5)) {
-                logArea.addHeader(recent, false);
-            }
+            // TODO: log area is SLOW
+//            LogArea logArea = (LogArea) componentsByName.get("log");
+//            logArea.clear();
+//
+//            for (String recent : game.getState().getLog().getRecent(5)) {
+//                logArea.addHeader(recent, false);
+//            }
         }
 
         private void updateGameScreen(Layer gameScreen, Game game) {
@@ -538,29 +537,32 @@ public class GameUI {
                         throw new RuntimeException(ex);
                     }
 
-                    // TODO: hash positions
+                    // TODO: simple caching needs performance testing
                     Position uiScreenPosition = Position.create(x, y);
                     Location loc = Location.create(getX, getY);
 
                     Entity npc = getNPC(game, loc);
 
                     if (locationLightLevelPct > .25) {
-                        Entity entity = game.getState().getWorld().getTerrain(loc);
+                        if (npc == null) {
 
-                        Maybe<Tile> existingTile = gameScreen.getTileAt(uiScreenPosition);
-                        Tile bottomTile = existingTile.get();
-                        boolean drawTile = true;
+                            Entity terrainEnt = game.getState().getWorld().getTerrain(loc);
 
-                        if (bottomTile != null) {
-                            String existingTileHash = bottomTile.getCacheKey();
-                            bottomTile = toTile(bottomTile, entity);
-                            drawTile = !bottomTile.getCacheKey().equals(existingTileHash);
-                        } else {
-                            bottomTile = toTile(entity);
-                        }
+                            Maybe<Tile> existingTile = gameScreen.getTileAt(uiScreenPosition);
+                            Tile bottomTile = existingTile.get();
+                            boolean drawTile = true;
 
-                        if (drawTile) {
-                            gameScreen.draw(bottomTile, uiScreenPosition);
+                            if (bottomTile != null) {
+                                String existingTileHash = bottomTile.getCacheKey();
+                                bottomTile = toTile(bottomTile, terrainEnt);
+                                drawTile = !bottomTile.getCacheKey().equals(existingTileHash);
+                            } else {
+                                bottomTile = toTile(terrainEnt);
+                            }
+
+                            if (drawTile) {
+                                gameScreen.draw(bottomTile, uiScreenPosition);
+                            }
                         }
 
                         // Not drawing player if they're in a shadow.. will this make sense?
