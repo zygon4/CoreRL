@@ -6,7 +6,6 @@ import com.google.common.cache.LoadingCache;
 import com.stewsters.util.shadow.twoDimention.LitMap2d;
 import com.stewsters.util.shadow.twoDimention.ShadowCaster2d;
 import com.zygon.rl.util.Audio;
-import com.zygon.rl.util.NoiseUtil;
 import com.zygon.rl.world.Attribute;
 import com.zygon.rl.world.CommonAttributes;
 import com.zygon.rl.world.DoubleAttribute;
@@ -59,12 +58,10 @@ import org.hexworks.zircon.internal.component.modal.EmptyModalResult;
 
 import java.awt.Color;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -103,6 +100,12 @@ public class GameUI {
 
         public static final String VIEW_BLOCK_NAME = CommonAttributes.VIEW_BLOCK.name();
 
+        private final World world;
+
+        public FOVHelper(World world) {
+            this.world = world;
+        }
+
         public float[][] generateSimpleResistances(Location minValues,
                 Location maxValues) {
 
@@ -110,7 +113,7 @@ public class GameUI {
 
             for (int y = minValues.getY(); y < maxValues.getY(); y++) {
                 for (int x = minValues.getX(); x < maxValues.getX(); x++) {
-                    Entity entity = getTerrain(Location.create(x, y));
+                    Entity entity = world.getTerrain(Location.create(x, y));
 
                     double viewBlocking = getMaxViewBlock(entity);
 
@@ -227,7 +230,7 @@ public class GameUI {
                         });
 
         private final TileGrid tileGrid;
-        private final FOVHelper fovHelper = new FOVHelper();
+        private final FOVHelper fovHelper;
 
         private Game game;
         private Layer gameScreenLayer = null;
@@ -239,6 +242,7 @@ public class GameUI {
             super(tileGrid, colorTheme);
 
             this.tileGrid = tileGrid;
+            this.fovHelper = new FOVHelper(game.getState().getWorld());
             this.game = game;
         }
 
@@ -481,7 +485,7 @@ public class GameUI {
                     .stream().collect(Collectors.joining(", "));
 
             ((TextOverride) componentsByName.get("status"))
-                    .setText("Age: " + playerSheet.getStatus().getAge() + "    "
+                    .setText("Age: " + playerSheet.getStatus().getAge() + "  "
                             + "HP: " + playerSheet.getStatus().getHitPoints()
                             + "\n" + status);
 
@@ -541,7 +545,7 @@ public class GameUI {
                     Entity npc = getNPC(game, loc);
 
                     if (locationLightLevelPct > .25) {
-                        Entity entity = getTerrain(loc);
+                        Entity entity = game.getState().getWorld().getTerrain(loc);
 
                         Maybe<Tile> existingTile = gameScreen.getTileAt(uiScreenPosition);
                         Tile bottomTile = existingTile.get();
@@ -581,7 +585,7 @@ public class GameUI {
         private void updateMiniMap(Layer miniMap, Game game) {
 
             Map<Location, Color> miniMapLocations = createMiniMap(
-                    getPlayerLocation(game));
+                    game.getState().getWorld(), getPlayerLocation(game));
 
             for (Location loc : miniMapLocations.keySet()) {
                 Color color = miniMapLocations.get(loc);
@@ -765,7 +769,11 @@ public class GameUI {
         return TileColor.create(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
     }
 
-    private static Map<Location, Color> createMiniMap(Location center) {
+    private static Location convert(Position position) {
+        return Location.create(position.getX(), position.getY());
+    }
+
+    private static Map<Location, Color> createMiniMap(World world, Location center) {
 
         // round
         Location rounded = Location.create(25 * (Math.round(center.getX() / 25)),
@@ -778,7 +786,7 @@ public class GameUI {
             for (int x = rounded.getX() - 200, realX = 0; x < rounded.getX() + 200; x += 25, realX++) {
 
                 Location location = Location.create(x, y);
-                Entity entity = getTerrain(location);
+                Entity entity = world.getTerrain(location);
                 WorldTile wt = WorldTile.get(entity);
 
                 colorsByLocation.put(Location.create(realX, realY), wt.getColor());
@@ -786,54 +794,6 @@ public class GameUI {
         }
 
         return colorsByLocation;
-    }
-
-    // Only used in a single thread
-    private static final byte[] NOISE_BYTES = new byte[8];
-    private static final NoiseUtil terrainNoise = new NoiseUtil(new Random().nextInt(), 1.0, 1.0);
-    private static final NoiseUtil npcNoise = new NoiseUtil(new Random().nextInt(), 1.0, 1.0);
-
-    // TODO: this should be completely customizable via json/config
-    // This is also weird because terrain tiles are NOT being set in the world ECS
-    // this is just a convenient way to get tile information.
-    private static Entity getTerrain(Location location) {
-        double terrainVal = terrainNoise.getScaledValue(location.getX(), location.getY());
-
-        ByteBuffer.wrap(NOISE_BYTES).putDouble(terrainVal);
-        int noiseFactor = ByteBuffer.wrap(NOISE_BYTES).getInt(4);
-        int noise = Math.abs(noiseFactor % 9);
-
-        if (terrainVal < .4) {
-            return Entities.PUDDLE;
-        } else if (terrainVal < .5) {
-            if (noise > 3) {
-                return Entities.DIRT;
-            } else {
-                return Entities.GRASS;
-            }
-        } else if (terrainVal < .6) {
-            if (noise > 4) {
-                return Entities.TALL_GRASS;
-            } else if (noise > 2) {
-                return Entities.TREE;
-            } else {
-                return Entities.GRASS;
-            }
-        } else if (terrainVal < .7) {
-            if (noise > 3) {
-                return Entities.GRASS;
-            } else {
-                return Entities.TALL_GRASS;
-            }
-        } else if (terrainVal < .8) {
-            if (noise > 6) {
-                return Entities.TREE;
-            } else {
-                return Entities.DIRT;
-            }
-        } else {
-            return Entities.WALL;
-        }
     }
 
     private static Entity getNPC(Game game, Location location) {

@@ -12,7 +12,10 @@ import com.zygon.rl.game.GameState;
 import com.zygon.rl.game.GameUI;
 import com.zygon.rl.util.rng.family.FamilyTreeGenerator;
 import com.zygon.rl.util.rng.family.Person;
+import com.zygon.rl.world.Attribute;
 import com.zygon.rl.world.Calendar;
+import com.zygon.rl.world.CommonAttributeValues;
+import com.zygon.rl.world.CommonAttributes;
 import com.zygon.rl.world.Entities;
 import com.zygon.rl.world.Entity;
 import com.zygon.rl.world.IntegerAttribute;
@@ -143,7 +146,7 @@ public class BloodRLMain {
                 "Alucard",
                 "He's cool",
                 new Stats(10, 10, 16, 12, 12),
-                new Status(19, 8, Set.of()),
+                new Status(19, 100, Set.of()),
                 Set.of(bite),
                 Set.of());
 
@@ -157,11 +160,15 @@ public class BloodRLMain {
 
         world.add(playerEntity);
 
-        for (int i = -5; i < 5; i++) {
+        for (int i = -3; i < 3; i++) {
             Person npc = FamilyTreeGenerator.create();
             Entity npcEntity = Entities.createMonster(npc.getName().toString())
                     .setOrigin(Location.create(i, 1))
                     .setLocation(Location.create(i, 1))
+                    .addAttributes(Attribute.builder()
+                            .setName(CommonAttributes.TEMPERMENT.name())
+                            .setValue(CommonAttributeValues.HOSTILE.name())
+                            .build())
                     .build();
 
             world.add(npcEntity);

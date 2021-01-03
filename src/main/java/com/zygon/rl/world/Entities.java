@@ -21,15 +21,15 @@ public class Entities {
     }
 
     private static final Attribute IMPASSABLE = Attribute.builder()
-            .setName(CommonAttributes.IMPASSABLE.name()).setValue(Boolean.TRUE.toString()).build();
+            .setName(CommonAttributes.IMPASSABLE.name()).setValue(CommonAttributeValues.TRUE.name()).build();
     private static final Attribute CLOSED = Attribute.builder()
-            .setName(CommonAttributes.CLOSED.name()).setValue(Boolean.TRUE.toString()).build();
+            .setName(CommonAttributes.CLOSED.name()).setValue(CommonAttributeValues.TRUE.name()).build();
     private static final Attribute HEALTH = Attribute.builder()
             .setName(CommonAttributes.HEALTH.name()).setValue("100").build();
     private static final Attribute LIVING = Attribute.builder()
-            .setName(CommonAttributes.LIVING.name()).setValue(Boolean.TRUE.toString()).build();
+            .setName(CommonAttributes.LIVING.name()).setValue(CommonAttributeValues.TRUE.name()).build();
     private static final Attribute NPC = Attribute.builder()
-            .setName(CommonAttributes.NPC.name()).setValue(Boolean.TRUE.toString()).build();
+            .setName(CommonAttributes.NPC.name()).setValue(CommonAttributeValues.TRUE.name()).build();
 
     public static Entity FLOOR = Entity.builder()
             .setName("FLOOR")

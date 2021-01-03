@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * Mutable state here..
@@ -103,9 +102,7 @@ public class EntityManager {
     }
 
     // TBD: caching if needed
-    // TBD: two maps could be big?? Also double-storing uuids which isn't great.
     private final Map<UUID, Entity> entitiesByUuid = new HashMap<>();
-    private final Map<String, Set<UUID>> entityUuidByAttribyuteName = new HashMap<>();
 
     private static final Predicate<Entity> IS_NOT_DELETED = (ent) -> {
         return ent.getAttribute(CommonAttributes.DELETED.name()) == null;
@@ -118,11 +115,6 @@ public class EntityManager {
         if (erase) {
             // remove from uuid map
             entitiesByUuid.remove(uuid);
-
-            // remove from attribute maps
-            for (String attrName : existing.getAttributeNames()) {
-                entityUuidByAttribyuteName.get(attrName).remove(uuid);
-            }
         } else {
             // don't delete, just flag
             save(existing.copy()
@@ -139,53 +131,41 @@ public class EntityManager {
 
         Set<Entity> entities = new HashSet<>();
 
-        for (var attribute : query.getAttributes().entrySet()) {
-            String attrName = attribute.getKey();
-            String attrValue = attribute.getValue();
+        for (var ent : entitiesByUuid.entrySet()) {
+            if (IS_NOT_DELETED.test(ent.getValue())) {
 
-            Set<UUID> entitiesWithAttr = entityUuidByAttribyuteName.get(attrName);
+                // sad double loop, for each entity, check each attribute to
+                // produce an intercection of entities with the query attrs
+                boolean include = true;
+                for (var attribute : query.getAttributes().entrySet()) {
+                    String attrName = attribute.getKey();
+                    String attrValue = attribute.getValue();
 
-            if (attrValue != null) {
-                // Get entities with attr=val
-                entities.addAll(entitiesWithAttr.stream()
-                        .map(this::get)
-                        .filter(IS_NOT_DELETED)
-                        .filter(ent -> ent.getAttribute(attrName).getValue().equals(attrValue))
-                        .collect(Collectors.toSet()));
-            } else {
-                // Get the entities that have this attribute e.g. "get all cursed"
-                entities.addAll(entitiesWithAttr.stream()
-                        .map(this::get)
-                        .filter(IS_NOT_DELETED)
-                        .collect(Collectors.toSet()));
+                    if (!ent.getValue().hasAttribute(attrName)
+                            || attrValue != null && !ent.getValue().getAttributeValue(attrName).equals(attrValue)) {
+                        include = false;
+                        break;
+                    }
+                }
+
+                if (include) {
+                    Location queryLocation = query.getLocation();
+                    if (queryLocation != null && !ent.getValue().getLocation().equals(queryLocation)) {
+                        include = false;
+                    }
+                }
+
+                if (include) {
+                    Location queryOrigin = query.getOrigin();
+                    if (queryOrigin != null && !ent.getValue().getOrigin().equals(queryOrigin)) {
+                        include = false;
+                    }
+                }
+
+                if (include) {
+                    entities.add(ent.getValue());
+                }
             }
-        }
-
-        // Note: this is a "query for any" implementation.
-        // It would be better to have a query that only returns entries that
-        // satisfy all queries.
-        //
-        //
-        // Query for location
-        // TBD: consider storing by location if slow
-        // The original Region code had a location cache
-        Location queryLocation = query.getLocation();
-        if (queryLocation != null) {
-            entities.addAll(entitiesByUuid.values().stream()
-                    .filter(IS_NOT_DELETED)
-                    .filter(ent -> ent.getLocation().equals(queryLocation))
-                    .collect(Collectors.toSet()));
-        }
-
-        // Query for origin location
-        // TBD: consider storing by location if slow
-        // The original Region code had a location cache
-        Location queryOrigin = query.getOrigin();
-        if (queryOrigin != null) {
-            entities.addAll(entitiesByUuid.values().stream()
-                    .filter(IS_NOT_DELETED)
-                    .filter(ent -> ent.getOrigin() != null && ent.getOrigin().equals(queryOrigin))
-                    .collect(Collectors.toSet()));
         }
 
         return entities;
@@ -200,15 +180,6 @@ public class EntityManager {
     }
 
     public Entity save(Entity entity) {
-        entitiesByUuid.put(entity.getId(), entity);
-        for (String attrName : entity.getAttributeNames()) {
-            Set<UUID> entityUuids = entityUuidByAttribyuteName.get(attrName);
-            if (entityUuids == null) {
-                entityUuids = new HashSet<>();
-                entityUuidByAttribyuteName.put(attrName, entityUuids);
-            }
-            entityUuids.add(entity.getId());
-        }
         return entitiesByUuid.put(entity.getId(), entity);
     }
 }

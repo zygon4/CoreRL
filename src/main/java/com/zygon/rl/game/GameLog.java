@@ -28,8 +28,6 @@ public class GameLog {
         // TODO: throttle repeated messages
         messages.add(message);
 
-        System.out.println(message);
-
         return new GameLog(messages);
     }
 
