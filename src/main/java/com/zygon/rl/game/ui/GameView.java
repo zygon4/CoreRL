@@ -249,16 +249,38 @@ final class GameView extends BaseView {
         World world = game.getState().getWorld();
         Entity player = getPlayer(game);
         CharacterSheet playerSheet = CharacterSheet.fromEntity(player);
+
         String worldText = "Day " + world.getCalendar().getDayOfYear() + ", year " + world.getCalendar().getYear();
         worldText += "\n" + world.getCalendar().getTime() + "  " + world.getCalendar().getSeason().getDisplay();
         ((TextArea) componentsByName.get("world")).setText(worldText);
+
         // Gathering these attributes could be expensive.. should only
         // update when needed..
         Set<Attribute> stats = playerSheet.getStats().getAttributes();
-        String statsText = stats.stream().map(attr -> attr.getName() + ": " + attr.getValue()).collect(Collectors.joining("\n"));
-        ((TextArea) componentsByName.get("stats")).setText(statsText);
-        String status = playerSheet.getStatus().getEffects().stream().collect(Collectors.joining(", "));
-        ((TextOverride) componentsByName.get("status")).setText("Age: " + playerSheet.getStatus().getAge() + "  " + "HP: " + playerSheet.getStatus().getHitPoints() + "\n" + status);
+        StringBuilder statsBuilder = new StringBuilder();
+
+        int perRow = 1;
+        for (var stat : stats) {
+            statsBuilder.append(stat.getName()).append(":").append(stat.getValue());
+
+            if (perRow == 2) {
+                statsBuilder.append("\n");
+                perRow = 1;
+            } else {
+                statsBuilder.append("  ");
+                perRow++;
+            }
+        }
+
+        ((TextArea) componentsByName.get("stats"))
+                .setText(statsBuilder.toString());
+
+        String status = playerSheet.getStatus().getEffects().stream()
+                .collect(Collectors.joining(", "));
+        ((TextOverride) componentsByName.get("status"))
+                .setText("Age: " + playerSheet.getStatus().getAge() + "  "
+                        + "HP: " + playerSheet.getStatus().getHitPoints() + "\n" + status);
+        //
         // TODO: list NPCs nearby
         // TODO: log area is SLOW
         //            LogArea logArea = (LogArea) componentsByName.get("log");

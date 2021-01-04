@@ -146,7 +146,7 @@ public class BloodRLMain {
         CharacterSheet pc = new CharacterSheet(
                 "Alucard",
                 "He's cool",
-                new Stats(10, 10, 16, 12, 12),
+                new Stats(12, 12, 12, 10, 10, 12),
                 new Status(19, 100, Set.of()),
                 Set.of(drainBlood),
                 Set.of());

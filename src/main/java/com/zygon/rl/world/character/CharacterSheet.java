@@ -115,7 +115,8 @@ public class CharacterSheet {
                 IntegerAttribute.getValue(entity.getAttribute("DEX")),
                 IntegerAttribute.getValue(entity.getAttribute("CON")),
                 IntegerAttribute.getValue(entity.getAttribute("INT")),
-                IntegerAttribute.getValue(entity.getAttribute("WIS")));
+                IntegerAttribute.getValue(entity.getAttribute("WIS")),
+                IntegerAttribute.getValue(entity.getAttribute("CHA")));
     }
 
     private static Status toStatus(Entity entity) {

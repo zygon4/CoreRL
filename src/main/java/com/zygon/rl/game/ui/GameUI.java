@@ -8,20 +8,12 @@ import com.zygon.rl.world.World;
 import com.zygon.rl.world.WorldTile;
 import org.hexworks.zircon.api.CP437TilesetResources;
 import org.hexworks.zircon.api.ColorThemes;
-import org.hexworks.zircon.api.Components;
 import org.hexworks.zircon.api.SwingApplications;
 import org.hexworks.zircon.api.application.AppConfig;
 import org.hexworks.zircon.api.color.TileColor;
-import org.hexworks.zircon.api.component.Button;
-import org.hexworks.zircon.api.component.ComponentAlignment;
-import org.hexworks.zircon.api.component.Panel;
 import org.hexworks.zircon.api.data.Position;
 import org.hexworks.zircon.api.data.Size;
-import org.hexworks.zircon.api.graphics.BoxType;
 import org.hexworks.zircon.api.grid.TileGrid;
-import org.hexworks.zircon.api.uievent.MouseEventType;
-import org.hexworks.zircon.api.uievent.UIEventResponse;
-import org.hexworks.zircon.api.view.base.BaseView;
 
 import java.awt.Color;
 import java.util.HashMap;
@@ -57,7 +49,6 @@ public class GameUI {
 
         titleView.dock();
     }
-
 
     private static final String POWERED_BY = "[powered by https://github.com/zygon4/CoreRL]";
 
