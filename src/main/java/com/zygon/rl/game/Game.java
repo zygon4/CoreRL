@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author zygon
  */
-public class Game {
+public final class Game {
 
     private static final System.Logger logger = System.getLogger(Game.class.getCanonicalName());
 
@@ -72,11 +72,11 @@ public class Game {
         return gameSystems;
     }
 
-    /*pkg*/ GameConfiguration getConfiguration() {
+    public GameConfiguration getConfiguration() {
         return configuration;
     }
 
-    /*pkg*/ GameState getState() {
+    public GameState getState() {
         return state;
     }
 

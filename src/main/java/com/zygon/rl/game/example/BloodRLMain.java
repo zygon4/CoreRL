@@ -9,7 +9,7 @@ import com.zygon.rl.game.AttributeTimedAdjustmentSystem;
 import com.zygon.rl.game.Game;
 import com.zygon.rl.game.GameConfiguration;
 import com.zygon.rl.game.GameState;
-import com.zygon.rl.game.GameUI;
+import com.zygon.rl.game.ui.GameUI;
 import com.zygon.rl.util.rng.family.FamilyTreeGenerator;
 import com.zygon.rl.util.rng.family.Person;
 import com.zygon.rl.world.Attribute;
