@@ -46,17 +46,17 @@ import java.util.concurrent.TimeUnit;
  */
 public class BloodRLMain {
 
-    private static final class BiteAbility implements Ability {
+    private static final class DrainBlood implements Ability {
 
         private final UUID playerUuid;
 
-        public BiteAbility(UUID playerUuid) {
+        public DrainBlood(UUID playerUuid) {
             this.playerUuid = playerUuid;
         }
 
         @Override
         public String getName() {
-            return "Bite";
+            return "Drain Blood";
         }
 
         @Override
@@ -66,6 +66,7 @@ public class BloodRLMain {
 
         @Override
         public Target getTargeting() {
+            // TODO: and 'held' or disabled
             return Target.ADJACENT;
         }
 
@@ -100,10 +101,10 @@ public class BloodRLMain {
                             .setCalendar(state.getWorld().getCalendar().addTime(30)));
                 } else {
                     // special case future ability?
-                    copy.addLog("Cannot bite yourself");
+                    copy.addLog("Cannot drain yourself");
                 }
             } else {
-                copy.addLog("Cannot bite that");
+                copy.addLog("Cannot drain that");
             }
 
             return copy.build();
@@ -134,8 +135,8 @@ public class BloodRLMain {
         config.setMusicFile(themeFile.toPath());
         config.setRandom(new Random());
 
-        Ability bite = new BiteAbility(config.getPlayerUuid());
-        config.setCustomAbilities(Set.of(bite));
+        Ability drainBlood = new DrainBlood(config.getPlayerUuid());
+        config.setCustomAbilities(Set.of(drainBlood));
 
         int daysPerYear = 20;
         int startingYear = 1208;
@@ -147,7 +148,7 @@ public class BloodRLMain {
                 "He's cool",
                 new Stats(10, 10, 16, 12, 12),
                 new Status(19, 100, Set.of()),
-                Set.of(bite),
+                Set.of(drainBlood),
                 Set.of());
 
         Entity playerEntity = pc.toEntity();

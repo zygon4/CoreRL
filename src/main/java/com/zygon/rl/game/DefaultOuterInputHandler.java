@@ -68,7 +68,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                 // not serialized using the Entity class (yet).
                 Set<Ability> abilities = new LinkedHashSet<>();
                 abilities.addAll(character.getAbilities());
-                abilities.add(abilitiesByName.get("Bite"));
+                abilities.add(abilitiesByName.get("Drain Blood"));
                 character = character.set(abilities);
                 // Done with hack
 
