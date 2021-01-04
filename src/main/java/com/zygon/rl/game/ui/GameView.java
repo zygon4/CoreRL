@@ -104,62 +104,80 @@ final class GameView extends BaseView {
                 }
             }
 
-            VBox gameScreen = Components.vbox().withSize(tileGrid.getSize().getWidth() - SIDEBAR_SCREEN_WIDTH, tileGrid.getSize().getHeight() - 3).withDecorations(org.hexworks.zircon.api.ComponentDecorations.box(BoxType.DOUBLE)).withAlignmentWithin(tileGrid, ComponentAlignment.TOP_LEFT).build();
+            VBox gameScreen = Components.vbox()
+                    .withSize(tileGrid.getSize().getWidth() - SIDEBAR_SCREEN_WIDTH, tileGrid.getSize().getHeight() - 3)
+                    .withDecorations(org.hexworks.zircon.api.ComponentDecorations.box(BoxType.DOUBLE))
+                    .withAlignmentWithin(tileGrid, ComponentAlignment.TOP_LEFT)
+                    .build();
             getScreen().addComponent(gameScreen);
 
             sideBar = createSideBar(Position.create(gameScreen.getWidth(), 0), game);
             getScreen().addFragment(sideBar);
 
-            miniMapLayer = Layer.newBuilder().withSize(SIDEBAR_SCREEN_WIDTH, SIDEBAR_SCREEN_WIDTH).withOffset(gameScreen.getSize().getWidth() + 1, sideBar.getRoot().getHeight() + 1).build();
+            miniMapLayer = Layer.newBuilder()
+                    .withSize(SIDEBAR_SCREEN_WIDTH, SIDEBAR_SCREEN_WIDTH)
+                    .withOffset(gameScreen.getSize().getWidth() + 1, sideBar.getRoot().getHeight() + 1)
+                    .build();
             getScreen().addLayer(miniMapLayer);
 
-            gameScreenLayer = Layer.newBuilder().withSize(gameScreen.getSize()).build();
+            gameScreenLayer = Layer.newBuilder()
+                    .withSize(gameScreen.getSize())
+                    .build();
             getScreen().addLayer(gameScreenLayer);
 
             updateGameScreen(gameScreenLayer, game);
             updateSideBar(sideBar, game);
             updateMiniMap(miniMapLayer, game);
 
-            Header promptHeader = Components.header().withSize(20, 1).withPosition(1, gameScreen.getHeight() + 1).build();
+            Header promptHeader = Components.header()
+                    .withSize(20, 1)
+                    .withPosition(1, gameScreen.getHeight() + 1)
+                    .build();
             getScreen().addComponent(promptHeader);
             promptHeader.setHidden(true);
-            tileGrid.processKeyboardEvents(KeyboardEventType.KEY_PRESSED, Functions.fromBiConsumer((event, phase) -> {
-                Input input = Input.valueOf(event.getCode().getCode());
 
-                long turnStart = System.nanoTime();
-                game = game.turn(input);
-                logger.log(System.Logger.Level.TRACE, "turn (ms) " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - turnStart));
+            tileGrid.processKeyboardEvents(KeyboardEventType.KEY_PRESSED,
+                    Functions.fromBiConsumer((event, phase) -> {
+                        Input input = Input.valueOf(event.getCode().getCode());
 
-                long updateGameScreen = System.nanoTime();
-                updateGameScreen(gameScreenLayer, game);
-                logger.log(System.Logger.Level.TRACE, "game screen (ms) " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - updateGameScreen));
+                        long turnStart = System.nanoTime();
+                        game = game.turn(input);
+                        logger.log(System.Logger.Level.TRACE, "turn (ms) "
+                                + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - turnStart));
 
-                GameState.InputContext inputCtx = game.getState().getInputContext().peek();
-                promptHeader.setHidden(true);
+                        long updateGameScreen = System.nanoTime();
+                        updateGameScreen(gameScreenLayer, game);
+                        logger.log(System.Logger.Level.TRACE, "game screen (ms) "
+                                + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - updateGameScreen));
 
-                if (inputCtx.getPrompt() != GameState.InputContextPrompt.NONE) {
-                    switch (inputCtx.getPrompt()) {
-                        case DIRECTION:
-                            // TODO: modal for direction? I think it's more generic?
-                            promptHeader.setText("Which Direction?");
-                            promptHeader.setHidden(false);
-                            break;
-                        case LIST:
-                            String list = inputCtx.getHandler().getInputs().stream().map(i -> i.toString() + ") " + inputCtx.getHandler().getDisplayText(i)).collect(Collectors.joining("\n"));
-                            promptHeader.setText(list);
-                            promptHeader.setHidden(false);
-                            break;
-                        case MODAL:
-                            replaceWith(new HelpView(this, game));
-                            break;
-                    }
-                }
-                updateSideBar(sideBar, game);
-                // I didn't intend to leave this "delay" in here, but it's not a terrible idea..
-                if (game.getState().getTurnCount() % 10 == 0) {
-                    updateMiniMap(miniMapLayer, game);
-                }
-            }));
+                        GameState.InputContext inputCtx = game.getState().getInputContext().peek();
+                        promptHeader.setHidden(true);
+
+                        if (inputCtx.getPrompt() != GameState.InputContextPrompt.NONE) {
+                            switch (inputCtx.getPrompt()) {
+                                case DIRECTION:
+                                    // TODO: modal for direction? I think it's more generic?
+                                    promptHeader.setText("Which Direction?");
+                                    promptHeader.setHidden(false);
+                                    break;
+                                case LIST:
+                                    String list = inputCtx.getHandler().getInputs().stream()
+                                            .map(i -> i.toString() + ") " + inputCtx.getHandler().getDisplayText(i))
+                                            .collect(Collectors.joining("\n"));
+                                    promptHeader.setText(list);
+                                    promptHeader.setHidden(false);
+                                    break;
+                                case MODAL:
+                                    replaceWith(new HelpView(this, game));
+                                    break;
+                            }
+                        }
+                        updateSideBar(sideBar, game);
+                        // I didn't intend to leave this "delay" in here, but it's not a terrible idea..
+                        if (game.getState().getTurnCount() % 10 == 0) {
+                            updateMiniMap(miniMapLayer, game);
+                        }
+                    }));
             initialized = true;
         }
     }
@@ -167,15 +185,23 @@ final class GameView extends BaseView {
     private SideBar createSideBar(Position position, Game game) {
         // TODO: creation method
         Map<String, Component> componentsByName = new LinkedHashMap<>();
-        componentsByName.put("world", Components.textArea().withSize(SIDEBAR_SCREEN_WIDTH - 2, 4).build());
-        componentsByName.put("stats", Components.textArea().withSize(SIDEBAR_SCREEN_WIDTH - 2, 5).build());
-        componentsByName.put("status", Components.label().withSize(SIDEBAR_SCREEN_WIDTH - 2, 5).build());
+        componentsByName.put("world", Components.textArea()
+                .withSize(SIDEBAR_SCREEN_WIDTH - 2, 4).build());
+        componentsByName.put("stats", Components.textArea()
+                .withSize(SIDEBAR_SCREEN_WIDTH - 2, 4).build());
+        componentsByName.put("status", Components.label()
+                .withSize(SIDEBAR_SCREEN_WIDTH - 2, 5).build());
         // TODO: full screen log area (view?) to see/search all
-        LogArea logArea = Components.logArea().withSize(SIDEBAR_SCREEN_WIDTH - 2, 20).withLogRowHistorySize(5).build();
+        LogArea logArea = Components.logArea()
+                .withSize(SIDEBAR_SCREEN_WIDTH - 2, 20)
+                .withLogRowHistorySize(5).build();
         componentsByName.put("log", logArea);
 
         String playerName = getPlayer(game).getName();
-        return new SideBar(componentsByName, Size.create(SIDEBAR_SCREEN_WIDTH, tileGrid.getSize().getHeight() - SIDEBAR_SCREEN_WIDTH), position, playerName);
+        return new SideBar(componentsByName,
+                Size.create(SIDEBAR_SCREEN_WIDTH, tileGrid.getSize().getHeight() - SIDEBAR_SCREEN_WIDTH),
+                position,
+                playerName);
     }
 
     private static int getFoVForce(Game game) {
@@ -236,12 +262,18 @@ final class GameView extends BaseView {
 
     private Tile toTile(Tile tile, Entity entity) {
         WorldTile wt = WorldTile.get(entity);
-        return tile.asCharacterTile().get().withBackgroundColor(colorCache.getUnchecked(Color.BLACK)).withForegroundColor(colorCache.getUnchecked(wt.getColor())).withCharacter(wt.getGlyph(entity));
+        return tile.asCharacterTile().get()
+                .withBackgroundColor(colorCache.getUnchecked(Color.BLACK))
+                .withForegroundColor(colorCache.getUnchecked(wt.getColor()))
+                .withCharacter(wt.getGlyph(entity));
     }
 
     private Tile toTile(Entity entity) {
         WorldTile wt = WorldTile.get(entity);
-        return Tile.newBuilder().withForegroundColor(colorCache.getUnchecked(wt.getColor())).withCharacter(wt.getGlyph(entity)).buildCharacterTile();
+        return Tile.newBuilder()
+                .withForegroundColor(colorCache.getUnchecked(wt.getColor()))
+                .withCharacter(wt.getGlyph(entity))
+                .buildCharacterTile();
     }
 
     private void updateSideBar(SideBar sideBar, Game game) {
@@ -295,11 +327,15 @@ final class GameView extends BaseView {
         Location playerLocation = getPlayerLocation(game);
         int xHalf = gameScreen.getSize().getWidth() / 2;
         int yHalf = gameScreen.getSize().getHeight() / 2;
+
         // Note these are zero-based
-        float[][] lightResistances = fovHelper.generateSimpleResistances(Location.create(playerLocation.getX() - xHalf, playerLocation.getY() - yHalf), Location.create(playerLocation.getX() + xHalf, playerLocation.getY() + yHalf));
+        float[][] lightResistances = fovHelper.generateSimpleResistances(
+                Location.create(playerLocation.getX() - xHalf, playerLocation.getY() - yHalf),
+                Location.create(playerLocation.getX() + xHalf, playerLocation.getY() + yHalf));
         LitMap2d lightMap = new LitMap2DImpl(lightResistances);
         ShadowCaster2d shadowCaster = new ShadowCaster2d(lightMap);
         long fovForce = getFoVForce(game);
+
         try {
             shadowCaster.recalculateFOV(lightMap.getXSize() / 2, lightMap.getYSize() / 2, fovForce, .5f);
         } catch (java.lang.ArrayIndexOutOfBoundsException aioob) {
@@ -362,12 +398,15 @@ final class GameView extends BaseView {
     }
 
     private void updateMiniMap(Layer miniMap, Game game) {
-        Map<Location, Color> miniMapLocations = GameUI.createMiniMap(game.getState().getWorld(), getPlayerLocation(game));
+        Map<Location, Color> miniMapLocations = GameUI.createMiniMap(
+                game.getState().getWorld(), getPlayerLocation(game));
         for (Location loc : miniMapLocations.keySet()) {
             Color color = miniMapLocations.get(loc);
             TileColor tileColor = colorCache.getUnchecked(color);
-            Tile tile = BLANK_TILE.createCopy().withBackgroundColor(tileColor).withForegroundColor(ANSITileColor.BRIGHT_CYAN);
+            Tile tile = BLANK_TILE.createCopy().withBackgroundColor(tileColor)
+                    .withForegroundColor(ANSITileColor.BRIGHT_CYAN);
             Position offset = Position.create(loc.getX(), loc.getY());
+
             miniMap.draw(tile, offset);
         }
     }
