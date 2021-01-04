@@ -39,6 +39,15 @@ public class World {
         entityManager.save(entity);
     }
 
+    public boolean canMove(Location destination) {
+        Entity terrain = getTerrain(destination);
+        if (terrain.hasAttribute(CommonAttributes.IMPASSABLE.name())) {
+            return false;
+        }
+        Entity dest = get(destination);
+        return dest == null || dest.getAttribute(CommonAttributes.IMPASSABLE.name()) == null;
+    }
+
     // These APIS (the "gets") are becoming weird..
     public Set<Entity> getAll(Location location, Location origin) {
         Set<Entity> entities = entityManager.findAll(

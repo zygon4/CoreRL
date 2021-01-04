@@ -83,20 +83,23 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                                 .build());
             }
             case NUMPAD_5, DIGIT_5 -> {
-                // TODO: log
-                //                    System.out.println("Waiting " + input.getInput());
+                copy.addLog("Waiting");
                 copy.setWorld(state.getWorld()
                         .setCalendar(state.getWorld().getCalendar().addTime(DEFAULT_ACTION_TIME)));
                 break;
             }
             case NUMPAD_1, NUMPAD_2, NUMPAD_3, NUMPAD_4, /* NOT 5*/ NUMPAD_6, NUMPAD_7, NUMPAD_8, NUMPAD_9,
                  DIGIT_1, DIGIT_2, DIGIT_3, DIGIT_4, /* NOT 5*/ DIGIT_6, DIGIT_7, DIGIT_8, DIGIT_9 -> {
-                // TODO: check if location is available, check for bump actions
+
                 Entity player = getPlayer(state);
                 Location playerLocation = player.getLocation();
 
                 Location destination = getRelativeLocation(playerLocation, input);
-                state.getWorld().move(player, destination);
+                if (state.getWorld().canMove(destination)) {
+                    state.getWorld().move(player, destination);
+                } else {
+                    // TODO: bump to interact
+                }
 
                 // Same movement cost everywhere for now..
                 // Same movement speed, etc

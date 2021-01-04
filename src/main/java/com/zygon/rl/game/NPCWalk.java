@@ -50,7 +50,7 @@ final class NPCWalk extends GameSystem {
                 // move towards, use available weapon
                 List<Location> pathToPlayer = npc.getLocation().getPath(player,
                         (l) -> {
-                            return canMove(l, world);
+                            return world.canMove(l);
                         });
 
                 if (pathToPlayer == null) {
@@ -64,7 +64,7 @@ final class NPCWalk extends GameSystem {
                     state = state.log(npc.getName() + " attacks!");
                 } else {
                     // can move may be calculated already in the pathing..
-                    if (canMove(pathToPlayer.get(0), state.getWorld())) {
+                    if (state.getWorld().canMove(pathToPlayer.get(0))) {
                         state.getWorld().move(npc, pathToPlayer.get(0));
                     }
                 }
@@ -74,7 +74,7 @@ final class NPCWalk extends GameSystem {
                     List<Location> neighboringLocations = npc.getLocation().getNeighbors()
                             .stream().collect(Collectors.toList());
                     Collections.shuffle(neighboringLocations);
-                    if (canMove(neighboringLocations.get(0), state.getWorld())) {
+                    if (state.getWorld().canMove(neighboringLocations.get(0))) {
                         state.getWorld().move(npc, neighboringLocations.get(0));
                     }
                 }
@@ -82,14 +82,4 @@ final class NPCWalk extends GameSystem {
         }
         return state;
     }
-
-    private boolean canMove(Location destination, World world) {
-        Entity terrain = world.getTerrain(destination);
-        if (terrain.hasAttribute(CommonAttributes.IMPASSABLE.name())) {
-            return false;
-        }
-        Entity dest = world.get(destination);
-        return dest == null || dest.getAttribute(CommonAttributes.IMPASSABLE.name()) == null;
-    }
-
 }
