@@ -10,6 +10,7 @@ import com.zygon.rl.game.GameState;
 import com.zygon.rl.game.Input;
 import com.zygon.rl.util.Audio;
 import com.zygon.rl.world.Attribute;
+import com.zygon.rl.world.CommonAttributes;
 import com.zygon.rl.world.Entities;
 import com.zygon.rl.world.Entity;
 import com.zygon.rl.world.Location;
@@ -43,6 +44,7 @@ import org.hexworks.zircon.api.view.base.BaseView;
 import java.awt.Color;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -192,6 +194,29 @@ final class GameView extends BaseView {
         }
     }
 
+    static Map<Location, Color> createMiniMap(World world, Location center) {
+
+        // round
+        Location rounded = Location.create(25 * (Math.round(center.getX() / 25)),
+                25 * (Math.round(center.getY() / 25)));
+
+        // PERF: could be passed in for performance
+        Map<Location, Color> colorsByLocation = new HashMap<>();
+
+        for (int y = rounded.getY() + 200, realY = 0; y > rounded.getY() - 200; y -= 25, realY++) {
+            for (int x = rounded.getX() - 200, realX = 0; x < rounded.getX() + 200; x += 25, realX++) {
+
+                Location location = Location.create(x, y);
+                Entity entity = world.getTerrain(location);
+                WorldTile wt = WorldTile.get(entity);
+
+                colorsByLocation.put(Location.create(realX, realY), wt.getColor());
+            }
+        }
+
+        return colorsByLocation;
+    }
+
     private SideBar createSideBar(Position position, Game game) {
         // TODO: creation method
         Map<String, Component> componentsByName = new LinkedHashMap<>();
@@ -260,6 +285,15 @@ final class GameView extends BaseView {
         }
         // TODO: modified by character stats, status, traits
         return fov;
+    }
+
+    private static Entity getNPC(Game game, Location location) {
+
+        Set<Entity> entities = game.getState().getWorld().getAll(location, null);
+
+        return entities.stream()
+                .filter(ent -> ent.getAttribute(CommonAttributes.NPC.name()) != null)
+                .findFirst().orElse(null);
     }
 
     private Entity getPlayer(Game game) {
@@ -370,7 +404,7 @@ final class GameView extends BaseView {
                 // TODO: simple caching needs performance testing
                 Position uiScreenPosition = Position.create(x, y);
                 Location loc = Location.create(getX, getY);
-                Entity npc = GameUI.getNPC(game, loc);
+                Entity npc = getNPC(game, loc);
                 if (locationLightLevelPct > .25) {
                     if (npc == null) {
                         Entity terrainEnt = game.getState().getWorld().getTerrain(loc);
@@ -408,7 +442,7 @@ final class GameView extends BaseView {
     }
 
     private void updateMiniMap(Layer miniMap, Game game) {
-        Map<Location, Color> miniMapLocations = GameUI.createMiniMap(
+        Map<Location, Color> miniMapLocations = createMiniMap(
                 game.getState().getWorld(), getPlayerLocation(game));
         for (Location loc : miniMapLocations.keySet()) {
             Color color = miniMapLocations.get(loc);

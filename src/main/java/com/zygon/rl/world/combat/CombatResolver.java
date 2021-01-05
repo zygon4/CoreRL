@@ -116,7 +116,7 @@ public class CombatResolver {
         } else {
             if (!fail) {
                 // regular hit
-                int toHitModifier = attackRoll + attacker.getStats().getDexterity();
+                int toHitModifier = attackRoll + attacker.getStats().getStrength();
                 if (weapon != null) {
                     toHitModifier += weapon.getToHit();
                 }
