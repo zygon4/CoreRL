@@ -31,15 +31,17 @@ public class CharacterSheet {
 
     private final Stats stats;
     private final Status status;
+    private final Equipment equipment;
     private final Set<Ability> abilities;
     private final Set<Spell> spells;
 
     public CharacterSheet(String name, String description, Stats stats, Status status,
-            Set<Ability> abilities, Set<Spell> spells) {
+            Equipment equipment, Set<Ability> abilities, Set<Spell> spells) {
         this.name = name;
         this.description = description;
         this.stats = stats;
         this.status = status;
+        this.equipment = equipment;
         this.abilities = Collections.unmodifiableSet(abilities);
         this.spells = Collections.unmodifiableSet(spells);
     }
@@ -50,6 +52,10 @@ public class CharacterSheet {
 
     public String getDescription() {
         return description;
+    }
+
+    public Equipment getEquipment() {
+        return equipment;
     }
 
     public Stats getStats() {
@@ -69,11 +75,11 @@ public class CharacterSheet {
     }
 
     public CharacterSheet set(Status status) {
-        return new CharacterSheet(name, description, stats, status, abilities, spells);
+        return new CharacterSheet(name, description, stats, status, equipment, abilities, spells);
     }
 
     public CharacterSheet set(Set<Ability> abilities) {
-        return new CharacterSheet(name, description, stats, status, abilities, spells);
+        return new CharacterSheet(name, description, stats, status, equipment, abilities, spells);
     }
 
     public static CharacterSheet fromEntity(Entity entity) {
@@ -83,6 +89,7 @@ public class CharacterSheet {
                 entity.getDescription(),
                 toStats(entity),
                 toStatus(entity),
+                toEquipment(entity),
                 Set.of(),
                 Set.of());
     }
@@ -127,6 +134,10 @@ public class CharacterSheet {
                         .filter(attrName -> attrName.startsWith(STATUS_PREFIX))
                         .map(attrName -> entity.getAttributeValue(attrName))
                         .collect(Collectors.toSet()));
+    }
+
+    private static Equipment toEquipment(Entity entity) {
+        return new Equipment(new Weapon(20, 2, 4, 1, 0, 0, 0));
     }
 
     // TODO: the rest of the setters as needed
