@@ -71,8 +71,10 @@ final class GameView extends BaseView {
                     return GameUI.convert(key);
                 }
             });
+
     private final TileGrid tileGrid;
     private final FOVHelper fovHelper;
+
     private Game game;
     private Layer gameScreenLayer = null;
     private SideBar sideBar = null;
@@ -145,6 +147,12 @@ final class GameView extends BaseView {
                         logger.log(System.Logger.Level.TRACE, "turn (ms) "
                                 + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - turnStart));
 
+                        if (game.getState().isPlayerDead()) {
+                            replaceWith(new TitleView(tileGrid, getTheme(), game,
+                                    // TODO: better death notice
+                                    "YOU DIED!\nYou lasted " + game.getState().getTurnCount() + " turns"));
+                        }
+
                         long updateGameScreen = System.nanoTime();
                         updateGameScreen(gameScreenLayer, game);
                         logger.log(System.Logger.Level.TRACE, "game screen (ms) "
@@ -168,6 +176,8 @@ final class GameView extends BaseView {
                                     promptHeader.setHidden(false);
                                     break;
                                 case MODAL:
+                                    // TODO: this isn't meant to be specifically
+                                    // the help view..
                                     replaceWith(new HelpView(this, game));
                                     break;
                             }

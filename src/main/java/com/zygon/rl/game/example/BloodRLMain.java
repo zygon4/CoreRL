@@ -23,8 +23,10 @@ import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
 import com.zygon.rl.world.character.Ability;
 import com.zygon.rl.world.character.CharacterSheet;
+import com.zygon.rl.world.character.Equipment;
 import com.zygon.rl.world.character.Stats;
 import com.zygon.rl.world.character.Status;
+import com.zygon.rl.world.character.Weapon;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import org.apache.commons.io.IOUtils;
@@ -148,6 +150,7 @@ public class BloodRLMain {
                 "He's cool",
                 new Stats(12, 12, 12, 10, 10, 12),
                 new Status(19, 100, Set.of()),
+                new Equipment(new Weapon(18, 2, 6, 2, 0, 1, 0)),
                 Set.of(drainBlood),
                 Set.of());
 

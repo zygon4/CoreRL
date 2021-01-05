@@ -1,6 +1,9 @@
 package com.zygon.rl.game;
 
 // Would almost prefer a central "world" interface
+import com.zygon.rl.world.CommonAttributeValues;
+import com.zygon.rl.world.CommonAttributes;
+import com.zygon.rl.world.Entity;
 import com.zygon.rl.world.World;
 
 import java.util.Objects;
@@ -127,6 +130,11 @@ public class GameState {
 
     public World getWorld() {
         return world;
+    }
+
+    public boolean isPlayerDead() {
+        Entity player = getWorld().get(getGameConfiguration().getPlayerUuid());
+        return player.getAttributeValue(CommonAttributes.DEAD.name()).equals(CommonAttributeValues.TRUE.name());
     }
 
     public GameState log(String message) {
