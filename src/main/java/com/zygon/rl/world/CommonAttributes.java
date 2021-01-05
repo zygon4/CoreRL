@@ -7,6 +7,7 @@ package com.zygon.rl.world;
  */
 public enum CommonAttributes {
     CLOSED,
+    DEAD,
     DELETED,
     HEALTH,
     IMPASSABLE,
