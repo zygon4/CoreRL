@@ -134,7 +134,9 @@ public class GameState {
 
     public boolean isPlayerDead() {
         Entity player = getWorld().get(getGameConfiguration().getPlayerUuid());
-        return player.getAttributeValue(CommonAttributes.DEAD.name()).equals(CommonAttributeValues.TRUE.name());
+        return player.hasAttribute(CommonAttributes.DEAD.name())
+                && player.getAttributeValue(CommonAttributes.DEAD.name())
+                        .equals(CommonAttributeValues.TRUE.name());
     }
 
     public GameState log(String message) {
