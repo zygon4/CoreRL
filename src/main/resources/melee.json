@@ -1,0 +1,13 @@
+[
+    {
+        "id": "dagger",
+        "type": "MELEE",
+        "symbol": ",",
+        "name": "dagger",
+        "description": "A small dagger",
+        "damage": 4,
+        "dice": 1,
+        "toHit": 1,
+        "toDamage": 0
+    }
+]
