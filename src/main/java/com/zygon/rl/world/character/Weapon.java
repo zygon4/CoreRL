@@ -25,15 +25,19 @@ public class Weapon {
         this.initMod = initMod;
     }
 
-    public int calculateHit(DiceRoller dice) {
+    private int calculateHit(DiceRoller dice, int toDamage) {
         return calcDamage(dice, numDice, damage) + toDamage;
+    }
+
+    public int calculateHit(DiceRoller dice) {
+        return calculateHit(dice, toDamage);
     }
 
     public int calculateCrit(DiceRoller dice) {
         int damageDealt = 0;
 
         for (int i = 0; i < critMod; i++) {
-            damageDealt += calcDamage(dice, numDice, damage);
+            damageDealt += calculateHit(dice, 0);
         }
 
         return damageDealt + toDamage;
