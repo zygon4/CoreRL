@@ -1,9 +1,12 @@
 package com.zygon.rl.game;
 
+import com.zygon.rl.world.CommonAttributeValues;
+import com.zygon.rl.world.CommonAttributes;
 import com.zygon.rl.world.Entity;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.character.Ability;
 import com.zygon.rl.world.character.CharacterSheet;
+import com.zygon.rl.world.combat.CombatResolver;
 import org.hexworks.zircon.api.uievent.KeyCode;
 
 import java.util.Collections;
@@ -91,14 +94,30 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
             case NUMPAD_1, NUMPAD_2, NUMPAD_3, NUMPAD_4, /* NOT 5*/ NUMPAD_6, NUMPAD_7, NUMPAD_8, NUMPAD_9,
                  DIGIT_1, DIGIT_2, DIGIT_3, DIGIT_4, /* NOT 5*/ DIGIT_6, DIGIT_7, DIGIT_8, DIGIT_9 -> {
 
-                Entity player = getPlayer(state);
-                Location playerLocation = player.getLocation();
+                Entity playerEnt = getPlayer(state);
+                Location playerLocation = playerEnt.getLocation();
 
                 Location destination = getRelativeLocation(playerLocation, input);
                 if (state.getWorld().canMove(destination)) {
-                    state.getWorld().move(player, destination);
+                    state.getWorld().move(playerEnt, destination);
                 } else {
                     // TODO: bump to interact
+                    Entity interactable = state.getWorld().get(destination);
+                    if (interactable.hasAttribute(CommonAttributes.NPC.name())
+                            && interactable.getAttributeValue(CommonAttributes.TEMPERMENT.name())
+                                    .equals(CommonAttributeValues.HOSTILE.name())) {
+                        CharacterSheet player = CharacterSheet.fromEntity(playerEnt);
+
+                        // TODO: NPC entity does not contain enough info
+                        // for testing only lets attack ourselves!
+                        CharacterSheet npc = player; //CharacterSheet.fromEntity(interactable);
+                        CombatResolver combat = new CombatResolver(getGameConfiguration().getRandom());
+                        CombatResolver.Resolution resolveCloseCombat = combat.resolveCloseCombat(player, npc);
+                        System.out.println(resolveCloseCombat);
+
+                        // TODO: resolve damages, kill NPCs or player
+                    }
+                    // else an item?
                 }
 
                 // Same movement cost everywhere for now..

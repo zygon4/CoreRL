@@ -60,7 +60,7 @@ public class CombatResolver {
             }
 
             if (critial) {
-                sb.append("Critial!\n");
+                sb.append("Critical!\n");
             }
 
             sb.append(damageByType.entrySet().stream()
@@ -106,6 +106,7 @@ public class CombatResolver {
         int attackRoll = dice.rollD20();
         boolean critical = isCritical(weapon, attackRoll);
         boolean fail = isFail(attackRoll);
+        boolean miss = fail;
         int defenderAC = calculateAC(defender);
         int dmg = 0;
 
@@ -121,6 +122,7 @@ public class CombatResolver {
                     toHitModifier += weapon.getToHit();
                 }
                 if (toHitModifier > defenderAC) {
+                    miss = false;
                     dmg = weapon != null
                             ? weapon.calculateHit(dice)
                             : 1 + attacker.getStats().getStrength();
@@ -128,7 +130,7 @@ public class CombatResolver {
             }
         }
 
-        Resolution resolution = new Resolution(fail, critical);
+        Resolution resolution = new Resolution(miss, critical);
         if (dmg > 0) {
             // TODO: different weapon types
             resolution.set(DamageType.Bludgeoning, dmg);
