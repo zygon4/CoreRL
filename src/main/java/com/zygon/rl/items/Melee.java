@@ -17,9 +17,8 @@ import java.util.stream.Collectors;
 
 /**
  *
- * @author zygon
  */
-public class Melee {
+public class Melee extends Item {
 
     private static final Map<String, Melee> MELEE_BY_ID = new HashMap<>();
 
@@ -41,35 +40,10 @@ public class Melee {
         return MELEE_BY_ID.get(id);
     }
 
-    private final String id = null;
-    private final String type = null;
-    private final String symbol = null;
-    private final String name = null;
-    private final String description = null;
     private int damage;
     private int dice;
     private int toHit;
     private int toDamage;
-
-    public String getId() {
-        return id;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public String getSymbol() {
-        return symbol;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
 
     public int getDamage() {
         return damage;
