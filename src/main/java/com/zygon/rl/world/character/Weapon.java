@@ -1,8 +1,7 @@
 package com.zygon.rl.world.character;
 
 /**
- *
- * @author zygon
+ * Also adding items/weapons Melee, so these need to be reconciled.
  */
 public class Weapon {
 

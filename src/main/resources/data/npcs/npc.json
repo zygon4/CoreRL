@@ -1,0 +1,11 @@
+[
+    {
+        "id": "generic",
+        "type": "NPC",
+        "name": "?",
+        "description": "Salt of the earth",
+        "symbol": "P",
+        "color": "yellow",
+        "aggression": 2
+    }
+]

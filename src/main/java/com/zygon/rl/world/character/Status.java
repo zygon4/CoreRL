@@ -1,11 +1,7 @@
 package com.zygon.rl.world.character;
 
-import com.zygon.rl.world.Attribute;
-import com.zygon.rl.world.IntegerAttribute;
-
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -15,9 +11,9 @@ public class Status {
 
     private final int age;
     private final int hitPoints;
-    private final Set<String> effects;
+    private final Map<String, Integer> effects;
 
-    public Status(int age, int hitPoints, Set<String> effects) {
+    public Status(int age, int hitPoints, Map<String, Integer> effects) {
         this.age = age;
         this.hitPoints = hitPoints;
         this.effects = effects;
@@ -27,7 +23,7 @@ public class Status {
         return age;
     }
 
-    public Set<String> getEffects() {
+    public Map<String, Integer> getEffects() {
         return effects;
     }
 
@@ -48,26 +44,18 @@ public class Status {
     }
 
     public Status addEffect(String effect) {
-        Set<String> effects = new HashSet<>(this.effects);
-        effects.add(effect);
+        return addEffect(effect, null);
+    }
+
+    public Status addEffect(String effect, Integer value) {
+        Map<String, Integer> effects = new HashMap<>(this.effects);
+        effects.put(effect, value);
         return new Status(age, hitPoints, effects);
     }
 
     public Status removeEffect(String effect) {
-        Set<String> effects = new HashSet<>(this.effects);
+        Map<String, Integer> effects = new HashMap<>(this.effects);
         effects.remove(effect);
         return new Status(age, hitPoints, effects);
-    }
-
-    public Set<Attribute> getAttributes() {
-        Set<Attribute> stats = new LinkedHashSet<>();
-
-        stats.add(IntegerAttribute.create("Age", "Age", getAge()));
-        stats.add(IntegerAttribute.create("HP", "Hit Points", getHitPoints()));
-        effects.forEach(effect -> {
-            stats.add(Attribute.builder().setName(effect).build());
-        });
-
-        return stats;
     }
 }

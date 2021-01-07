@@ -1,9 +1,9 @@
 package com.zygon.rl.game;
 
-import com.zygon.rl.world.CommonAttributeValues;
+import com.zygon.rl.data.Element;
 import com.zygon.rl.world.CommonAttributes;
-import com.zygon.rl.world.Entity;
 import com.zygon.rl.world.Location;
+import com.zygon.rl.world.World;
 import com.zygon.rl.world.character.Ability;
 import com.zygon.rl.world.character.CharacterSheet;
 import com.zygon.rl.world.combat.CombatResolver;
@@ -64,8 +64,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
             }
             // ability - present abilities
             case KEY_A -> {
-                Entity playerEntity = getPlayer(state);
-                CharacterSheet character = CharacterSheet.fromEntity(playerEntity);
+                CharacterSheet character = state.getWorld().get("player");
 
                 // As a (not terrible) hack, adding bite manually because it's
                 // not serialized using the Entity class (yet).
@@ -94,19 +93,19 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
             case NUMPAD_1, NUMPAD_2, NUMPAD_3, NUMPAD_4, /* NOT 5*/ NUMPAD_6, NUMPAD_7, NUMPAD_8, NUMPAD_9,
                  DIGIT_1, DIGIT_2, DIGIT_3, DIGIT_4, /* NOT 5*/ DIGIT_6, DIGIT_7, DIGIT_8, DIGIT_9 -> {
 
-                Entity playerEnt = getPlayer(state);
-                Location playerLocation = playerEnt.getLocation();
+                final World world = state.getWorld();
+                CharacterSheet player = world.get("player");
+                Location playerLocation = world.getPlayerLocation();
 
                 Location destination = getRelativeLocation(playerLocation, input);
                 if (state.getWorld().canMove(destination)) {
-                    state.getWorld().move(playerEnt, destination);
+                    state.getWorld().move(player, playerLocation, destination);
                 } else {
                     // TODO: bump to interact
-                    Entity interactable = state.getWorld().get(destination);
-                    if (interactable.hasAttribute(CommonAttributes.NPC.name())
-                            && interactable.getAttributeValue(CommonAttributes.TEMPERMENT.name())
-                                    .equals(CommonAttributeValues.HOSTILE.name())) {
-                        CharacterSheet player = CharacterSheet.fromEntity(playerEnt);
+                    Element interactable = state.getWorld().getNEW(destination, CommonAttributes.NPC.name());
+
+                    // TODO: hostile status
+                    if (interactable != null) {
 
                         // TODO: NPC entity does not contain enough info
                         // for testing only lets attack ourselves!

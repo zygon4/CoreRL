@@ -3,6 +3,7 @@
         "id": "dagger",
         "type": "MELEE",
         "symbol": ",",
+        "color": "grey",
         "name": "dagger",
         "description": "A small dagger",
         "damage": 4,

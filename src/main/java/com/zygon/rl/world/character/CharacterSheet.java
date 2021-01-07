@@ -1,12 +1,12 @@
 package com.zygon.rl.world.character;
 
+import com.zygon.rl.data.Element;
 import com.zygon.rl.world.Entities;
 import com.zygon.rl.world.Entity;
 import com.zygon.rl.world.IntegerAttribute;
 
 import java.util.Collections;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Player or NPC
@@ -15,19 +15,10 @@ import java.util.stream.Collectors;
  *
  * @author zygon
  */
-public class CharacterSheet {
+public class CharacterSheet extends Element {
 
     // This is maybe a little hokey?
     public static final String STATUS_PREFIX = "CHAR_STATUS_";
-
-    // TODO: what do to about marshalling the entity to a character sheet?
-    // this doesn't want to have all of the fields, it would rather
-    // hold onto the Entity object but I worry about cache invalidation.
-    private final String name;
-//    private final UUID id;
-    private final String description;
-//    private final Location origin;
-//    private final Location location;
 
     private final Stats stats;
     private final Status status;
@@ -37,8 +28,8 @@ public class CharacterSheet {
 
     public CharacterSheet(String name, String description, Stats stats, Status status,
             Equipment equipment, Set<Ability> abilities, Set<Spell> spells) {
-        this.name = name;
-        this.description = description;
+        setName(name);
+        setDescription(description);
         this.stats = stats;
         this.status = status;
         this.equipment = equipment;
@@ -46,12 +37,24 @@ public class CharacterSheet {
         this.spells = Collections.unmodifiableSet(spells);
     }
 
-    public String getName() {
-        return name;
+    @Override
+    public String getId() {
+        return "player";
     }
 
-    public String getDescription() {
-        return description;
+    @Override
+    public String getType() {
+        return "player";
+    }
+
+    @Override
+    public String getSymbol() {
+        return "@";
+    }
+
+    @Override
+    public String getColor() {
+        return "red";
     }
 
     public Equipment getEquipment() {
@@ -75,25 +78,14 @@ public class CharacterSheet {
     }
 
     public CharacterSheet set(Status status) {
-        return new CharacterSheet(name, description, stats, status, equipment, abilities, spells);
+        return new CharacterSheet(getName(), getDescription(), stats, status, equipment, abilities, spells);
     }
 
     public CharacterSheet set(Set<Ability> abilities) {
-        return new CharacterSheet(name, description, stats, status, equipment, abilities, spells);
+        return new CharacterSheet(getName(), getDescription(), stats, status, equipment, abilities, spells);
     }
 
-    public static CharacterSheet fromEntity(Entity entity) {
-        // TODO: finish conversion
-        return new CharacterSheet(
-                entity.getName(),
-                entity.getDescription(),
-                toStats(entity),
-                toStatus(entity),
-                toEquipment(entity),
-                Set.of(),
-                Set.of());
-    }
-
+    @Deprecated
     public Entity toEntity() {
 
         // abilities??? are we using reflection now??
@@ -105,17 +97,10 @@ public class CharacterSheet {
                 .setDescription(getDescription())
                 .setDescription("fierce something");
 
-        getStatus().getAttributes().forEach(status -> {
-            builder.addAttributes(status);
-        });
-
-        getStats().getAttributes().forEach(stat -> {
-            builder.addAttributes(stat);
-        });
-
         return builder.build();
     }
 
+    @Deprecated
     private static Stats toStats(Entity entity) {
         return new Stats(
                 IntegerAttribute.getValue(entity.getAttribute("STR")),
@@ -124,16 +109,6 @@ public class CharacterSheet {
                 IntegerAttribute.getValue(entity.getAttribute("INT")),
                 IntegerAttribute.getValue(entity.getAttribute("WIS")),
                 IntegerAttribute.getValue(entity.getAttribute("CHA")));
-    }
-
-    private static Status toStatus(Entity entity) {
-        return new Status(
-                IntegerAttribute.getValue(entity.getAttribute("Age")),
-                IntegerAttribute.getValue(entity.getAttribute("HP")),
-                entity.getAttributeNames().stream()
-                        .filter(attrName -> attrName.startsWith(STATUS_PREFIX))
-                        .map(attrName -> entity.getAttributeValue(attrName))
-                        .collect(Collectors.toSet()));
     }
 
     private static Equipment toEquipment(Entity entity) {

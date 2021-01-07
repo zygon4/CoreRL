@@ -16,6 +16,7 @@ import java.util.UUID;
  *
  *
  */
+@Deprecated // TODO: primarily used for terrain, that should be converted to a resource file
 public class Entity {
 
     private final UUID id;

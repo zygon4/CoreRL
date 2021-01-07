@@ -1,15 +1,13 @@
 package com.zygon.rl.world;
 
+import com.zygon.rl.data.Element;
 import com.zygon.rl.util.NoiseUtil;
 
 import java.nio.ByteBuffer;
-import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * This is an ugly sweater on the ECS, could really use some more structure.
@@ -20,14 +18,17 @@ public class World {
 
     private final Calendar calendar;
     private final EntityManager entityManager;
+    // got lazy, partially immutable
+    private Location playerLocation;
 
-    public World(Calendar calendar, EntityManager entityManager) {
+    public World(Calendar calendar, EntityManager entityManager, Location playerLocation) {
         this.calendar = calendar;
         this.entityManager = entityManager;
+        this.playerLocation = playerLocation;
     }
 
     public World(Calendar calendar) {
-        this(calendar, new EntityManager());
+        this(calendar, new EntityManager(), null);
     }
 
     // this is fresh world only
@@ -35,8 +36,11 @@ public class World {
         this(new Calendar(20).addTime(TimeUnit.DAYS.toSeconds(1000)));
     }
 
-    public void add(Entity entity) {
-        entityManager.save(entity);
+    public void add(Element element, Location location) {
+        entityManager.save(element, location);
+        if (element.getId().equals("player")) {
+            playerLocation = location;
+        }
     }
 
     public boolean canMove(Location destination) {
@@ -44,53 +48,43 @@ public class World {
         if (terrain.hasAttribute(CommonAttributes.IMPASSABLE.name())) {
             return false;
         }
-        Entity dest = get(destination);
-        return dest == null || dest.getAttribute(CommonAttributes.IMPASSABLE.name()) == null;
+        Element dest = getNEW(destination);
+        // TODO: check for other non-passable elements
+        return dest == null || !dest.getType().equals(CommonAttributes.NPC.name());
     }
 
-    // These APIS (the "gets") are becoming weird..
-    public Set<Entity> getAll(Location location, Location origin) {
-        Set<Entity> entities = entityManager.findAll(
-                EntityManager.Query.builder()
-                        .setLocation(location)
-                        .setOrigin(origin)
-                        .build());
-        return entities == null ? Collections.emptySet() : Collections.unmodifiableSet(entities);
+    public Map<Location, List<Element>> getAllNEW(Location location, String type, int radius) {
+        return entityManager.get(location, type, radius);
     }
 
-    // These APIS (the "gets") are becoming weird..
-    public Set<Entity> getAll(Location location, int radius, Map<String, String> attrs) {
-
-        EntityManager.Query.Builder queryBuilder = EntityManager.Query.builder();
-
-        for (var attr : attrs.entrySet()) {
-            queryBuilder.addAttribute(attr.getKey(), attr.getValue());
-        }
-
-        // TODO: location/radius should be part of the query, not after
-        Set<Entity> entities = entityManager.findAll(queryBuilder.build()).stream()
-                .filter(ent -> ent.getLocation().getDistance(location) <= radius)
-                .collect(Collectors.toSet());
-
-        return entities == null
-                ? Collections.emptySet() : Collections.unmodifiableSet(entities);
+    public List<Element> getAllNEW(Location location, String type) {
+        return entityManager.get(location, type);
     }
 
-    public Set<Entity> getAll(Location location) {
-        return getAll(location, null);
+    public List<Element> getAllNEW(Location location) {
+        return entityManager.get(location);
     }
 
-    public Entity get(Location location) {
-        Set<Entity> entities = getAll(location, null);
-        return entities.isEmpty() ? null : entities.iterator().next();
+    public <T extends Element> T getNEW(Location location, String type) {
+        List<Element> entities = getAllNEW(location, type);
+        return entities.isEmpty() ? null : (T) entities.iterator().next();
     }
 
-    public Entity get(UUID uuid) {
-        return entityManager.get(uuid);
+    public Element getNEW(Location location) {
+        return getNEW(location, null);
+    }
+
+    public <T extends Element> T get(String id) {
+        return (T) entityManager.get(id);
     }
 
     public Calendar getCalendar() {
         return calendar;
+    }
+
+    // convience method
+    public Location getPlayerLocation() {
+        return playerLocation;
     }
 
     // Only used in a single thread
@@ -141,16 +135,19 @@ public class World {
         }
     }
 
-    public void move(Entity entity, Location destination) {
-        entityManager.delete(entity.getId());
-        entityManager.save(entity.copy().setLocation(destination).build());
+    public void move(Element element, Location from, Location to) {
+        entityManager.delete(element.getId(), from);
+        add(element, to);
     }
 
-    public void remove(Entity entity) {
-        entityManager.delete(entity.getId());
+    public void remove(Element element, Location from) {
+        entityManager.delete(element.getId(), from);
+        if (element.getId().equals("player")) {
+            playerLocation = null;
+        }
     }
 
     public World setCalendar(Calendar calendar) {
-        return new World(calendar, entityManager);
+        return new World(calendar, entityManager, playerLocation);
     }
 }

@@ -70,7 +70,6 @@ public class Location {
         return Math.sqrt(total);
     }
 
-    // This either goes here or in a util that you pass the locations (plus game info) into
     public List<Location> getPath(final Location to, Function<Location, Boolean> canTraverse) {
 
         Pair<Location, Location> projected = projectToBox(this, to, BOX_SIZE);
@@ -116,6 +115,11 @@ public class Location {
         return getPath(to, (t) -> true);
     }
 
+    /**
+     * Returns the immediate neighbors.
+     *
+     * @return
+     */
     public Set<Location> getNeighbors() {
         Set<Location> neighors = new HashSet<>();
 
@@ -130,6 +134,37 @@ public class Location {
 
         neighors.add(Location.create(x, y - 1, z));
         neighors.add(Location.create(x + 1, y - 1, z));
+
+        return neighors;
+    }
+
+    private static final int NUM_POINTS = 15;
+
+    public Set<Location> getNeighbors(int radius) {
+        // always include all immediate neighbors (special case of radius = 1)
+        // TODO: maybe just collapse the methods?
+        Set<Location> neighors = new HashSet<>(getNeighbors());
+
+        double radiusDouble = 0;
+        int numPoints = 0;
+
+        for (int i = 1; i < radius; i++) {
+
+            radiusDouble = i;
+            numPoints = NUM_POINTS * i;
+
+            for (int points = 0; points < numPoints; ++points) {
+                final double angle = Math.toRadians(((double) points / numPoints) * 360d);
+
+                Location l = Location.create(
+                        (int) (Math.cos(angle) * radiusDouble),
+                        (int) (Math.sin(angle) * radiusDouble));
+
+                if (!neighors.contains(l) && !l.equals(this)) {
+                    neighors.add(l);
+                }
+            }
+        }
 
         return neighors;
     }

@@ -5,8 +5,8 @@
  */
 package com.zygon.rl.game;
 
-import com.zygon.rl.world.Entity;
 import com.zygon.rl.world.Location;
+import com.zygon.rl.world.character.CharacterSheet;
 import org.hexworks.zircon.api.uievent.KeyCode;
 
 import java.util.Collections;
@@ -99,8 +99,8 @@ public abstract class BaseInputHandler implements LayerInputHandler {
         return gameConfiguration;
     }
 
-    protected final Entity getPlayer(final GameState state) {
-        return state.getWorld().get(gameConfiguration.getPlayerUuid());
+    protected final CharacterSheet getPlayer(final GameState state) {
+        return state.getWorld().get("player");
     }
 
     protected final Location getRelativeLocation(Location location, Input input) {

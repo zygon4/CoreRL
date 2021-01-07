@@ -1,12 +1,12 @@
 package com.zygon.rl.world;
 
-import java.util.Collections;
+import com.zygon.rl.data.Element;
+
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Mutable state here..
@@ -15,171 +15,83 @@ import java.util.function.Predicate;
  */
 public class EntityManager {
 
-    public static class Query {
+    private final Map<Location, List<Element>> entitiesByLocation = new HashMap<>();
+    private final Map<String, Element> elementsById = new HashMap<>();
 
-        private final Map<String, String> attributes;
-        private final Location origin;
-        private final Location location;
+    public void delete(String id, Location location) {
+        List<Element> existing = entitiesByLocation.get(location);
 
-        private Query(Builder builder) {
-            this.attributes = Collections.unmodifiableMap(builder.attributes);
-            this.origin = builder.origin;
-            this.location = builder.location;
-        }
+        List<Element> newElements = new ArrayList<>();
 
-        public Map<String, String> getAttributes() {
-            return attributes;
-        }
+        // There HAS to be a better way to remove the first instance of
+        // an element???
+        boolean removedFirst = false;
 
-        public Location getLocation() {
-            return location;
-        }
+        for (int i = 0; i < existing.size(); i++) {
 
-        public Location getOrigin() {
-            return origin;
-        }
-
-        public static Builder builder() {
-            return new Builder();
-        }
-
-        public static class Builder {
-
-            private Map<String, String> attributes = new HashMap<>();
-            private Location origin;
-            private Location location;
-
-            /**
-             * Any entity with this attribute will be returned regardless of the
-             * value.
-             *
-             * @param name
-             * @return
-             */
-            public Builder addAttribute(String name) {
-                attributes.put(name, null);
-                return this;
-            }
-
-            /**
-             * Any entity with this attribute=value will be returned.
-             *
-             * @param name
-             * @param value
-             * @return
-             */
-            public Builder addAttribute(String name, String value) {
-                attributes.put(name, value);
-                return this;
-            }
-
-            /**
-             * Returns entities at the given location
-             *
-             * @param location
-             * @return
-             */
-            public Builder setLocation(Location location) {
-                this.location = location;
-                return this;
-            }
-
-            /**
-             * Returns entities at the given origin location
-             *
-             * @param origin
-             * @return
-             */
-            public Builder setOrigin(Location origin) {
-                this.origin = origin;
-                return this;
-            }
-
-            public Query build() {
-                return new Query(this);
+            if (existing.get(i).getId().equals(id)) {
+                if (!removedFirst) {
+                    removedFirst = true;
+                }
+            } else {
+                newElements.add(existing.get(i));
             }
         }
-    }
 
-    // TBD: caching if needed
-    private final Map<UUID, Entity> entitiesByUuid = new HashMap<>();
-
-    private static final Predicate<Entity> IS_NOT_DELETED = (ent) -> {
-        return ent.getAttribute(CommonAttributes.DELETED.name()) == null;
-    };
-
-    // Basic CRUD for entities..
-    public void delete(UUID uuid, boolean erase) {
-        Entity existing = get(uuid);
-
-        if (erase) {
-            // remove from uuid map
-            entitiesByUuid.remove(uuid);
+        if (newElements.isEmpty()) {
+            entitiesByLocation.remove(location);
         } else {
-            // don't delete, just flag
-            save(existing.copy()
-                    .setAttributeValue(CommonAttributes.DELETED.name(), Boolean.TRUE.toString())
-                    .build());
+            entitiesByLocation.put(location, newElements);
         }
+
+        elementsById.remove(id);
     }
 
-    public void delete(UUID uuid) {
-        delete(uuid, false);
-    }
+    public Map<Location, List<Element>> get(Location location, String type, int radius) {
 
-    public Set<Entity> findAll(Query query) {
+        Map<Location, List<Element>> elementsByLocation = new HashMap<>();
 
-        Set<Entity> entities = new HashSet<>();
+        location.getNeighbors(radius).stream().forEach(loc -> {
+            List<Element> elements = get(loc);
+            if (elements != null && !elements.isEmpty()) {
+                List<Element> filtered = elements.stream()
+                        .filter(ele -> type == null || ele.getType().equals(type))
+                        .collect(Collectors.toList());
 
-        for (var ent : entitiesByUuid.entrySet()) {
-            if (IS_NOT_DELETED.test(ent.getValue())) {
-
-                // sad double loop, for each entity, check each attribute to
-                // produce an intercection of entities with the query attrs
-                boolean include = true;
-                for (var attribute : query.getAttributes().entrySet()) {
-                    String attrName = attribute.getKey();
-                    String attrValue = attribute.getValue();
-
-                    if (!ent.getValue().hasAttribute(attrName)
-                            || attrValue != null && !ent.getValue().getAttributeValue(attrName).equals(attrValue)) {
-                        include = false;
-                        break;
-                    }
-                }
-
-                if (include) {
-                    Location queryLocation = query.getLocation();
-                    if (queryLocation != null && !ent.getValue().getLocation().equals(queryLocation)) {
-                        include = false;
-                    }
-                }
-
-                if (include) {
-                    Location queryOrigin = query.getOrigin();
-                    if (queryOrigin != null && !ent.getValue().getOrigin().equals(queryOrigin)) {
-                        include = false;
-                    }
-                }
-
-                if (include) {
-                    entities.add(ent.getValue());
+                if (filtered != null && !filtered.isEmpty()) {
+                    elementsByLocation.put(loc, filtered);
                 }
             }
+        });
+
+        return elementsByLocation;
+    }
+
+    public List<Element> get(Location location, String type) {
+        List<Element> elements = get(location);
+
+        return elements != null ? elements.stream()
+                .filter(ele -> type == null || ele.getType().equals(type))
+                .collect(Collectors.toList()) : List.of();
+    }
+
+    public List<Element> get(Location location) {
+        return entitiesByLocation.get(location);
+    }
+
+    public Element get(String id) {
+        return elementsById.get(id);
+    }
+
+    public void save(Element entity, Location location) {
+
+        List<Element> entities = entitiesByLocation.get(location);
+        if (entities == null) {
+            entities = new ArrayList<>();
         }
+        entities.add(entity);
+        entitiesByLocation.put(location, entities);
 
-        return entities;
-    }
-
-    public Entity find(Query query) {
-        return findAll(query).iterator().next();
-    }
-
-    public Entity get(UUID uuid) {
-        return entitiesByUuid.get(uuid);
-    }
-
-    public Entity save(Entity entity) {
-        return entitiesByUuid.put(entity.getId(), entity);
+        elementsById.put(entity.getId(), entity);
     }
 }

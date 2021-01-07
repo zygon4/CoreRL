@@ -1,6 +1,6 @@
 package com.zygon.rl.game;
 
-import com.zygon.rl.world.Entity;
+import com.zygon.rl.data.Element;
 import com.zygon.rl.world.character.Ability;
 
 import java.util.Map;
@@ -16,10 +16,10 @@ import java.util.Set;
 public class AbilityTargetInputHandler extends BaseInputHandler {
 
     private final Ability ability;
-    private final Map<Input, Entity> targetsByInput;
+    private final Map<Input, Element> targetsByInput;
 
     private AbilityTargetInputHandler(GameConfiguration gameConfiguration,
-            Ability ability, Map<Input, Entity> targetsByInput) {
+            Ability ability, Map<Input, Element> targetsByInput) {
         super(gameConfiguration, targetsByInput.keySet());
 
         this.ability = ability;
@@ -27,10 +27,10 @@ public class AbilityTargetInputHandler extends BaseInputHandler {
     }
 
     public static final AbilityTargetInputHandler create(GameConfiguration gameConfiguration,
-            Ability ability, Set<Entity> targets) {
+            Ability ability, Set<Element> targets) {
 
         // TODO: use location-based inputs vs alphabet
-        Map<Input, Entity> targetsByInput = createAlphaInputs(targets);
+        Map<Input, Element> targetsByInput = createAlphaInputs(targets);
         return new AbilityTargetInputHandler(gameConfiguration, ability, targetsByInput);
     }
 
@@ -38,7 +38,7 @@ public class AbilityTargetInputHandler extends BaseInputHandler {
     public GameState apply(GameState state, Input input) {
 
         GameState newState = state;
-        Entity target = targetsByInput.get(input);
+        Element target = targetsByInput.get(input);
 
         if (target != null) {
             newState = ability.use(state, Optional.of(target), Optional.empty());
@@ -56,7 +56,7 @@ public class AbilityTargetInputHandler extends BaseInputHandler {
 
     @Override
     public String getDisplayText(Input input) {
-        Entity entity = targetsByInput.get(input);
+        Element entity = targetsByInput.get(input);
         return entity.getName();
     }
 

@@ -5,6 +5,9 @@
  */
 package com.zygon.rl.game.example;
 
+import com.zygon.rl.data.Element;
+import com.zygon.rl.data.items.Melee;
+import com.zygon.rl.data.npc.Npc;
 import com.zygon.rl.game.AttributeTimedAdjustmentSystem;
 import com.zygon.rl.game.Game;
 import com.zygon.rl.game.GameConfiguration;
@@ -12,13 +15,8 @@ import com.zygon.rl.game.GameState;
 import com.zygon.rl.game.ui.GameUI;
 import com.zygon.rl.util.rng.family.FamilyTreeGenerator;
 import com.zygon.rl.util.rng.family.Person;
-import com.zygon.rl.world.Attribute;
 import com.zygon.rl.world.Calendar;
-import com.zygon.rl.world.CommonAttributeValues;
 import com.zygon.rl.world.CommonAttributes;
-import com.zygon.rl.world.Entities;
-import com.zygon.rl.world.Entity;
-import com.zygon.rl.world.IntegerAttribute;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
 import com.zygon.rl.world.character.Ability;
@@ -35,6 +33,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
@@ -73,38 +72,34 @@ public class BloodRLMain {
         }
 
         @Override
-        public GameState use(GameState state, Optional<Entity> empty,
+        public GameState use(GameState state, Optional<Element> empty,
                 Optional<Location> victimLocation) {
 
-            Entity playerEnt = state.getWorld().get(playerUuid);
+            CharacterSheet player = state.getWorld().get("player");
 
             GameState.Builder copy = state.copy();
 
             // TODO: add game log
-            Entity victim = state.getWorld().get(victimLocation.get());
+            Npc victim = state.getWorld().getNEW(victimLocation.get(), CommonAttributes.NPC.name());
             if (victim != null) {
-                if (victim.getId() != playerUuid) {
-                    // TODO: biting is a special case attack
-                    // needs combat resolution
-                    // TODO: calculate bite stats and what happens to the player, etc.
-                    // gain health
-                    copy.addLog("You feed on the blood of " + victim.getName());
-                    state.getWorld().remove(victim);
+                // TODO: biting is a special case attack
+                // needs combat resolution
+                // TODO: calculate bite stats and what happens to the player, etc.
+                // gain health
+                copy.addLog("You feed on the blood of " + victim.getName());
+                state.getWorld().remove(victim, victimLocation.get());
 
-                    IntegerAttribute hungerLevel = IntegerAttribute.create(
-                            playerEnt.getAttribute("HUNGER_CLOCK"));
+                int hungerLevel = player.getStatus().getEffects().get("HUNGER_CLOCK");
 
-                    // this is very very clunky to adjust a scalar attribute..
-                    state.getWorld().add(playerEnt.copy()
-                            .setAttributeValue("HUNGER_CLOCK", String.valueOf(
-                                    hungerLevel.getIntegerValue() - 10))
-                            .build());
-                    copy.setWorld(state.getWorld()
-                            .setCalendar(state.getWorld().getCalendar().addTime(30)));
-                } else {
-                    // special case future ability?
-                    copy.addLog("Cannot drain yourself");
-                }
+                // this feels a bit clunky.. better than before but not perfect
+                state.getWorld().move(
+                        player.set(player.getStatus().addEffect("HUNGER_CLOCK", hungerLevel - 10)),
+                        state.getWorld().getPlayerLocation(),
+                        state.getWorld().getPlayerLocation());
+
+                copy.setWorld(state.getWorld()
+                        .setCalendar(state.getWorld().getCalendar().addTime(30)));
+
             } else {
                 copy.addLog("Cannot drain that");
             }
@@ -149,34 +144,37 @@ public class BloodRLMain {
                 "Alucard",
                 "He's cool",
                 new Stats(12, 12, 12, 10, 10, 12),
-                new Status(19, 100, Set.of()),
+                new Status(19, 100, Map.of("HUNGER_CLOCK", 150)),
                 new Equipment(new Weapon(18, 2, 6, 2, 0, 1, 0)),
                 Set.of(drainBlood),
                 Set.of());
 
-        Entity playerEntity = pc.toEntity();
-        playerEntity = playerEntity.copy()
-                .setId(config.getPlayerUuid())
-                .setLocation(Location.create(0, 0))
-                // TODO: initial hunger based on starting scenario
-                .setAttributeValue("HUNGER_CLOCK", String.valueOf(150))
-                .build();
+        world.add(pc, Location.create(0, 0));
 
-        world.add(playerEntity);
+        //TODO: load somewhere more official
+        Npc.load();
 
         for (int i = -3; i < 3; i++) {
-            Person npc = FamilyTreeGenerator.create();
-            Entity npcEntity = Entities.createMonster(npc.getName().toString())
-                    .setOrigin(Location.create(i, 1))
-                    .setLocation(Location.create(i, 1))
-                    .addAttributes(Attribute.builder()
-                            .setName(CommonAttributes.TEMPERMENT.name())
-                            .setValue(CommonAttributeValues.HOSTILE.name())
-                            .build())
-                    .build();
+            Person npcPerson = FamilyTreeGenerator.create();
+//            Entity npcEntity = Entities.createMonster(npcPerson.getName().toString())
+//                    .setOrigin(Location.create(i, 1))
+//                    .setLocation(Location.create(i, 1))
+//                    .addAttributes(Attribute.builder()
+//                            .setName(CommonAttributes.TEMPERMENT.name())
+//                            .setValue(CommonAttributeValues.HOSTILE.name())
+//                            .build())
+//                    .build();
 
-            world.add(npcEntity);
+            Npc npc = Npc.get("generic");
+            npc.setName(npcPerson.getName().toString());
+            world.add(npc, Location.create(i, 1));
         }
+
+        Melee.load();
+
+        Melee dagger = Melee.get("dagger");
+        world.add(dagger, Location.create(0, 0));
+        world.add(dagger, Location.create(0, -1));
 
         GameState initialState = GameState.builder(config)
                 .setWorld(world)
@@ -186,7 +184,7 @@ public class BloodRLMain {
                 .addGameSystem(new AttributeTimedAdjustmentSystem(config,
                         "HUNGER_CLOCK",
                         TimeUnit.HOURS.toSeconds(1),
-                        gs -> 1l,
+                        gs -> 1,
                         hungerValue -> {
                             if (hungerValue < 0) {
                                 return "FULL";

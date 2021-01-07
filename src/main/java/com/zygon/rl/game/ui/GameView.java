@@ -5,6 +5,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.stewsters.util.shadow.twoDimention.LitMap2d;
 import com.stewsters.util.shadow.twoDimention.ShadowCaster2d;
+import com.zygon.rl.data.Element;
 import com.zygon.rl.game.Game;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.game.Input;
@@ -46,6 +47,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -287,21 +289,19 @@ final class GameView extends BaseView {
         return fov;
     }
 
-    private static Entity getNPC(Game game, Location location) {
+    private static Element getNPC(Game game, Location location) {
 
-        Set<Entity> entities = game.getState().getWorld().getAll(location, null);
-
-        return entities.stream()
-                .filter(ent -> ent.getAttribute(CommonAttributes.NPC.name()) != null)
-                .findFirst().orElse(null);
+        List<Element> entities = game.getState().getWorld()
+                .getAllNEW(location, CommonAttributes.NPC.name());
+        return entities != null && !entities.isEmpty() ? entities.get(0) : null;
     }
 
-    private Entity getPlayer(Game game) {
-        return game.getState().getWorld().get(game.getConfiguration().getPlayerUuid());
+    private CharacterSheet getPlayer(Game game) {
+        return game.getState().getWorld().get("player");
     }
 
     private Location getPlayerLocation(Game game) {
-        return getPlayer(game).getLocation();
+        return game.getState().getWorld().getPlayerLocation();
     }
 
     private Tile toTile(Tile tile, Entity entity) {
@@ -320,11 +320,26 @@ final class GameView extends BaseView {
                 .buildCharacterTile();
     }
 
+    private Tile toTile(Tile tile, Element entity) {
+//        WorldTile wt = WorldTile.get(entity);
+        return tile.asCharacterTile().get()
+                .withBackgroundColor(GameUI.convert(Color.BLACK))
+                .withForegroundColor(GameUI.convert(Color.YELLOW))
+                .withCharacter(entity.getSymbol().charAt(0));
+    }
+
+    private Tile toTile(Element entity) {
+        //        WorldTile wt = WorldTile.get(entity);
+        return Tile.newBuilder()
+                .withForegroundColor((GameUI.convert(Color.YELLOW)))
+                .withCharacter(entity.getSymbol().charAt(0))
+                .buildCharacterTile();
+    }
+
     private void updateSideBar(SideBar sideBar, Game game) {
         Map<String, Component> componentsByName = sideBar.getComponentsByName();
         World world = game.getState().getWorld();
-        Entity player = getPlayer(game);
-        CharacterSheet playerSheet = CharacterSheet.fromEntity(player);
+        CharacterSheet playerSheet = getPlayer(game);
 
         String worldText = "Day " + world.getCalendar().getDayOfYear() + ", year " + world.getCalendar().getYear();
         worldText += "\n" + world.getCalendar().getTime() + "  " + world.getCalendar().getSeason().getDisplay();
@@ -351,8 +366,9 @@ final class GameView extends BaseView {
         ((TextArea) componentsByName.get("stats"))
                 .setText(statsBuilder.toString());
 
-        String status = playerSheet.getStatus().getEffects().stream()
-                .collect(Collectors.joining(", "));
+        String status = "TODO:";
+//        String status = playerSheet.getStatus().getEffects().stream()
+//                .collect(Collectors.joining(", "));
         ((TextOverride) componentsByName.get("status"))
                 .setText("Age: " + playerSheet.getStatus().getAge() + "  "
                         + "HP: " + playerSheet.getStatus().getHitPoints() + "\n" + status);
@@ -404,7 +420,7 @@ final class GameView extends BaseView {
                 // TODO: simple caching needs performance testing
                 Position uiScreenPosition = Position.create(x, y);
                 Location loc = Location.create(getX, getY);
-                Entity npc = getNPC(game, loc);
+                Element npc = getNPC(game, loc);
                 if (locationLightLevelPct > .25) {
                     if (npc == null) {
                         Entity terrainEnt = game.getState().getWorld().getTerrain(loc);

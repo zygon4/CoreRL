@@ -1,8 +1,6 @@
 package com.zygon.rl.game;
 
-import com.zygon.rl.world.CommonAttributes;
-import com.zygon.rl.world.Entity;
-import com.zygon.rl.world.Location;
+import com.zygon.rl.data.Element;
 import com.zygon.rl.world.character.Ability;
 
 import java.util.Map;
@@ -36,28 +34,24 @@ final class AbilityInputHandler extends BaseInputHandler {
 
         switch (ability.getTargeting()) {
             case ADJACENT -> {
-                Entity player = getPlayer(state);
-                Set<Location> adjacentLocations = player.getLocation()
-                        .getNeighbors().stream().collect(Collectors.toSet());
-
                 newState = newState.copy()
                         .addInputContext(GameState.InputContext.builder()
                                 .setName("TARGET")
                                 .setHandler(new AbilityDirectionInputHandler(
-                                        getGameConfiguration(), ability, getGameConfiguration().getPlayerUuid()))
+                                        getGameConfiguration(), ability, state.getWorld().getPlayerLocation()))
                                 .setPrompt(GameState.InputContextPrompt.DIRECTION)
                                 .build())
                         .build();
             }
             case ADJACENT_LIVING -> {
+                // This isn't being used right now..
+
                 // need to find all legal targets,
                 // should this code be preparing them? or asking for them
                 // from the game impl?
-                Entity player = getPlayer(state);
-                Set<Entity> livingAdjacents = player.getLocation().getNeighbors().stream()
-                        .map(loc -> state.getWorld().get(loc))
+                Set<Element> livingAdjacents = state.getWorld().getPlayerLocation().getNeighbors().stream()
+                        .map(loc -> state.getWorld().getNEW(loc))
                         .filter(Objects::nonNull)
-                        .filter(ent -> ent.getAttribute(CommonAttributes.LIVING.name()) != null)
                         .collect(Collectors.toSet());
 
                 newState = newState.copy()

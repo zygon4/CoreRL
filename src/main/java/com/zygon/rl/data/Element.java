@@ -1,17 +1,18 @@
-package com.zygon.rl.items;
+package com.zygon.rl.data;
 
 import com.zygon.rl.util.StringUtil;
 
 /**
- *
+ * Entity is a better term but it's taken.
  */
-public class Item {
+public class Element {
 
     private final String id = null;
     private final String type = null;
     private final String symbol = null;
-    private final String name = null;
-    private final String description = null;
+    private final String color = null;
+    private String name = null;
+    private String description = null;
 
     public String getId() {
         return id;
@@ -25,12 +26,24 @@ public class Item {
         return symbol;
     }
 
+    public String getColor() {
+        return color;
+    }
+
     public String getName() {
         return name;
     }
 
     public String getDescription() {
         return description;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override

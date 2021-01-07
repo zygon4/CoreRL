@@ -1,8 +1,8 @@
 package com.zygon.rl.world.character;
 
 // This is a bad package reference
+import com.zygon.rl.data.Element;
 import com.zygon.rl.game.GameState;
-import com.zygon.rl.world.Entity;
 import com.zygon.rl.world.Location;
 
 import java.util.Optional;
@@ -53,5 +53,5 @@ public interface Ability {
      * @param targetLocation
      * @return the GameState after using this ability.
      */
-    GameState use(GameState state, Optional<Entity> targetEntity, Optional<Location> targetLocation);
+    GameState use(GameState state, Optional<Element> targetEntity, Optional<Location> targetLocation);
 }

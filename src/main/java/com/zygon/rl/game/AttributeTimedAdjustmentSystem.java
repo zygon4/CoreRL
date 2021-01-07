@@ -1,9 +1,6 @@
 package com.zygon.rl.game;
 
-import com.zygon.rl.world.Attribute;
 import com.zygon.rl.world.Calendar;
-import com.zygon.rl.world.Entity;
-import com.zygon.rl.world.IntegerAttribute;
 import com.zygon.rl.world.character.CharacterSheet;
 
 import java.util.function.Function;
@@ -20,14 +17,14 @@ public class AttributeTimedAdjustmentSystem extends GameSystem {
 
     private final String attributeName;
     private final long frequencySeconds;
-    private final Function<GameState, Long> attributeAdjustmentFn;
-    private final Function<Long, String> statusAdjustmentFn;
+    private final Function<GameState, Integer> attributeAdjustmentFn;
+    private final Function<Integer, String> statusAdjustmentFn;
 
     private Calendar cal;
 
     public AttributeTimedAdjustmentSystem(GameConfiguration gameConfiguration, String attributeName,
-            long frequencySeconds, Function<GameState, Long> attributeAdjustmentFn,
-            Function<Long, String> statusAdjustmentFn) {
+            long frequencySeconds, Function<GameState, Integer> attributeAdjustmentFn,
+            Function<Integer, String> statusAdjustmentFn) {
         super(gameConfiguration);
         this.attributeName = attributeName;
         this.frequencySeconds = frequencySeconds;
@@ -38,7 +35,7 @@ public class AttributeTimedAdjustmentSystem extends GameSystem {
     @Override
     public GameState apply(GameState state) {
         Calendar current = state.getWorld().getCalendar();
-        Entity player = state.getWorld().get(getGameConfiguration().getPlayerUuid());
+        CharacterSheet player = state.getWorld().get("player");
 
         if (cal != null) {
             long secondsDiff = current.getDifferenceSeconds(cal);
@@ -47,15 +44,15 @@ public class AttributeTimedAdjustmentSystem extends GameSystem {
             if (numberOfAdjustments > 0) {
 
                 for (int i = 0; i < numberOfAdjustments; i++) {
-                    IntegerAttribute currentValue = IntegerAttribute.create(
-                            player.getAttribute(attributeName));
+                    Integer currentValue = player.getStatus().getEffects().get(attributeName);
 
-                    long adjustment = attributeAdjustmentFn.apply(state);
-                    long adjustedValue = currentValue.getIntegerValue() + adjustment;
+                    int adjustment = attributeAdjustmentFn.apply(state);
+                    int adjustedValue = currentValue != null ? currentValue.intValue() : 0 + adjustment;
 
-                    state.getWorld().add(player.copy()
-                            .setAttributeValue(attributeName, String.valueOf(adjustedValue))
-                            .build());
+                    state.getWorld().move(player.set(
+                            player.getStatus().addEffect(attributeName, adjustedValue)),
+                            state.getWorld().getPlayerLocation(),
+                            state.getWorld().getPlayerLocation());
                 }
                 cal = current;
             }
@@ -64,26 +61,30 @@ public class AttributeTimedAdjustmentSystem extends GameSystem {
         }
 
         if (statusAdjustmentFn != null) {
-            long watchAttrValue = IntegerAttribute.create(player.getAttribute(attributeName)).getIntegerValue();
-            Attribute statusAttr = player.getAttribute(CharacterSheet.STATUS_PREFIX + attributeName);
-            String status = statusAdjustmentFn.apply(watchAttrValue);
 
-            if (status == null) {
-                // clear status
-                if (statusAttr != null) {
-                    state.getWorld()
-                            .add(player.remove(CharacterSheet.STATUS_PREFIX + attributeName));
-                }
-            } else {
-                // add or adjust status
-                if (statusAttr == null || !statusAttr.getValue().equals(status)) {
-                    state.getWorld().add(player.add(Attribute.builder()
-                            .setName(CharacterSheet.STATUS_PREFIX + attributeName)
-                            //                        .setDescription(statusAttr.getDescription())
-                            .setValue(status)
-                            .build()));
-                }
-            }
+            // TODO:
+//            Integer watchValue = player.getStatus().getEffects().get(attributeName);
+//            String statusName = CharacterSheet.STATUS_PREFIX + attributeName;
+//            Integer statusAttr = player.getStatus().getEffects().containsKey(statusName);
+//            String status = statusAdjustmentFn.apply(watchValue);
+//
+//            if (status == null) {
+//                // clear status
+//                if (statusAttr != null) {
+//                    state.getWorld().add(player.set(
+//                            player.getStatus().removeEffect(
+//                                    CharacterSheet.STATUS_PREFIX + attributeName)), null);
+//                }
+//            } else {
+//                // add or adjust status
+//                if (statusAttr == null || !statusAttr.getValue().equals(status)) {
+//                    state.getWorld().add(player.add(Attribute.builder()
+//                            .setName(CharacterSheet.STATUS_PREFIX + attributeName)
+//                            //                        .setDescription(statusAttr.getDescription())
+//                            .setValue(status)
+//                            .build()));
+//                }
+//            }
         }
 
         return state;
