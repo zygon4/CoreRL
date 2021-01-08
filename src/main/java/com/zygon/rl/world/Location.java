@@ -157,8 +157,8 @@ public class Location {
                 final double angle = Math.toRadians(((double) points / numPoints) * 360d);
 
                 Location l = Location.create(
-                        (int) (Math.cos(angle) * radiusDouble),
-                        (int) (Math.sin(angle) * radiusDouble));
+                        getX() + (int) (Math.cos(angle) * radiusDouble),
+                        getY() + (int) (Math.sin(angle) * radiusDouble));
 
                 if (!neighors.contains(l) && !l.equals(this)) {
                     neighors.add(l);
