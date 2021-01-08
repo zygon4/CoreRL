@@ -53,23 +53,4 @@ public class Npc extends Element {
     public String toString() {
         return StringUtil.JSON.toJson(this);
     }
-
-    /**
-     * [
-     * {
-     * "type": "GENERIC", "id": "sword_wood", "symbol": "!", "color": "brown",
-     * "name": { "str": "2-by-sword" }, "description": "A two by four with a
-     * cross guard and whittled down point; not much for slashing, but much
-     * better than your bare hands.", "material": "wood", "volume": "1250 ml",
-     * "weight": "600 g", "bashing": 12, "cutting": 1, "to_hit": 1, "flags": [
-     * "SHEATH_SWORD" ], "techniques": [ "WBLOCK_1" ] },
-     *
-     */
-    // TODO: remove main
-    public static void main(String[] args) throws IOException {
-
-        NPC_BY_ID.forEach((s, m) -> {
-            System.out.println(s + " " + m);
-        });
-    }
 }

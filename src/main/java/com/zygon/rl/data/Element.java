@@ -7,7 +7,7 @@ import com.zygon.rl.util.StringUtil;
  */
 public class Element {
 
-    private final String id = null;
+    private String id = null;
     private final String type = null;
     private final String symbol = null;
     private final String color = null;
@@ -36,6 +36,10 @@ public class Element {
 
     public String getDescription() {
         return description;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public void setName(String name) {
