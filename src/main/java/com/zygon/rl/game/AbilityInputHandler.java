@@ -50,7 +50,7 @@ final class AbilityInputHandler extends BaseInputHandler {
                 // should this code be preparing them? or asking for them
                 // from the game impl?
                 Set<Element> livingAdjacents = state.getWorld().getPlayerLocation().getNeighbors().stream()
-                        .map(loc -> state.getWorld().getNEW(loc))
+                        .map(loc -> state.getWorld().get(loc))
                         .filter(Objects::nonNull)
                         .collect(Collectors.toSet());
 

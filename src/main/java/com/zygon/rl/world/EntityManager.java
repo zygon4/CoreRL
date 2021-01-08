@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 /**
@@ -15,28 +16,26 @@ import java.util.stream.Collectors;
  */
 public class EntityManager {
 
+    // TODO: don't store the elements, store their IDs (String)
     private final Map<Location, List<Element>> entitiesByLocation = new HashMap<>();
     private final Map<String, Element> elementsById = new HashMap<>();
 
     public void delete(String id, Location location) {
         List<Element> existing = entitiesByLocation.get(location);
 
-        List<Element> newElements = new ArrayList<>();
-
         // There HAS to be a better way to remove the first instance of
         // an element???
-        boolean removedFirst = false;
+        AtomicBoolean removedFirst = new AtomicBoolean(false);
+        List<Element> newElements = existing.stream()
+                .filter(ele -> {
+                    if (ele.getId().equals(id) && !removedFirst.get()) {
+                        removedFirst.set(true);
+                        return false;
+                    }
 
-        for (int i = 0; i < existing.size(); i++) {
-
-            if (existing.get(i).getId().equals(id)) {
-                if (!removedFirst) {
-                    removedFirst = true;
-                }
-            } else {
-                newElements.add(existing.get(i));
-            }
-        }
+                    return true;
+                })
+                .collect(Collectors.toList());
 
         if (newElements.isEmpty()) {
             entitiesByLocation.remove(location);
@@ -58,7 +57,7 @@ public class EntityManager {
                         .filter(ele -> type == null || ele.getType().equals(type))
                         .collect(Collectors.toList());
 
-                if (filtered != null && !filtered.isEmpty()) {
+                if (!filtered.isEmpty()) {
                     elementsByLocation.put(loc, filtered);
                 }
             }
@@ -79,6 +78,9 @@ public class EntityManager {
         return entitiesByLocation.get(location);
     }
 
+    // TODO: this is broke, saving by Id collapses the elements.
+    // This isn't so bad right NOW because we just get the player.
+    @Deprecated
     public Element get(String id) {
         return elementsById.get(id);
     }

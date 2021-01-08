@@ -102,7 +102,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                     state.getWorld().move(player, playerLocation, destination);
                 } else {
                     // TODO: bump to interact
-                    Element interactable = state.getWorld().getNEW(destination, CommonAttributes.NPC.name());
+                    Element interactable = state.getWorld().get(destination, CommonAttributes.NPC.name());
 
                     // TODO: hostile status
                     if (interactable != null) {

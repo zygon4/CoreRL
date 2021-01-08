@@ -88,7 +88,7 @@ public final class Game {
 
         private Builder(GameConfiguration gameConfiguration) {
             this.gameSystems.add(new DefaultGameSystem(gameConfiguration));
-            this.gameSystems.add(new NPCWalk(gameConfiguration));
+            this.gameSystems.add(new AISystem(gameConfiguration));
             this.configuration = gameConfiguration;
         }
 

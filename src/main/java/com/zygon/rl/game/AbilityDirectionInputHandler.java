@@ -28,12 +28,9 @@ public class AbilityDirectionInputHandler extends BaseInputHandler {
     @Override
     public GameState apply(GameState state, Input input) {
 
-        // TODO: convert the input (0-9) to a location relative to the player
         GameState newState = state;
-
         Location target = null;
 
-        // TODO: should add direction and relative direction concepts?
         switch (convert(input)) {
             case NUMPAD_1, DIGIT_1 -> {
                 target = Location.create(centralLocation.getX() - 1,

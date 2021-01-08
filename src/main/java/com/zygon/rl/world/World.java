@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * This is an ugly sweater on the ECS, could really use some more structure.
@@ -44,34 +45,40 @@ public class World {
     }
 
     public boolean canMove(Location destination) {
+
+        // quick check for player location
+        if (destination.equals(playerLocation)) {
+            return false;
+        }
+
         Entity terrain = getTerrain(destination);
         if (terrain.hasAttribute(CommonAttributes.IMPASSABLE.name())) {
             return false;
         }
-        Element dest = getNEW(destination);
         // TODO: check for other non-passable elements
-        return dest == null || !dest.getType().equals(CommonAttributes.NPC.name());
+        Element dest = get(destination, CommonAttributes.NPC.name());
+        return dest == null;
     }
 
-    public Map<Location, List<Element>> getAllNEW(Location location, String type, int radius) {
+    public Map<Location, List<Element>> getAll(Location location, String type, int radius) {
         return entityManager.get(location, type, radius);
     }
 
-    public List<Element> getAllNEW(Location location, String type) {
+    public List<Element> getAll(Location location, String type) {
         return entityManager.get(location, type);
     }
 
-    public List<Element> getAllNEW(Location location) {
+    public List<Element> getAll(Location location) {
         return entityManager.get(location);
     }
 
-    public <T extends Element> T getNEW(Location location, String type) {
-        List<Element> entities = getAllNEW(location, type);
+    public <T extends Element> T get(Location location, String type) {
+        List<Element> entities = getAll(location, type);
         return entities.isEmpty() ? null : (T) entities.iterator().next();
     }
 
-    public Element getNEW(Location location) {
-        return getNEW(location, null);
+    public Element get(Location location) {
+        return get(location, null);
     }
 
     public <T extends Element> T get(String id) {
@@ -82,7 +89,12 @@ public class World {
         return calendar;
     }
 
-    // convience method
+    public List<Location> getPassableNeighbors(Location center) {
+        return center.getNeighbors().stream()
+                .filter(this::canMove)
+                .collect(Collectors.toList());
+    }
+
     public Location getPlayerLocation() {
         return playerLocation;
     }
@@ -136,8 +148,18 @@ public class World {
     }
 
     public void move(Element element, Location from, Location to) {
-        entityManager.delete(element.getId(), from);
-        add(element, to);
+
+        if (!canMove(to)) {
+            // TODO: remove eventually once this never happens again
+            throw new IllegalStateException();
+        } else {
+            // TODO: trace logging
+//            System.out.println("Moving " + element.getId() + ", "
+//                    + element.getName() + " from " + from + " to " + to);
+
+            remove(element, from);
+            add(element, to);
+        }
     }
 
     public void remove(Element element, Location from) {

@@ -80,7 +80,7 @@ public class BloodRLMain {
             GameState.Builder copy = state.copy();
 
             // TODO: add game log
-            Npc victim = state.getWorld().getNEW(victimLocation.get(), CommonAttributes.NPC.name());
+            Npc victim = state.getWorld().get(victimLocation.get(), CommonAttributes.NPC.name());
             if (victim != null) {
                 // TODO: biting is a special case attack
                 // needs combat resolution
@@ -91,12 +91,11 @@ public class BloodRLMain {
 
                 int hungerLevel = player.getStatus().getEffects().get("HUNGER_CLOCK");
 
-                // this feels a bit clunky.. better than before but not perfect
-                state.getWorld().move(
-                        player.set(player.getStatus().addEffect("HUNGER_CLOCK", hungerLevel - 10)),
-                        state.getWorld().getPlayerLocation(),
-                        state.getWorld().getPlayerLocation());
-
+                // this feels really clunky.. better than before but not perfect
+//                state.getWorld().move(
+//                        player.set(player.getStatus().addEffect("HUNGER_CLOCK", hungerLevel - 10)),
+//                        state.getWorld().getPlayerLocation(),
+//                        state.getWorld().getPlayerLocation());
                 copy.setWorld(state.getWorld()
                         .setCalendar(state.getWorld().getCalendar().addTime(30)));
 
@@ -166,15 +165,15 @@ public class BloodRLMain {
 //                    .build();
 
             Npc npc = Npc.get("generic");
-            npc.setName(npcPerson.getName().toString());
+            npc.setName(npcPerson.getName().toString() + i);
             world.add(npc, Location.create(i, 1));
         }
 
         Melee.load();
 
         Melee dagger = Melee.get("dagger");
-        world.add(dagger, Location.create(0, 0));
-        world.add(dagger, Location.create(0, -1));
+//        world.add(dagger, Location.create(0, 0));
+//        world.add(dagger, Location.create(0, -1));
 
         GameState initialState = GameState.builder(config)
                 .setWorld(world)

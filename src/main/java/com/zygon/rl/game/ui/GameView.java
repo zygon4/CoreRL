@@ -292,7 +292,7 @@ final class GameView extends BaseView {
     private static Element getNPC(Game game, Location location) {
 
         List<Element> entities = game.getState().getWorld()
-                .getAllNEW(location, CommonAttributes.NPC.name());
+                .getAll(location, CommonAttributes.NPC.name());
         return entities != null && !entities.isEmpty() ? entities.get(0) : null;
     }
 
