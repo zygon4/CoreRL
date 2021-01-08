@@ -28,6 +28,7 @@ public class CharacterSheet extends Element {
 
     public CharacterSheet(String name, String description, Stats stats, Status status,
             Equipment equipment, Set<Ability> abilities, Set<Spell> spells) {
+        setId("player");
         setName(name);
         setDescription(description);
         this.stats = stats;
@@ -35,11 +36,6 @@ public class CharacterSheet extends Element {
         this.equipment = equipment;
         this.abilities = Collections.unmodifiableSet(abilities);
         this.spells = Collections.unmodifiableSet(spells);
-    }
-
-    @Override
-    public String getId() {
-        return "player";
     }
 
     @Override
