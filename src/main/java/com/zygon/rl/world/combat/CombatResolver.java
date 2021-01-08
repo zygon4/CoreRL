@@ -19,6 +19,8 @@ public class CombatResolver {
 
     public static class Resolution {
 
+        private final String attacker;
+        private final String defender;
         private final boolean miss;
         private final boolean critial;
         private final Map<DamageType, Integer> damageByType = new LinkedHashMap<>();
@@ -26,7 +28,9 @@ public class CombatResolver {
         // TODO: damage to weapons/armor/items on person, or even damage
         // to the local area (acid spray, etc.)
         //
-        public Resolution(boolean miss, boolean critial) {
+        public Resolution(String attacker, String defender, boolean miss, boolean critial) {
+            this.attacker = attacker;
+            this.defender = defender;
             this.miss = miss;
             this.critial = critial;
             if (miss && critial) {
@@ -56,17 +60,18 @@ public class CombatResolver {
             StringBuilder sb = new StringBuilder();
 
             if (miss) {
-                sb.append("Missed!\n");
+                sb.append(attacker).append(" missed!\n");
+            } else {
+                if (critial) {
+                    sb.append("Critical!\n");
+                }
+
+                sb.append(attacker).append(" hit ").append(defender)
+                        .append(" for ").append("\n  ")
+                        .append(damageByType.entrySet().stream()
+                                .map(entry -> entry.getKey().name() + " - " + entry.getValue() + " damage")
+                                .collect(Collectors.joining("\n  ")));
             }
-
-            if (critial) {
-                sb.append("Critical!\n");
-            }
-
-            sb.append(damageByType.entrySet().stream()
-                    .map(entry -> entry.getKey().name() + "-" + entry.getValue())
-                    .collect(Collectors.joining("\n")));
-
             return sb.toString();
         }
     }
@@ -130,7 +135,7 @@ public class CombatResolver {
             }
         }
 
-        Resolution resolution = new Resolution(miss, critical);
+        Resolution resolution = new Resolution(attacker.getName(), defender.getName(), miss, critical);
         if (dmg > 0) {
             // TODO: different weapon types
             resolution.set(DamageType.Bludgeoning, dmg);
