@@ -44,6 +44,11 @@ public final class Game {
      */
     public Game turn(Input input) {
 
+        // TODO: not sure.. handle elsewhere!
+        if (state.isPlayerDead()) {
+            throw new IllegalStateException();
+        }
+
         //
         // TODO: logging input would make the game re-playable as long
         // as the game systems used are seeded and consistent.

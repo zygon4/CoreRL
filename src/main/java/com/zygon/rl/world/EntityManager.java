@@ -18,7 +18,6 @@ public class EntityManager {
 
     // TODO: don't store the elements, store their IDs (String)
     private final Map<Location, List<Element>> entitiesByLocation = new HashMap<>();
-    private final Map<String, Element> elementsById = new HashMap<>();
 
     public void delete(String id, Location location) {
         List<Element> existing = entitiesByLocation.get(location);
@@ -42,8 +41,6 @@ public class EntityManager {
         } else {
             entitiesByLocation.put(location, newElements);
         }
-
-        elementsById.remove(id);
     }
 
     public Map<Location, List<Element>> get(Location location, String type, int radius) {
@@ -78,13 +75,6 @@ public class EntityManager {
         return entitiesByLocation.get(location);
     }
 
-    // TODO: this is broke, saving by Id collapses the elements.
-    // This isn't so bad right NOW because we just get the player.
-    @Deprecated
-    public Element get(String id) {
-        return elementsById.get(id);
-    }
-
     public void save(Element entity, Location location) {
 
         List<Element> entities = entitiesByLocation.get(location);
@@ -93,7 +83,5 @@ public class EntityManager {
         }
         entities.add(entity);
         entitiesByLocation.put(location, entities);
-
-        elementsById.put(entity.getId(), entity);
     }
 }

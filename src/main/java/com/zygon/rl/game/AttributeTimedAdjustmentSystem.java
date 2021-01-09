@@ -35,7 +35,7 @@ public class AttributeTimedAdjustmentSystem extends GameSystem {
     @Override
     public GameState apply(GameState state) {
         Calendar current = state.getWorld().getCalendar();
-        CharacterSheet player = state.getWorld().get("player");
+        CharacterSheet player = state.getWorld().getPlayer();
 
         if (cal != null) {
             long secondsDiff = current.getDifferenceSeconds(cal);

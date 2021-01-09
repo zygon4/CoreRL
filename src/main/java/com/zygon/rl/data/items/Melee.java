@@ -13,6 +13,7 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -41,6 +42,10 @@ public class Melee extends Element {
 
     public static Melee get(String id) {
         return MELEE_BY_ID.get(id);
+    }
+
+    public static Set<String> getAllIds() {
+        return MELEE_BY_ID.keySet();
     }
 
     private int damage;

@@ -77,6 +77,7 @@ public class Location {
         final int toDeltaX = to.getX() - projected.getSecond().getX();
         final int toDeltaY = to.getY() - projected.getSecond().getY();
 
+        // TODO: something is funny here, paths are jumping around in certain cases
         Optional<List<Point2i>> foundPath = PATH_FINDER.findPath(
                 // canTraverse2d
                 (sx, sy, tx, ty) -> {

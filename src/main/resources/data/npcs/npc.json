@@ -1,6 +1,6 @@
 [
     {
-        "id": "generic",
+        "id": "npc_generic_farmer",
         "type": "NPC",
         "name": "?",
         "description": "Salt of the earth",

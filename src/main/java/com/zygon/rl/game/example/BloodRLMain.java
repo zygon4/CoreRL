@@ -16,7 +16,6 @@ import com.zygon.rl.game.ui.GameUI;
 import com.zygon.rl.util.rng.family.FamilyTreeGenerator;
 import com.zygon.rl.util.rng.family.Person;
 import com.zygon.rl.world.Calendar;
-import com.zygon.rl.world.CommonAttributes;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
 import com.zygon.rl.world.character.Ability;
@@ -75,12 +74,12 @@ public class BloodRLMain {
         public GameState use(GameState state, Optional<Element> empty,
                 Optional<Location> victimLocation) {
 
-            CharacterSheet player = state.getWorld().get("player");
+            CharacterSheet player = state.getWorld().getPlayer();
 
             GameState.Builder copy = state.copy();
 
             // TODO: add game log
-            Npc victim = state.getWorld().get(victimLocation.get(), CommonAttributes.NPC.name());
+            CharacterSheet victim = state.getWorld().get(victimLocation.get());
             if (victim != null) {
                 // TODO: biting is a special case attack
                 // needs combat resolution
@@ -148,32 +147,46 @@ public class BloodRLMain {
                 Set.of(drainBlood),
                 Set.of());
 
+        // TODO: this is a hack, someone else should set this
+        pc.setId("player");
+        pc.setType("player");
         world.add(pc, Location.create(0, 0));
 
-        //TODO: load somewhere more official
-        Npc.load();
-
-        for (int i = -3; i < 3; i++) {
-            Person npcPerson = FamilyTreeGenerator.create();
-//            Entity npcEntity = Entities.createMonster(npcPerson.getName().toString())
-//                    .setOrigin(Location.create(i, 1))
-//                    .setLocation(Location.create(i, 1))
-//                    .addAttributes(Attribute.builder()
-//                            .setName(CommonAttributes.TEMPERMENT.name())
-//                            .setValue(CommonAttributeValues.HOSTILE.name())
-//                            .build())
-//                    .build();
-
-            Npc npc = Npc.get("generic");
-            npc.setName(npcPerson.getName().toString() + i);
-            world.add(npc, Location.create(i, 1));
+        try {
+            //TODO: load somewhere more official
+            Npc.load();
+        } catch (IOException io) {
+            io.printStackTrace(System.err);
         }
 
-        Melee.load();
+        Npc farmerData = Npc.get("npc_generic_farmer");
+        for (int i = -3; i < 3; i++) {
+            Person npcPerson = FamilyTreeGenerator.create();
+
+            CharacterSheet npcSheet = new CharacterSheet(
+                    npcPerson.getName().toString(),
+                    farmerData.getDescription(),
+                    new Stats(10, 8, 10, 8, 9, 6),
+                    new Status(44, 40, Map.of()),
+                    new Equipment(new Weapon(18, 2, 6, 2, 0, 1, 0)),
+                    Set.of(),
+                    Set.of());
+
+            npcSheet.setId(farmerData.getId());
+            npcSheet.setType(farmerData.getType());
+
+            world.add(npcSheet, Location.create(i, 5));
+        }
+
+        try {
+            Melee.load();
+        } catch (IOException io) {
+            io.printStackTrace(System.err);
+        }
 
         Melee dagger = Melee.get("dagger");
-//        world.add(dagger, Location.create(0, 0));
-//        world.add(dagger, Location.create(0, -1));
+        world.add(dagger.getId(), Location.create(0, 0));
+        world.add(dagger.getId(), Location.create(0, -1));
 
         GameState initialState = GameState.builder(config)
                 .setWorld(world)

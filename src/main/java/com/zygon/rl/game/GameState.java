@@ -2,7 +2,6 @@ package com.zygon.rl.game;
 
 // Would almost prefer a central "world" interface
 import com.zygon.rl.world.World;
-import com.zygon.rl.world.character.CharacterSheet;
 
 import java.util.Objects;
 import java.util.Stack;
@@ -131,9 +130,9 @@ public class GameState {
     }
 
     public boolean isPlayerDead() {
-        // TODO: set player as dead
-        return ((CharacterSheet) getWorld().get("player"))
-                .getStatus().getEffects().containsKey("DEAD");
+        // TODO: for now the player is removed from the game (to be eventually
+        // replaced with a corpse). So we only expect the "== null" case to be active.
+        return getWorld().getPlayer() == null || getWorld().getPlayer().isDead();
     }
 
     public GameState log(String message) {

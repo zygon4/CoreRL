@@ -1,9 +1,7 @@
 package com.zygon.rl.world.character;
 
 import com.zygon.rl.data.Element;
-import com.zygon.rl.world.Entities;
-import com.zygon.rl.world.Entity;
-import com.zygon.rl.world.IntegerAttribute;
+import com.zygon.rl.world.CommonAttributes;
 
 import java.util.Collections;
 import java.util.Set;
@@ -15,7 +13,7 @@ import java.util.Set;
  *
  * @author zygon
  */
-public class CharacterSheet extends Element {
+public final class CharacterSheet extends Element {
 
     // This is maybe a little hokey?
     public static final String STATUS_PREFIX = "CHAR_STATUS_";
@@ -28,7 +26,6 @@ public class CharacterSheet extends Element {
 
     public CharacterSheet(String name, String description, Stats stats, Status status,
             Equipment equipment, Set<Ability> abilities, Set<Spell> spells) {
-        setId("player");
         setName(name);
         setDescription(description);
         this.stats = stats;
@@ -36,11 +33,6 @@ public class CharacterSheet extends Element {
         this.equipment = equipment;
         this.abilities = Collections.unmodifiableSet(abilities);
         this.spells = Collections.unmodifiableSet(spells);
-    }
-
-    @Override
-    public String getType() {
-        return "player";
     }
 
     @Override
@@ -73,43 +65,40 @@ public class CharacterSheet extends Element {
         return spells;
     }
 
+    public boolean isDead() {
+        return getStatus().getEffects().containsKey(CommonAttributes.DEAD.name());
+    }
+
+    // TODO: maybe future - damage to a specific area
+    public CharacterSheet loseHitPoints(int hps) {
+        Status updateStatus = getStatus().decHitPoints(hps);
+        if (updateStatus.getHitPoints() <= 0) {
+            // A case of the deads.. in the future we could have other effects
+            // here, or revive abilities, etc.
+            updateStatus = updateStatus.addEffect(CommonAttributes.DEAD.name());
+        }
+        return set(updateStatus);
+    }
+
     public CharacterSheet set(Status status) {
-        return new CharacterSheet(getName(), getDescription(), stats, status, equipment, abilities, spells);
+        CharacterSheet copy = new CharacterSheet(getName(), getDescription(), stats, status,
+                equipment, abilities, spells);
+
+        // TODO: this is a unreliable pattern
+        copy.setId(getId());
+        copy.setType(getType());
+
+        return copy;
     }
 
     public CharacterSheet set(Set<Ability> abilities) {
-        return new CharacterSheet(getName(), getDescription(), stats, status, equipment, abilities, spells);
+        CharacterSheet copy = new CharacterSheet(getName(), getDescription(), stats, status,
+                equipment, abilities, spells);
+
+        // TODO: this is a unreliable pattern
+        copy.setId(getId());
+        copy.setType(getType());
+
+        return copy;
     }
-
-    @Deprecated
-    public Entity toEntity() {
-
-        // abilities??? are we using reflection now??
-        //
-        Entity.Builder builder = Entities.PLAYER
-                .copy()
-                //                .setId(config.getPlayerUuid())
-                .setName(getName())
-                .setDescription(getDescription())
-                .setDescription("fierce something");
-
-        return builder.build();
-    }
-
-    @Deprecated
-    private static Stats toStats(Entity entity) {
-        return new Stats(
-                IntegerAttribute.getValue(entity.getAttribute("STR")),
-                IntegerAttribute.getValue(entity.getAttribute("DEX")),
-                IntegerAttribute.getValue(entity.getAttribute("CON")),
-                IntegerAttribute.getValue(entity.getAttribute("INT")),
-                IntegerAttribute.getValue(entity.getAttribute("WIS")),
-                IntegerAttribute.getValue(entity.getAttribute("CHA")));
-    }
-
-    private static Equipment toEquipment(Entity entity) {
-        return new Equipment(new Weapon(20, 2, 4, 1, 0, 0, 0));
-    }
-
-    // TODO: the rest of the setters as needed
 }

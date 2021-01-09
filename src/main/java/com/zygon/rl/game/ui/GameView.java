@@ -47,7 +47,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -291,13 +290,6 @@ final class GameView extends BaseView {
         return fov;
     }
 
-    private static Element getNPC(Game game, Location location) {
-
-        List<Element> entities = game.getState().getWorld()
-                .getAll(location, CommonAttributes.NPC.name());
-        return entities != null && !entities.isEmpty() ? entities.get(0) : null;
-    }
-
     private CharacterSheet getPlayer(Game game) {
         return game.getState().getWorld().getPlayer();
     }
@@ -422,7 +414,8 @@ final class GameView extends BaseView {
                 // TODO: simple caching needs performance testing
                 Position uiScreenPosition = Position.create(x, y);
                 Location loc = Location.create(getX, getY);
-                Element npc = getNPC(game, loc);
+                Element npc = game.getState().getWorld().get(loc, CommonAttributes.NPC.name());
+
                 if (locationLightLevelPct > .25) {
                     if (npc == null) {
                         Entity terrainEnt = game.getState().getWorld().getTerrain(loc);

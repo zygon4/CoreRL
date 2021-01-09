@@ -12,14 +12,6 @@ class EntityWrapper {
         this.entity = entity;
     }
 
-    public BooleanAttribute getBoolean(String attr) {
-        return BooleanAttribute.create(entity.getAttribute(attr));
-    }
-
-    public DoubleAttribute getDouble(String attr) {
-        return DoubleAttribute.create(entity.getAttribute(attr));
-    }
-
     public Entity getEntity() {
         return entity;
     }

@@ -13,6 +13,7 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -41,6 +42,10 @@ public class Npc extends Element {
 
     public static Npc get(String id) {
         return NPC_BY_ID.get(id);
+    }
+
+    public static Set<String> getAllIds() {
+        return NPC_BY_ID.keySet();
     }
 
     private int aggression;

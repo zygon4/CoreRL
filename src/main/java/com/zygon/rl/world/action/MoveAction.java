@@ -3,6 +3,7 @@ package com.zygon.rl.world.action;
 import com.zygon.rl.data.Element;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
+import com.zygon.rl.world.character.CharacterSheet;
 
 import java.util.Collections;
 import java.util.List;
@@ -40,13 +41,13 @@ public class MoveAction extends Action {
     public void execute() {
         World world = getWorld();
 
-        List<Element> elements = world.getAll(from).stream()
+        List<CharacterSheet> elements = world.getAll(from).stream()
                 .filter(element -> element.getId().equals(id))
                 .collect(Collectors.toList());
 
         // this will move everything of the id, but we don't expect to double
         // move NPCs..
-        for (Element element : elements) {
+        for (CharacterSheet element : elements) {
             if (world.canMove(to)) {
                 world.move(element, from, to);
             } else {

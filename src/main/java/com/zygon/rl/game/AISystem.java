@@ -1,6 +1,5 @@
 package com.zygon.rl.game;
 
-import com.zygon.rl.data.Element;
 import com.zygon.rl.world.CommonAttributes;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
@@ -33,17 +32,17 @@ final class AISystem extends GameSystem {
         final World world = state.getWorld();
         Location playerLocation = world.getPlayerLocation();
 
-        Map<Location, List<Element>> closeElements = world.getAll(
+        Map<Location, List<CharacterSheet>> closeCharacters = world.getAll(
                 playerLocation, null, REALITY_BUBBLE);
 
-        closeElements.forEach((currentLoc, elements) -> {
+        closeCharacters.forEach((currentLoc, characters) -> {
 
-            for (Element element : elements) {
+            for (CharacterSheet character : characters) {
 
                 Action action = null;
 
                 // maybe have a type enum somewhere?
-                if (element.getType().equals(CommonAttributes.NPC.name())) {
+                if (character.getType().equals(CommonAttributes.NPC.name())) {
 
                     // Is near hostile? hostile status TBD
                     if (currentLoc.getDistance(playerLocation) < 10) {
@@ -53,19 +52,25 @@ final class AISystem extends GameSystem {
                         if (pathToPlayer.size() == 1) {
                             // TODO: log
 //                            state = state.log(element.getName() + " attacks!");
-                            CharacterSheet player = world.get("player");
-                            CharacterSheet npc = player; // TODO: use real NPC sheet
-                            action = new MeleeAttackAction(world, getGameConfiguration(), npc, player);
+                            CharacterSheet player = world.getPlayer();
+
+                            // if player is alive..
+                            if (player != null) {
+                                action = new MeleeAttackAction(world, getGameConfiguration(),
+                                        character, player, playerLocation);
+                            }
                         } else {
                             // can move may be calculated already in the pathing..
                             if (world.canMove(pathToPlayer.get(0))) {
-                                action = new MoveAction(world, element.getId(), currentLoc, pathToPlayer.get(0));
+                                action = new MoveAction(world, character.getId(),
+                                        currentLoc, pathToPlayer.get(0));
                             }
                         }
 
                     } else {
                         if (random.nextDouble() > .75) {
-                            action = MoveAction.createRandomWalkAction(world, element.getId(), currentLoc);
+                            action = MoveAction.createRandomWalkAction(world,
+                                    character.getId(), currentLoc);
                         }
                     }
                 }

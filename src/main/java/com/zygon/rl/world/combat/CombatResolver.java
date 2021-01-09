@@ -24,6 +24,7 @@ public class CombatResolver {
         private final boolean miss;
         private final boolean critial;
         private final Map<DamageType, Integer> damageByType = new LinkedHashMap<>();
+        private int totalDamage = 0;
 
         // TODO: damage to weapons/armor/items on person, or even damage
         // to the local area (acid spray, etc.)
@@ -41,10 +42,15 @@ public class CombatResolver {
         // Will override, not add
         private void set(DamageType damage, int ammount) {
             damageByType.put(damage, ammount);
+            totalDamage += ammount;
         }
 
         public Map<DamageType, Integer> getDamageByType() {
             return Collections.unmodifiableMap(damageByType);
+        }
+
+        public int getTotalDamage() {
+            return totalDamage;
         }
 
         public boolean isCritial() {

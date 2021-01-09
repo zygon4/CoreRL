@@ -2,7 +2,6 @@ package com.zygon.rl.world;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -26,8 +25,6 @@ public class Entity {
     private final Location location;
     private final Map<String, Attribute> attributes;
 
-    private final Set<Behavior> behaviors;
-
     private Entity(Builder builder) {
         this.id = builder.id != null ? builder.id : UUID.randomUUID();
         this.name = builder.name;
@@ -37,20 +34,12 @@ public class Entity {
 
         this.attributes = builder.attributes != null
                 ? Collections.unmodifiableMap(builder.attributes) : Collections.emptyMap();
-        this.behaviors = builder.behaviors != null
-                ? Collections.unmodifiableSet(builder.behaviors) : Collections.emptySet();
     }
 
     public Entity add(Attribute attribute) {
         Map<String, Attribute> attrs = new HashMap<>(attributes);
         attrs.put(attribute.getName(), attribute);
         return copy().setAttributes(attrs).build();
-    }
-
-    public Entity add(Behavior behavior) {
-        Set<Behavior> behvs = new HashSet<>(behaviors);
-        behvs.add(behavior);
-        return copy().setBehaviors(behvs).build();
     }
 
     public UUID getId() {
@@ -87,10 +76,6 @@ public class Entity {
 
     public String getAttributeValue(String name) {
         return getAttribute(name).getValue();
-    }
-
-    private Set<Behavior> getBehaviors() {
-        return behaviors;
     }
 
     public boolean hasAttribute(String name) {
@@ -148,8 +133,6 @@ public class Entity {
         private Location location;
         private Map<String, Attribute> attributes;
 
-        private Set<Behavior> behaviors;
-
         private Builder() {
         }
 
@@ -160,7 +143,6 @@ public class Entity {
             this.origin = entity.getOrigin();
             this.location = entity.getLocation();
             this.attributes = new HashMap<>(entity.getAttributes());
-            this.behaviors = entity.getBehaviors();
         }
 
         public Builder addAttributes(Attribute attribute) {
@@ -196,11 +178,6 @@ public class Entity {
 
             this.attributes.put(name, attr);
 
-            return this;
-        }
-
-        public Builder setBehaviors(Set<Behavior> behaviors) {
-            this.behaviors = behaviors;
             return this;
         }
 

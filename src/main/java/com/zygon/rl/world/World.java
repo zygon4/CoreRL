@@ -1,7 +1,9 @@
 package com.zygon.rl.world;
 
-import com.zygon.rl.data.Element;
+import com.zygon.rl.data.Identifable;
+import com.zygon.rl.data.context.Data;
 import com.zygon.rl.util.NoiseUtil;
+import com.zygon.rl.world.character.CharacterSheet;
 
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -18,18 +20,21 @@ import java.util.stream.Collectors;
 public class World {
 
     private final Calendar calendar;
-    private final EntityManager entityManager;
+    private final GenericEntityManager<Identifable> staticObjects;
+    private final ElementEntityManager<CharacterSheet> actors;
     // got lazy, partially immutable
     private Location playerLocation;
 
-    public World(Calendar calendar, EntityManager entityManager, Location playerLocation) {
+    public World(Calendar calendar, GenericEntityManager<Identifable> staticObjects,
+            ElementEntityManager<CharacterSheet> actors, Location playerLocation) {
         this.calendar = calendar;
-        this.entityManager = entityManager;
+        this.staticObjects = staticObjects;
+        this.actors = actors;
         this.playerLocation = playerLocation;
     }
 
     public World(Calendar calendar) {
-        this(calendar, new EntityManager(), null);
+        this(calendar, new GenericEntityManager<>(), new ElementEntityManager<>(), null);
     }
 
     // this is fresh world only
@@ -37,9 +42,14 @@ public class World {
         this(new Calendar(20).addTime(TimeUnit.DAYS.toSeconds(1000)));
     }
 
-    public void add(Element element, Location location) {
-        entityManager.save(element, location);
-        if (element.getId().equals("player")) {
+    public void add(String id, Location location) {
+        staticObjects.add(() -> id, location);
+    }
+
+    public void add(CharacterSheet character, Location location) {
+        actors.save(character, location);
+
+        if (character.getId().equals("player")) {
             playerLocation = location;
         }
     }
@@ -55,34 +65,40 @@ public class World {
         if (terrain.hasAttribute(CommonAttributes.IMPASSABLE.name())) {
             return false;
         }
-        // TODO: check for other non-passable elements
-        Element dest = get(destination, CommonAttributes.NPC.name());
-        return dest == null;
+
+        // Assumption is you cannot pass an "actor" of any kind
+        List<CharacterSheet> get = actors.getByType(destination, null);
+        return get == null || get.isEmpty();
     }
 
-    public Map<Location, List<Element>> getAll(Location location, String type, int radius) {
-        return entityManager.get(location, type, radius);
+    public Map<Location, List<CharacterSheet>> getAll(Location location, String type, int radius) {
+        return actors.getAllByType(location, type, radius);
     }
 
-    public List<Element> getAll(Location location, String type) {
-        return entityManager.get(location, type);
+    public List<CharacterSheet> getAll(Location location) {
+        return actors.get(location);
     }
 
-    public List<Element> getAll(Location location) {
-        return entityManager.get(location);
+    public CharacterSheet get(Location location, String type) {
+        CharacterSheet character = get(location);
+
+        if (character == null) {
+            return null;
+        }
+
+        return type == null || character.getType().equals(type) ? character : null;
     }
 
-    public <T extends Element> T get(Location location, String type) {
-        List<Element> entities = getAll(location, type);
-        return entities.isEmpty() ? null : (T) entities.iterator().next();
+    public CharacterSheet get(Location location) {
+        return actors.getElement(location);
     }
 
-    public Element get(Location location) {
-        return get(location, null);
-    }
-
-    public <T extends Element> T get(String id) {
-        return (T) entityManager.get(id);
+    public List<String> getAll(Location location, String type) {
+        // Need to fetch the data out of the templates to check the type
+        return staticObjects.get(location).stream()
+                .filter(id -> Data.get(id.getId()).getType().equals(type))
+                .map(Identifable::getId)
+                .collect(Collectors.toList());
     }
 
     public Calendar getCalendar() {
@@ -97,6 +113,10 @@ public class World {
 
     public Location getPlayerLocation() {
         return playerLocation;
+    }
+
+    public CharacterSheet getPlayer() {
+        return get(getPlayerLocation());
     }
 
     // Only used in a single thread
@@ -147,29 +167,29 @@ public class World {
         }
     }
 
-    public void move(Element element, Location from, Location to) {
+    public void move(CharacterSheet element, Location from, Location to) {
 
         if (!canMove(to)) {
             // TODO: remove eventually once this never happens again
             throw new IllegalStateException();
         } else {
             // TODO: trace logging
-//            System.out.println("Moving " + element.getId() + ", "
-//                    + element.getName() + " from " + from + " to " + to);
+            System.out.println("Moving " + element.getId() + ", "
+                    + element.getName() + " from " + from + " to " + to);
 
             remove(element, from);
             add(element, to);
         }
     }
 
-    public void remove(Element element, Location from) {
-        entityManager.delete(element.getId(), from);
-        if (element.getId().equals("player")) {
+    public void remove(CharacterSheet character, Location from) {
+        actors.delete(character, from);
+        if (character.getId().equals("player")) {
             playerLocation = null;
         }
     }
 
     public World setCalendar(Calendar calendar) {
-        return new World(calendar, entityManager, playerLocation);
+        return new World(calendar, staticObjects, actors, playerLocation);
     }
 }

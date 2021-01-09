@@ -1,12 +1,11 @@
 package com.zygon.rl.game;
 
-import com.zygon.rl.data.Element;
-import com.zygon.rl.world.CommonAttributes;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
+import com.zygon.rl.world.action.Action;
+import com.zygon.rl.world.action.MeleeAttackAction;
 import com.zygon.rl.world.character.Ability;
 import com.zygon.rl.world.character.CharacterSheet;
-import com.zygon.rl.world.combat.CombatResolver;
 import org.hexworks.zircon.api.uievent.KeyCode;
 
 import java.util.Collections;
@@ -64,7 +63,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
             }
             // ability - present abilities
             case KEY_A -> {
-                CharacterSheet character = state.getWorld().get("player");
+                CharacterSheet character = state.getWorld().getPlayer();
 
                 // As a (not terrible) hack, adding bite manually because it's
                 // not serialized using the Entity class (yet).
@@ -85,6 +84,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                                 .build());
             }
             case NUMPAD_5, DIGIT_5 -> {
+                // TODO: wait action
                 copy.addLog("Waiting");
                 copy.setWorld(state.getWorld()
                         .setCalendar(state.getWorld().getCalendar().addTime(DEFAULT_ACTION_TIME)));
@@ -94,7 +94,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                  DIGIT_1, DIGIT_2, DIGIT_3, DIGIT_4, /* NOT 5*/ DIGIT_6, DIGIT_7, DIGIT_8, DIGIT_9 -> {
 
                 final World world = state.getWorld();
-                CharacterSheet player = world.get("player");
+                CharacterSheet player = world.getPlayer();
                 Location playerLocation = world.getPlayerLocation();
 
                 Location destination = getRelativeLocation(playerLocation, input);
@@ -102,17 +102,16 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                     state.getWorld().move(player, playerLocation, destination);
                 } else {
                     // TODO: bump to interact
-                    Element interactable = state.getWorld().get(destination, CommonAttributes.NPC.name());
+                    CharacterSheet interactable = state.getWorld().get(destination);
 
                     // TODO: hostile status
                     if (interactable != null) {
+                        Action bumpAttack = new MeleeAttackAction(world,
+                                getGameConfiguration(), player, interactable, destination);
 
-                        // TODO: NPC entity does not contain enough info
-                        // for testing only lets attack ourselves!
-                        CharacterSheet npc = player; //CharacterSheet.fromEntity(interactable);
-                        CombatResolver combat = new CombatResolver(getGameConfiguration().getRandom());
-                        CombatResolver.Resolution resolveCloseCombat = combat.resolveCloseCombat(player, npc);
-                        System.out.println(resolveCloseCombat);
+                        if (bumpAttack.canExecute()) {
+                            bumpAttack.execute();
+                        }
 
                         // TODO: resolve damages, kill NPCs or player
                     }
