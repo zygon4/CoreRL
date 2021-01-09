@@ -73,7 +73,7 @@ public class CombatResolver {
                 }
 
                 sb.append(attacker).append(" hit ").append(defender)
-                        .append(" for ").append("\n  ")
+                        .append(" for ").append(getTotalDamage()).append(" damage\n  ")
                         .append(damageByType.entrySet().stream()
                                 .map(entry -> entry.getKey().name() + " - " + entry.getValue() + " damage")
                                 .collect(Collectors.joining("\n  ")));

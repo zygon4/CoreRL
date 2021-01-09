@@ -168,7 +168,7 @@ public class BloodRLMain {
                     farmerData.getDescription(),
                     new Stats(10, 8, 10, 8, 9, 6),
                     new Status(44, 40, Map.of()),
-                    new Equipment(new Weapon(18, 2, 6, 2, 0, 1, 0)),
+                    new Equipment(new Weapon(18, 4, 8, 3, 1, 2, 0)),
                     Set.of(),
                     Set.of());
 
