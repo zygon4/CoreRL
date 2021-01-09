@@ -152,9 +152,11 @@ final class GameView extends BaseView {
                                 + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - turnStart));
 
                         if (game.getState().isPlayerDead()) {
-                            replaceWith(new TitleView(tileGrid, getTheme(), game,
-                                    // TODO: better death notice
-                                    "YOU DIED!\nYou lasted " + game.getState().getTurnCount() + " turns"));
+                            System.out.println("YOU DIED!\nYou lasted " + game.getState().getTurnCount() + " turns");
+                            System.exit(0);
+//                            replaceWith(new TitleView(tileGrid, getTheme(), game,
+//                                    // TODO: better death notice
+//                                    "YOU DIED!\nYou lasted " + game.getState().getTurnCount() + " turns"));
                         }
 
                         long updateGameScreen = System.nanoTime();
@@ -297,7 +299,7 @@ final class GameView extends BaseView {
     }
 
     private CharacterSheet getPlayer(Game game) {
-        return game.getState().getWorld().get("player");
+        return game.getState().getWorld().getPlayer();
     }
 
     private Location getPlayerLocation(Game game) {
