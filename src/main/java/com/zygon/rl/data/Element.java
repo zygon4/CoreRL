@@ -9,8 +9,8 @@ public class Element implements Identifable {
 
     private String id = null;
     private String type = null;
-    private final String symbol = null;
-    private final String color = null;
+    private String symbol = null;
+    private String color = null;
     private String name = null;
     private String description = null;
 
@@ -45,6 +45,14 @@ public class Element implements Identifable {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 
     public void setName(String name) {
