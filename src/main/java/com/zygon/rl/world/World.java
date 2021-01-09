@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
  */
 public class World {
 
+    private static final System.Logger logger = System.getLogger(World.class.getCanonicalName());
+
     private final Calendar calendar;
     private final GenericEntityManager<Identifable> staticObjects;
     private final ElementEntityManager<CharacterSheet> actors;
@@ -173,8 +175,7 @@ public class World {
             // TODO: remove eventually once this never happens again
             throw new IllegalStateException();
         } else {
-            // TODO: trace logging
-            System.out.println("Moving " + element.getId() + ", "
+            logger.log(System.Logger.Level.TRACE, "Moving " + element.getId() + ", "
                     + element.getName() + " from " + from + " to " + to);
 
             remove(element, from);

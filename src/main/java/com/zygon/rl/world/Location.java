@@ -238,8 +238,8 @@ public class Location {
     // e.g.
     private static Pair<Location, Location> projectToBox(Location from, Location to, int boxSize) {
         // first place the center. e.g. -5 -> 25, 218 -> 25
-        int diffX = Math.abs(from.getX() - to.getX());
-        int diffY = Math.abs(from.getY() - to.getY());
+        int diffX = to.getX() - from.getX();
+        int diffY = to.getY() - from.getY();
 
         int xFiller = (boxSize - diffX) / 2; // off by 1s? lollolol
         int yFiller = (boxSize - diffY) / 2;
@@ -248,11 +248,6 @@ public class Location {
         Location maybeFrom = Location.create(xFiller, yFiller);
         Location maybeTo = Location.create(xFiller + diffX, yFiller + diffY);
 
-        // what about Y?
-        if (from.getX() > to.getX()) {
-            return Pair.create(maybeTo, maybeFrom);
-        } else {
-            return Pair.create(maybeFrom, maybeTo);
-        }
+        return Pair.create(maybeFrom, maybeTo);
     }
 }
