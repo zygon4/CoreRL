@@ -49,23 +49,25 @@ final class AISystem extends GameSystem {
                         List<Location> pathToPlayer = currentLoc.getPath(playerLocation,
                                 (l) -> world.canMove(l));
 
-                        if (pathToPlayer.size() == 1) {
-                            // TODO: log
-//                            state = state.log(element.getName() + " attacks!");
-                            CharacterSheet player = world.getPlayer();
+                        if (pathToPlayer != null) {
+                            if (pathToPlayer.size() == 1) {
+                                // TODO: log
+                                //                            state = state.log(element.getName() + " attacks!");
+                                CharacterSheet player = world.getPlayer();
 
-                            // if player is alive..
-                            if (player != null) {
-                                action = new MeleeAttackAction(world, getGameConfiguration(),
-                                        character, player, playerLocation);
+                                // if player is alive..
+                                if (player != null) {
+                                    action = new MeleeAttackAction(world, getGameConfiguration(),
+                                            character, player, playerLocation);
+                                }
+                            } else {
+                                // can move may be calculated already in the pathing..
+                                if (world.canMove(pathToPlayer.get(0))) {
+                                    action = new MoveAction(world, character.getId(),
+                                            currentLoc, pathToPlayer.get(0));
+                                }
                             }
-                        } else {
-                            // can move may be calculated already in the pathing..
-                            if (world.canMove(pathToPlayer.get(0))) {
-                                action = new MoveAction(world, character.getId(),
-                                        currentLoc, pathToPlayer.get(0));
-                            }
-                        }
+                        }// else the path became obstructed
 
                     } else {
                         if (random.nextDouble() > .75) {
