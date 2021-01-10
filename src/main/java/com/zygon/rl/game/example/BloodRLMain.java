@@ -124,8 +124,8 @@ public class BloodRLMain {
             if (summonSpot != null) {
                 // TODO: something like a "turns to live" status
                 CharacterSheet familiar = new CharacterSheet(
-                        Monster.get("mon_simple_bat")
-                                .setName(state.getWorld().getPlayer().getName() + "'s familiar"),
+                        // TODO: setting the name returns a vanilla element which breaks downstream
+                        Monster.get("mon_simple_bat"),
                         new Stats(4, 4, 2, 2, 2, 1),
                         new Status(0, 10, Map.of()),
                         null, Set.of(), Set.of());
