@@ -216,6 +216,25 @@ public class BloodRLMain {
             world.add(npcSheet, Location.create(i, 5));
         }
 
+        Monster frog = Monster.get("mon_giant_frog");
+        for (int i = 0; i < 20; i++) {
+
+            Location rand = Location.create(
+                    20 + config.getRandom().nextInt(10),
+                    20 + config.getRandom().nextInt(10));
+
+            if (world.canMove(rand)) {
+                CharacterSheet npcSheet = new CharacterSheet(
+                        frog,
+                        new Stats(4, 4, 6, 3, 3, 3),
+                        new Status(2, frog.getHitPoints(), Map.of()),
+                        null,
+                        Set.of(),
+                        Set.of());
+                world.add(npcSheet, rand);
+            }
+        }
+
         world.add(dagger.getId(), Location.create(0, 0));
         world.add(dagger.getId(), Location.create(0, -1));
         world.add("corpse", Location.create(0, 1));

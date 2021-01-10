@@ -30,14 +30,13 @@ public class Monster extends Element {
 
     public static void load() throws FileNotFoundException, IOException {
 
-        List<Monster> melee = null;
         try ( Reader jsonReader = new BufferedReader(new InputStreamReader(
                 Monster.class.getResourceAsStream(RESOURCE_PATH)))) {
-            melee = StringUtil.JSON.fromJson(jsonReader, TYPE);
-        }
+            List<Monster> melee = StringUtil.JSON.fromJson(jsonReader, TYPE);
 
-        NPC_BY_ID.putAll(melee.stream()
-                .collect(Collectors.toMap(m -> m.getId(), m -> m)));
+            NPC_BY_ID.putAll(melee.stream()
+                    .collect(Collectors.toMap(m -> m.getId(), m -> m)));
+        }
     }
 
     public static Monster get(String id) {
@@ -48,9 +47,14 @@ public class Monster extends Element {
         return NPC_BY_ID.keySet();
     }
 
+    private String species;
     private int aggression;
     private int hitPoints;
     private Set<String> flags;
+
+    public String getSpecies() {
+        return species;
+    }
 
     public int getAggression() {
         return aggression;

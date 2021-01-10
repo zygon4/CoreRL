@@ -33,9 +33,13 @@ public final class CharacterSheet extends Element {
         this.template = template;
         this.stats = stats;
         this.status = status;
-        this.equipment = equipment;
+        this.equipment = equipment != null ? equipment : new Equipment(null);
         this.abilities = Collections.unmodifiableSet(abilities);
         this.spells = Collections.unmodifiableSet(spells);
+    }
+
+    public <T extends Element> T getElement() {
+        return (T) template;
     }
 
     public Equipment getEquipment() {

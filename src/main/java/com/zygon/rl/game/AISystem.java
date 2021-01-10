@@ -1,5 +1,7 @@
 package com.zygon.rl.game;
 
+import com.zygon.rl.data.monster.Monster;
+import com.zygon.rl.data.monster.Species;
 import com.zygon.rl.world.CommonAttributes;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
@@ -18,7 +20,7 @@ import java.util.Random;
  */
 final class AISystem extends GameSystem {
 
-    private static final int REALITY_BUBBLE = 20;
+    private static final int REALITY_BUBBLE = 50;
 
     private final Random random;
 
@@ -62,30 +64,50 @@ final class AISystem extends GameSystem {
 
         // This is hacked for the specific "familiar follower" usecase - expand it!
         if (character.getType().equals(CommonAttributes.MONSTER.name())) {
-            // TODO: check for status effects that would cause a follow event e.g. familiar
-            // TODO: also the familiar should have a "owner" not just the player,
-            // so this is a hack.
-            // TODO: different familars stay closer than others.
-            return follow(character, characterLocation, world.getPlayerLocation(), world, 5);
+            Monster monTemplate = character.getElement();
+            Species species = Species.valueOf(monTemplate.getSpecies());
+
+            // The actual behaviors should be different: e.g. "flock" vs "hunt"
+            // with different flee/fight caracteristics.
+            switch (species) {
+                case AMPHIBIAN:
+                    // If next to, attack, otherwise ignore
+                    if (characterLocation.getNeighbors().contains(world.getPlayerLocation())) {
+                        CharacterSheet player = world.getPlayer();
+                        return (c) -> new MeleeAttackAction(world, getGameConfiguration(),
+                                c, player, world.getPlayerLocation());
+                    } else {
+                        if (random.nextDouble() > .75) {
+                            return (c) -> MoveAction.createRandomWalkAction(world,
+                                    c.getId(), characterLocation);
+                        }
+                    }
+                    break;
+                case MAMMAL:
+                    // THIs is a hack for bat's right now.
+                    // TODO: check for status effects that would cause a follow event e.g. familiar
+                    // TODO: also the familiar should have a "owner" not just the player,
+                    // so this is a hack.
+                    // TODO: different familars stay closer than others.
+                    return follow(characterLocation, world.getPlayerLocation(), world, 5);
+            }
+
         } else if (character.getType().equals(CommonAttributes.NPC.name())) {
 
             // TODO: attack whatever it's hostile to..
             if (characterLocation.getNeighbors().contains(world.getPlayerLocation())) {
                 CharacterSheet player = world.getPlayer();
-                return (c) -> {
-                    return new MeleeAttackAction(world, getGameConfiguration(),
-                            c, player, world.getPlayerLocation());
-                };
+                return (c) -> new MeleeAttackAction(world, getGameConfiguration(),
+                        c, player, world.getPlayerLocation());
             } else {
                 // Again follow whoever is hostile
-                return follow(character, characterLocation, world.getPlayerLocation(), world, 1);
+                return follow(characterLocation, world.getPlayerLocation(), world, 1);
             }
         }
         return null;
     }
 
-    private Behavior follow(CharacterSheet follower, Location followerLocation,
-            Location destination, World world, int close) {
+    private Behavior follow(Location followerLocation, Location destination, World world, int close) {
 
         if (followerLocation.getDistance(destination) > close) {
             List<Location> pathToDest = followerLocation.getPath(destination,
@@ -93,18 +115,14 @@ final class AISystem extends GameSystem {
 
             if (pathToDest != null && pathToDest.size() > 1) {
                 if (world.canMove(pathToDest.get(0))) {
-                    return (character) -> {
-                        return new MoveAction(world, character.getId(),
-                                followerLocation, pathToDest.get(0));
-                    };
+                    return (character) -> new MoveAction(world, character.getId(),
+                            followerLocation, pathToDest.get(0));
                 }
             }
         } else {
             if (random.nextDouble() > .75) {
-                return (character) -> {
-                    return MoveAction.createRandomWalkAction(world,
-                            character.getId(), followerLocation);
-                };
+                return (character) -> MoveAction.createRandomWalkAction(world,
+                        character.getId(), followerLocation);
             }
         }
 

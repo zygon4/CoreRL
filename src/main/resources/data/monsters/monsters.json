@@ -2,11 +2,25 @@
     {
         "id": "mon_simple_bat",
         "type": "MONSTER",
-        "name": "?",
+        "name": "Bat",
         "description": "A bat",
         "symbol": "b",
         "color": "SandyBrown",
-        "aggression": 4,
+        "species": "MAMMAL",
+        "aggression": 2,
+        "hitPoints": 8,
         "flags": [ "FLIES" ]
+    },
+    {
+        "id": "mon_giant_frog",
+        "type": "MONSTER",
+        "name": "Giant Frog",
+        "description": "A giant frog",
+        "symbol": "f",
+        "color": "DarkSeaGreen",
+        "species": "AMPHIBIAN",
+        "aggression": 4,
+        "hitPoints": 30,
+        "flags": []
     }
 ]
