@@ -1,11 +1,13 @@
 package com.zygon.rl.world;
 
+import com.zygon.rl.data.Element;
 import com.zygon.rl.data.Identifable;
 import com.zygon.rl.data.context.Data;
 import com.zygon.rl.util.NoiseUtil;
 import com.zygon.rl.world.character.CharacterSheet;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -81,6 +83,24 @@ public class World {
         return actors.get(location);
     }
 
+    public List<Element> getAllElements(Location location) {
+        List<Element> elements = new ArrayList<>();
+
+        List<Element> staticItems = staticObjects.get(location).stream()
+                .map(Identifable::getId)
+                .map(id -> {
+                    //I think having to use this syntax is a language difficiency
+                    Element el = Data.get(id);
+                    return el;
+                })
+                .collect(Collectors.toList());
+
+        elements.addAll(staticItems);
+
+        elements.addAll(actors.get(location));
+        return elements;
+    }
+
     public CharacterSheet get(Location location, String type) {
         CharacterSheet character = get(location);
 
@@ -97,10 +117,14 @@ public class World {
 
     public List<String> getAll(Location location, String type) {
         // Need to fetch the data out of the templates to check the type
-        return staticObjects.get(location).stream()
-                .filter(id -> Data.get(id.getId()).getType().equals(type))
-                .map(Identifable::getId)
-                .collect(Collectors.toList());
+        List<Identifable> identifiables = staticObjects.get(location);
+
+        return identifiables != null
+                ? identifiables.stream()
+                        .filter(id -> type == null || Data.get(id.getId()).getType().equals(type))
+                        .map(Identifable::getId)
+                        .collect(Collectors.toList())
+                : List.of();
     }
 
     public Calendar getCalendar() {

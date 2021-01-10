@@ -1,5 +1,6 @@
 package com.zygon.rl.world.action;
 
+import com.zygon.rl.data.items.Corpse;
 import com.zygon.rl.game.GameConfiguration;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
@@ -9,6 +10,8 @@ import com.zygon.rl.world.combat.CombatResolver;
 import java.util.Objects;
 
 /**
+ * Eventually can introduce a generic CombatAction that Melee and Ranged hang
+ * off.
  *
  * @author zygon
  */
@@ -52,10 +55,23 @@ public class MeleeAttackAction extends Action {
             } else {
                 System.out.println(updatedDefender.getName() + " is dead!");
                 getWorld().remove(updatedDefender, defenderLocation);
-                // TODO: install corpse instead
+                getWorld().add(getCorpseId(defender), defenderLocation);
             }
         } else {
             // maybe killed otherwise,
         }
+    }
+
+    // Incredibly simple "corpse" for anything
+    // TODO: future use more info from the character info to get an appropriate corpse
+    // can use rng if desired for weight, etc.
+    private static String getCorpseId(CharacterSheet character) {
+        return Corpse.get("corpse").getId();
+
+        // TODO: this logic belogs in the game view eventually...
+//        Corpse corpse = Corpse.get("corpse");
+//
+//        return corpse.setName(corpse.getName() + character.getName())
+//                .setSymbol(character.getSymbol()).getId();
     }
 }

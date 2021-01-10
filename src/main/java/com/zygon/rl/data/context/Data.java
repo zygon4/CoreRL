@@ -1,6 +1,7 @@
 package com.zygon.rl.data.context;
 
 import com.zygon.rl.data.Element;
+import com.zygon.rl.data.items.Corpse;
 import com.zygon.rl.data.items.Melee;
 import com.zygon.rl.data.npc.Npc;
 
@@ -9,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Contains all of the data by Id.
  *
  * @author zygon
  */
@@ -20,14 +22,15 @@ public class Data {
         try {
             Melee.load();
             Npc.load();
-            load();
+            Corpse.load();
         } catch (IOException io) {
             io.printStackTrace(System.err);
             System.exit(1);
         }
     }
 
-    private static void load() {
+    // And put above
+    public static void load() {
         // get key -> val vs. just gimme the map directly?
         for (var v : Melee.getAllIds()) {
             elementsById.put(v, Melee.get(v));
@@ -36,9 +39,13 @@ public class Data {
         for (var v : Npc.getAllIds()) {
             elementsById.put(v, Npc.get(v));
         }
+
+        for (var v : Corpse.getAllIds()) {
+            elementsById.put(v, Corpse.get(v));
+        }
     }
 
-    public static Element get(String id) {
-        return elementsById.get(id);
+    public static <T extends Element> T get(String id) {
+        return (T) elementsById.get(id);
     }
 }

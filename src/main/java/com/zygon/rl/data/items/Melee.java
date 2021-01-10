@@ -68,9 +68,4 @@ public class Melee extends Element {
     public int getToDamage() {
         return toDamage;
     }
-
-    @Override
-    public String toString() {
-        return StringUtil.JSON.toJson(this);
-    }
 }

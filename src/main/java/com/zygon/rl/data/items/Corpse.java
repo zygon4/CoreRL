@@ -1,4 +1,4 @@
-package com.zygon.rl.data.npc;
+package com.zygon.rl.data.items;
 
 import com.google.gson.reflect.TypeToken;
 import com.zygon.rl.data.Element;
@@ -19,38 +19,38 @@ import java.util.stream.Collectors;
 /**
  *
  */
-public class Npc extends Element {
+public class Corpse extends Element {
 
-    private static final Map<String, Npc> NPC_BY_ID = new HashMap<>();
+    private static final Map<String, Corpse> BY_ID = new HashMap<>();
 
-    private static final Type TYPE = new TypeToken<List<Npc>>() {
+    private static final Type TYPE = new TypeToken<List<Corpse>>() {
     }.getType();
 
-    private static final String RESOURCE_PATH = "/data/npcs/npc.json";
+    private static final String PATH = "/data/items/corpse.json";
 
     public static void load() throws FileNotFoundException, IOException {
 
-        List<Npc> melee = null;
+        List<Corpse> element = null;
         try ( Reader jsonReader = new BufferedReader(new InputStreamReader(
-                Npc.class.getResourceAsStream(RESOURCE_PATH)))) {
-            melee = StringUtil.JSON.fromJson(jsonReader, TYPE);
+                Corpse.class.getResourceAsStream(PATH)))) {
+            element = StringUtil.JSON.fromJson(jsonReader, TYPE);
         }
 
-        NPC_BY_ID.putAll(melee.stream()
+        BY_ID.putAll(element.stream()
                 .collect(Collectors.toMap(m -> m.getId(), m -> m)));
     }
 
-    public static Npc get(String id) {
-        return NPC_BY_ID.get(id);
+    public static Corpse get(String id) {
+        return BY_ID.get(id);
     }
 
     public static Set<String> getAllIds() {
-        return NPC_BY_ID.keySet();
+        return BY_ID.keySet();
     }
 
-    private int aggression;
+    private int weight;
 
-    public int getAggression() {
-        return aggression;
+    public int getWeight() {
+        return weight;
     }
 }

@@ -7,7 +7,9 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
- * Player or NPC
+ * Represents any kind of "actor" in the game.
+ *
+ * TODO:
  *
  * name tbd;
  *
@@ -18,31 +20,23 @@ public final class CharacterSheet extends Element {
     // This is maybe a little hokey?
     public static final String STATUS_PREFIX = "CHAR_STATUS_";
 
+    private final Element template;
     private final Stats stats;
     private final Status status;
     private final Equipment equipment;
     private final Set<Ability> abilities;
     private final Set<Spell> spells;
 
-    public CharacterSheet(String name, String description, Stats stats, Status status,
+    public CharacterSheet(Element template, Stats stats, Status status,
             Equipment equipment, Set<Ability> abilities, Set<Spell> spells) {
-        setName(name);
-        setDescription(description);
+        super(template);
+
+        this.template = template;
         this.stats = stats;
         this.status = status;
         this.equipment = equipment;
         this.abilities = Collections.unmodifiableSet(abilities);
         this.spells = Collections.unmodifiableSet(spells);
-    }
-
-    @Override
-    public String getSymbol() {
-        return "@";
-    }
-
-    @Override
-    public String getColor() {
-        return "red";
     }
 
     public Equipment getEquipment() {
@@ -81,23 +75,15 @@ public final class CharacterSheet extends Element {
     }
 
     public CharacterSheet set(Status status) {
-        CharacterSheet copy = new CharacterSheet(getName(), getDescription(), stats, status,
+        CharacterSheet copy = new CharacterSheet(template, stats, status,
                 equipment, abilities, spells);
-
-        // TODO: this is a unreliable pattern
-        copy.setId(getId());
-        copy.setType(getType());
 
         return copy;
     }
 
     public CharacterSheet set(Set<Ability> abilities) {
-        CharacterSheet copy = new CharacterSheet(getName(), getDescription(), stats, status,
+        CharacterSheet copy = new CharacterSheet(template, stats, status,
                 equipment, abilities, spells);
-
-        // TODO: this is a unreliable pattern
-        copy.setId(getId());
-        copy.setType(getType());
 
         return copy;
     }

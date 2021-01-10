@@ -14,53 +14,71 @@ public class Element implements Identifable {
     private String name = null;
     private String description = null;
 
+    protected Element() {
+
+    }
+
+    protected Element(Element element) {
+        this(element.getId(), element.getType(), element.getSymbol(),
+                element.getColor(), element.getName(), element.getDescription());
+    }
+
+    public Element(String id, String type, String symbol, String color, String name, String description) {
+        this.id = id;
+        this.type = type;
+        this.symbol = symbol;
+        this.color = color;
+        this.name = name;
+        this.description = description;
+    }
+
     @Override
-    public String getId() {
+    public final String getId() {
         return id;
     }
 
-    public String getType() {
+    public final String getType() {
         return type;
     }
 
-    public String getSymbol() {
+    public final String getSymbol() {
         return symbol;
     }
 
-    public String getColor() {
+    public final String getColor() {
         return color;
     }
 
-    public String getName() {
+    public final String getName() {
         return name;
     }
 
-    public String getDescription() {
+    public final String getDescription() {
         return description;
     }
 
-    public void setId(String id) {
+    public final void setId(String id) {
         this.id = id;
     }
 
-    public void setType(String type) {
+    public final void setType(String type) {
         this.type = type;
     }
 
-    public void setSymbol(String symbol) {
-        this.symbol = symbol;
+    public final Element setSymbol(String symbol) {
+        return new Element(id, type, symbol, color, name, description);
     }
 
-    public void setColor(String color) {
-        this.color = color;
+    public final Element setColor(String color) {
+        return new Element(id, type, symbol, color, name, description);
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public final Element setName(String name) {
+        return new Element(id, type, symbol, color, name, description);
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public final Element setDescription(String description) {
+        return new Element(id, type, symbol, color, name, description);
     }
 
     @Override

@@ -1,0 +1,11 @@
+[
+    {
+        "id": "corpse",
+        "type": "CORPSE",
+        "symbol": "x",
+        "color": "grey",
+        "name": "Corpse of ",
+        "description": "A corpse",
+        "weight": 12
+    }
+]

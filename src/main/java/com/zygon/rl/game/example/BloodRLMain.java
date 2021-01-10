@@ -6,6 +6,7 @@
 package com.zygon.rl.game.example;
 
 import com.zygon.rl.data.Element;
+import com.zygon.rl.data.context.Data;
 import com.zygon.rl.data.items.Melee;
 import com.zygon.rl.data.npc.Npc;
 import com.zygon.rl.game.AttributeTimedAdjustmentSystem;
@@ -88,11 +89,11 @@ public class BloodRLMain {
                 copy.addLog("You feed on the blood of " + victim.getName());
                 state.getWorld().remove(victim, victimLocation.get());
 
-                int hungerLevel = player.getStatus().getEffects().get("HUNGER_CLOCK");
+                int hungerLevel = player.getStatus().getEffects().get("Hunger");
 
                 // this feels really clunky.. better than before but not perfect
 //                state.getWorld().move(
-//                        player.set(player.getStatus().addEffect("HUNGER_CLOCK", hungerLevel - 10)),
+//                        player.set(player.getStatus().addEffect("Hunger", hungerLevel - 10)),
 //                        state.getWorld().getPlayerLocation(),
 //                        state.getWorld().getPlayerLocation());
                 copy.setWorld(state.getWorld()
@@ -139,54 +140,37 @@ public class BloodRLMain {
                 TimeUnit.HOURS.toSeconds(7), startingYear * daysPerYear, daysPerYear));
 
         CharacterSheet pc = new CharacterSheet(
-                "Alucard",
-                "He's cool",
+                new Element("player", "player", "@", "red", "Alucard", "He's cool"),
                 new Stats(12, 12, 12, 10, 10, 12),
-                new Status(19, 100, Map.of("HUNGER_CLOCK", 150)),
-                new Equipment(new Weapon(18, 2, 6, 2, 0, 1, 0)),
+                new Status(19, 100, Map.of("Hunger", 150)),
+                new Equipment(new Weapon(18, 4, 8, 3, 1, 2, 0)),
                 Set.of(drainBlood),
                 Set.of());
 
-        // TODO: this is a hack, someone else should set this
-        pc.setId("player");
-        pc.setType("player");
         world.add(pc, Location.create(0, 0));
 
-        try {
-            //TODO: load somewhere more official
-            Npc.load();
-        } catch (IOException io) {
-            io.printStackTrace(System.err);
-        }
+        Data.load();
 
         Npc farmerData = Npc.get("npc_generic_farmer");
-        for (int i = -3; i < 3; i++) {
+        for (int i = -1; i < 1; i++) {
             Person npcPerson = FamilyTreeGenerator.create();
 
             CharacterSheet npcSheet = new CharacterSheet(
-                    npcPerson.getName().toString(),
-                    farmerData.getDescription(),
+                    farmerData.setName(npcPerson.getName().toString())
+                            .setDescription(farmerData.getDescription()),
                     new Stats(10, 8, 10, 8, 9, 6),
                     new Status(44, 40, Map.of()),
-                    new Equipment(new Weapon(18, 4, 8, 3, 1, 2, 0)),
+                    new Equipment(new Weapon(18, 2, 6, 2, 0, 1, 0)),
                     Set.of(),
                     Set.of());
 
-            npcSheet.setId(farmerData.getId());
-            npcSheet.setType(farmerData.getType());
-
             world.add(npcSheet, Location.create(i, 5));
-        }
-
-        try {
-            Melee.load();
-        } catch (IOException io) {
-            io.printStackTrace(System.err);
         }
 
         Melee dagger = Melee.get("dagger");
         world.add(dagger.getId(), Location.create(0, 0));
         world.add(dagger.getId(), Location.create(0, -1));
+        world.add("corpse", Location.create(0, 1));
 
         GameState initialState = GameState.builder(config)
                 .setWorld(world)
@@ -194,7 +178,7 @@ public class BloodRLMain {
 
         Game game = Game.builder(config)
                 .addGameSystem(new AttributeTimedAdjustmentSystem(config,
-                        "HUNGER_CLOCK",
+                        "Hunger",
                         TimeUnit.HOURS.toSeconds(1),
                         gs -> 1,
                         hungerValue -> {

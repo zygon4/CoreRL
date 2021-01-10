@@ -6,13 +6,12 @@ import com.google.common.cache.LoadingCache;
 import com.stewsters.util.shadow.twoDimention.LitMap2d;
 import com.stewsters.util.shadow.twoDimention.ShadowCaster2d;
 import com.zygon.rl.data.Element;
+import com.zygon.rl.data.context.Data;
 import com.zygon.rl.game.Game;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.game.Input;
 import com.zygon.rl.util.Audio;
 import com.zygon.rl.world.Attribute;
-import com.zygon.rl.world.CommonAttributes;
-import com.zygon.rl.world.Entities;
 import com.zygon.rl.world.Entity;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
@@ -20,7 +19,6 @@ import com.zygon.rl.world.WorldTile;
 import com.zygon.rl.world.character.CharacterSheet;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import org.hexworks.cobalt.datatypes.Maybe;
 import org.hexworks.zircon.api.Components;
 import org.hexworks.zircon.api.Functions;
 import org.hexworks.zircon.api.behavior.TextOverride;
@@ -47,6 +45,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -360,9 +359,9 @@ final class GameView extends BaseView {
         ((TextArea) componentsByName.get("stats"))
                 .setText(statsBuilder.toString());
 
-        String status = "TODO:";
-//        String status = playerSheet.getStatus().getEffects().stream()
-//                .collect(Collectors.joining(", "));
+        String status = playerSheet.getStatus().getEffects().entrySet().stream()
+                .map(entry -> (entry.getKey() + " ") + (entry.getValue() != null ? entry.getValue() : ""))
+                .collect(Collectors.joining("\n"));
         ((TextOverride) componentsByName.get("status"))
                 .setText("Age: " + playerSheet.getStatus().getAge() + "  "
                         + "HP: " + playerSheet.getStatus().getHitPoints() + "\n" + status);
@@ -414,37 +413,34 @@ final class GameView extends BaseView {
                 // TODO: simple caching needs performance testing
                 Position uiScreenPosition = Position.create(x, y);
                 Location loc = Location.create(getX, getY);
-                Element npc = game.getState().getWorld().get(loc, CommonAttributes.NPC.name());
+
+                Element actor = game.getState().getWorld().get(loc);
 
                 if (locationLightLevelPct > .25) {
-                    if (npc == null) {
-                        Entity terrainEnt = game.getState().getWorld().getTerrain(loc);
-                        Maybe<Tile> existingTile = gameScreen.getTileAt(uiScreenPosition);
-                        Tile bottomTile = existingTile.get();
-                        boolean drawTile = true;
-                        if (bottomTile != null) {
-                            String existingTileHash = bottomTile.getCacheKey();
-                            bottomTile = toTile(bottomTile, terrainEnt);
-                            drawTile = !bottomTile.getCacheKey().equals(existingTileHash);
-                        } else {
-                            bottomTile = toTile(terrainEnt);
-                        }
-                        if (drawTile) {
-                            gameScreen.draw(bottomTile, uiScreenPosition);
-                        }
-                    }
-                    // Not drawing player if they're in a shadow.. will this make sense?
-                    Tile topTile = null;
-                    if (loc.equals(playerLocation)) {
-                        topTile = toTile(Entities.PLAYER);
+
+                    // Just draw from top to bottom whatever item/actor is available
+                    // 1) Draw actor if available
+                    if (actor != null) {
+                        Tile actorTile = toTile(actor);
+                        gameScreen.draw(actorTile, uiScreenPosition);
                     } else {
-                        if (npc != null) {
-                            topTile = toTile(npc);
+
+                        List<String> staticObjectIds = game.getState().getWorld().getAll(loc, null);
+                        Element object = !staticObjectIds.isEmpty()
+                                ? Data.get(staticObjectIds.get(0)) : null;
+
+                        // 2) Next draw item if available
+                        if (object != null) {
+                            // Would be nice to use sprites eventually..
+                            Tile objectTile = toTile(object);
+                            gameScreen.draw(objectTile, uiScreenPosition);
+                        } else {
+                            // 3) Finally draw terrain if nothing is above
+                            Entity terrainEnt = game.getState().getWorld().getTerrain(loc);
+                            gameScreen.draw(toTile(terrainEnt), uiScreenPosition);
                         }
                     }
-                    if (topTile != null) {
-                        gameScreen.draw(topTile, uiScreenPosition);
-                    }
+
                 } else {
                     gameScreen.draw(BLANK_TILE, uiScreenPosition);
                 }

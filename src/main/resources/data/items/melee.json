@@ -4,7 +4,7 @@
         "type": "MELEE",
         "symbol": ",",
         "color": "grey",
-        "name": "dagger",
+        "name": "Dagger",
         "description": "A small dagger",
         "damage": 4,
         "dice": 1,
