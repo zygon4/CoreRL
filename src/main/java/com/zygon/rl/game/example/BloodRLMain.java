@@ -24,6 +24,7 @@ import com.zygon.rl.world.character.CharacterSheet;
 import com.zygon.rl.world.character.Equipment;
 import com.zygon.rl.world.character.Stats;
 import com.zygon.rl.world.character.Status;
+import com.zygon.rl.world.character.StatusEffect;
 import com.zygon.rl.world.character.Weapon;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -37,7 +38,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -47,13 +47,10 @@ import java.util.concurrent.TimeUnit;
  */
 public class BloodRLMain {
 
+    private static final StatusEffect THIRST_STATUS = new StatusEffect("blood_status_thirst",
+            "Blood Thirst", "You thirst for blood of the living", true, 150);
+
     private static final class DrainBlood implements Ability {
-
-        private final UUID playerUuid;
-
-        public DrainBlood(UUID playerUuid) {
-            this.playerUuid = playerUuid;
-        }
 
         @Override
         public String getName() {
@@ -89,7 +86,7 @@ public class BloodRLMain {
                 copy.addLog("You feed on the blood of " + victim.getName());
                 state.getWorld().remove(victim, victimLocation.get());
 
-                int hungerLevel = player.getStatus().getEffects().get("Hunger");
+                int hungerLevel = player.getStatus().getEffects().get(THIRST_STATUS.getId()).getValue();
 
                 // this feels really clunky.. better than before but not perfect
 //                state.getWorld().move(
@@ -127,11 +124,10 @@ public class BloodRLMain {
 
         GameConfiguration config = new GameConfiguration();
         config.setGameName("BloodRL");
-        config.setPlayerUuid(UUID.randomUUID());
         config.setMusicFile(themeFile.toPath());
         config.setRandom(new Random());
 
-        Ability drainBlood = new DrainBlood(config.getPlayerUuid());
+        Ability drainBlood = new DrainBlood();
         config.setCustomAbilities(Set.of(drainBlood));
 
         int daysPerYear = 20;
@@ -139,17 +135,19 @@ public class BloodRLMain {
         World world = new World(new Calendar(
                 TimeUnit.HOURS.toSeconds(7), startingYear * daysPerYear, daysPerYear));
 
+        Data.load();
+        Melee dagger = Melee.get("dagger");
+        Melee scythe = Melee.get("scythe");
+
         CharacterSheet pc = new CharacterSheet(
                 new Element("player", "player", "@", "red", "Alucard", "He's cool"),
                 new Stats(12, 12, 12, 10, 10, 12),
-                new Status(19, 100, Map.of("Hunger", 150)),
-                new Equipment(new Weapon(18, 4, 8, 3, 1, 2, 0)),
+                new Status(19, 100, Map.of(THIRST_STATUS.getId(), THIRST_STATUS)),
+                new Equipment(new Weapon(18, 4, scythe, 0)),
                 Set.of(drainBlood),
                 Set.of());
 
         world.add(pc, Location.create(0, 0));
-
-        Data.load();
 
         Npc farmerData = Npc.get("npc_generic_farmer");
         for (int i = -1; i < 1; i++) {
@@ -160,14 +158,13 @@ public class BloodRLMain {
                             .setDescription(farmerData.getDescription()),
                     new Stats(10, 8, 10, 8, 9, 6),
                     new Status(44, 40, Map.of()),
-                    new Equipment(new Weapon(18, 2, 6, 2, 0, 1, 0)),
+                    new Equipment(new Weapon(18, 2, dagger, 0)),
                     Set.of(),
                     Set.of());
 
             world.add(npcSheet, Location.create(i, 5));
         }
 
-        Melee dagger = Melee.get("dagger");
         world.add(dagger.getId(), Location.create(0, 0));
         world.add(dagger.getId(), Location.create(0, -1));
         world.add("corpse", Location.create(0, 1));
@@ -178,7 +175,7 @@ public class BloodRLMain {
 
         Game game = Game.builder(config)
                 .addGameSystem(new AttributeTimedAdjustmentSystem(config,
-                        "Hunger",
+                        THIRST_STATUS.getId(),
                         TimeUnit.HOURS.toSeconds(1),
                         gs -> 1,
                         hungerValue -> {

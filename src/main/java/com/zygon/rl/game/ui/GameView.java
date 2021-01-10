@@ -360,7 +360,11 @@ final class GameView extends BaseView {
                 .setText(statsBuilder.toString());
 
         String status = playerSheet.getStatus().getEffects().entrySet().stream()
-                .map(entry -> (entry.getKey() + " ") + (entry.getValue() != null ? entry.getValue() : ""))
+                .filter(entry -> entry.getValue().displayToPlayer())
+                .map(entry -> entry.getValue() != null
+                ? entry.getValue().getDisplayName() + (entry.getValue().getValue() != null
+                ? " " + entry.getValue().getValue() : "")
+                : "")
                 .collect(Collectors.joining("\n"));
         ((TextOverride) componentsByName.get("status"))
                 .setText("Age: " + playerSheet.getStatus().getAge() + "  "

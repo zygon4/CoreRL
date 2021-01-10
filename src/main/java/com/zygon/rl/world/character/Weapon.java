@@ -1,35 +1,30 @@
 package com.zygon.rl.world.character;
 
+import com.zygon.rl.data.items.Melee;
+
 /**
  * Also adding items/weapons Melee, so these need to be reconciled.
  */
 public class Weapon {
 
+    private final Melee template;
     private final int critRange; //lowest number weapon will crit on
     private final int critMod; //critical modifier
-    private final int damage; //damage the weapon does if 1d4 would be 4
-    private final int numDice; //number of dice rolled if 2d4 would be 2
-    private final int toHit; //to hit modifier
-    private final int toDamage; //plus to damage
     private final int initMod; //Initiative Modifer
 
-    public Weapon(int critRange, int critMod, int damage, int numDice,
-            int toHit, int toDamage, int initMod) {
+    public Weapon(int critRange, int critMod, Melee template, int initMod) {
         this.critRange = critRange;
         this.critMod = critMod;
-        this.damage = damage;
-        this.numDice = numDice;
-        this.toHit = toHit;
-        this.toDamage = toDamage;
+        this.template = template;
         this.initMod = initMod;
     }
 
     private int calculateHit(DiceRoller dice, int toDamage) {
-        return calcDamage(dice, numDice, damage) + toDamage;
+        return calcDamage(dice, template.getDice(), template.getDamage()) + toDamage;
     }
 
     public int calculateHit(DiceRoller dice) {
-        return calculateHit(dice, toDamage);
+        return calculateHit(dice, template.getToDamage());
     }
 
     public int calculateCrit(DiceRoller dice) {
@@ -39,11 +34,19 @@ public class Weapon {
             damageDealt += calculateHit(dice, 0);
         }
 
-        return damageDealt + toDamage;
+        return damageDealt + template.getToDamage();
     }
 
     public int getCritRange() {
         return critRange;
+    }
+
+    public String getDescription() {
+        return template.getDescription();
+    }
+
+    public String getName() {
+        return template.getName();
     }
 
     public int getInitMod() {
@@ -51,7 +54,12 @@ public class Weapon {
     }
 
     public int getToHit() {
-        return toHit;
+        return template.getToDamage();
+    }
+
+    @Override
+    public String toString() {
+        return getName() + " - " + getDescription();
     }
 
     private static int calcDamage(DiceRoller dice, int numDice, int damage) {

@@ -9,7 +9,6 @@ import java.util.Set;
 /**
  * Represents any kind of "actor" in the game.
  *
- * TODO:
  *
  * name tbd;
  *
@@ -17,8 +16,8 @@ import java.util.Set;
  */
 public final class CharacterSheet extends Element {
 
-    // This is maybe a little hokey?
-    public static final String STATUS_PREFIX = "CHAR_STATUS_";
+    private static final StatusEffect DEAD_STATUS = new StatusEffect(
+            CommonAttributes.DEAD.name(), "Dead", "Dead", true, null);
 
     private final Element template;
     private final Stats stats;
@@ -69,7 +68,7 @@ public final class CharacterSheet extends Element {
         if (updateStatus.getHitPoints() <= 0) {
             // A case of the deads.. in the future we could have other effects
             // here, or revive abilities, etc.
-            updateStatus = updateStatus.addEffect(CommonAttributes.DEAD.name());
+            updateStatus = updateStatus.addEffect(DEAD_STATUS);
         }
         return set(updateStatus);
     }

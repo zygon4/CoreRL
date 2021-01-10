@@ -1,6 +1,8 @@
 package com.zygon.rl.world.combat;
 
 import com.zygon.rl.data.Element;
+import com.zygon.rl.data.context.Data;
+import com.zygon.rl.data.items.Melee;
 import com.zygon.rl.world.character.CharacterSheet;
 import com.zygon.rl.world.character.Equipment;
 import com.zygon.rl.world.character.Stats;
@@ -26,18 +28,21 @@ public class CombatResolveTest {
     public void testBasicMelee() {
         CombatResolver resolver = new CombatResolver(random);
 
+        Data.load();
+        Melee dagger = Melee.get("dagger");
+
         CharacterSheet attacker = new CharacterSheet(
                 new Element("player", "player", "z", Color.PINK.toString(), "attacker", ""),
                 new Stats(10, 10, 10, 10, 10, 10),
                 new Status(20, 10, Map.of()),
-                new Equipment(new Weapon(20, 2, 4, 1, 0, 0, 0)),
+                new Equipment(new Weapon(20, 2, dagger, 0)),
                 Set.of(), Set.of());
 
         CharacterSheet defender = new CharacterSheet(
                 new Element("player", "player", "z", Color.PINK.toString(), "defender", ""),
                 new Stats(10, 10, 10, 10, 10, 10),
                 new Status(20, 10, Map.of()),
-                new Equipment(new Weapon(20, 2, 4, 1, 0, 0, 0)),
+                new Equipment(new Weapon(20, 2, dagger, 0)),
                 Set.of(), Set.of());
 
         CombatResolver.Resolution resolvedMelee = resolver.resolveCloseCombat(attacker, defender);

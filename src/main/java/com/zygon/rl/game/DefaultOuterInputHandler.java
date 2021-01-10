@@ -6,11 +6,12 @@ import com.zygon.rl.world.action.Action;
 import com.zygon.rl.world.action.MeleeAttackAction;
 import com.zygon.rl.world.character.Ability;
 import com.zygon.rl.world.character.CharacterSheet;
+import com.zygon.rl.world.character.Equipment;
+import com.zygon.rl.world.character.Weapon;
 import org.hexworks.zircon.api.uievent.KeyCode;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -34,6 +35,8 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
         defaultKeyCodes.addAll(INPUTS_1_9);
         // 'A' for abilities
         defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_A.getCode()));
+        // 'I' for inventory
+        defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_I.getCode()));
         // ESC for game menu
         defaultKeyCodes.add(Input.valueOf(KeyCode.ESCAPE.getCode()));
     }
@@ -65,14 +68,6 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
             case KEY_A -> {
                 CharacterSheet character = state.getWorld().getPlayer();
 
-                // As a (not terrible) hack, adding bite manually because it's
-                // not serialized using the Entity class (yet).
-                Set<Ability> abilities = new LinkedHashSet<>();
-                abilities.addAll(character.getAbilities());
-                abilities.add(abilitiesByName.get("Drain Blood"));
-                character = character.set(abilities);
-                // Done with hack
-
                 AbilityInputHandler abilityHandler = AbilityInputHandler.create(
                         getGameConfiguration(), character.getAbilities());
 
@@ -82,6 +77,24 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                                 .setHandler(abilityHandler)
                                 .setPrompt(GameState.InputContextPrompt.LIST)
                                 .build());
+            }
+            // ability - present abilities
+            case KEY_I -> {
+                CharacterSheet character = state.getWorld().getPlayer();
+                Equipment eq = character.getEquipment();
+
+                StringBuilder eqSb = new StringBuilder();
+
+                Weapon weapon = eq.getEquippedWeapon();
+
+                if (weapon != null) {
+                    eqSb.append(eq.getEquippedWeapon()).append(" [RIGHT HAND]");
+                }
+
+                System.out.println(eqSb.toString());
+                // TODO: use built-in modals/lists. THis is esspecially important
+                // because this style of context interaction won't cause a pause
+                // for the game so you'll get hit while using a menu. This is bad.
             }
             case NUMPAD_5, DIGIT_5 -> {
                 // TODO: wait action

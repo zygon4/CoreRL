@@ -10,5 +10,17 @@
         "dice": 1,
         "toHit": 1,
         "toDamage": 0
+    },
+    {
+        "id": "scythe",
+        "type": "MELEE",
+        "symbol": ";",
+        "color": "grey",
+        "name": "Scythe",
+        "description": "A large scythe",
+        "damage": 8,
+        "dice": 3,
+        "toHit": 1,
+        "toDamage": 2
     }
 ]

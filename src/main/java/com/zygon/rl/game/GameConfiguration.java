@@ -5,7 +5,6 @@ import com.zygon.rl.world.character.Ability;
 import java.nio.file.Path;
 import java.util.Random;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * Starting off as a POJO for now in case we need to JSON it.
@@ -13,7 +12,6 @@ import java.util.UUID;
 public class GameConfiguration {
 
     private String gameName = "";
-    private UUID playerUuid;
     private Path musicFile;
     // Ability isn't serializable right now..
     private Set<Ability> customAbilities;
@@ -25,14 +23,6 @@ public class GameConfiguration {
 
     public void setGameName(String name) {
         this.gameName = name;
-    }
-
-    public UUID getPlayerUuid() {
-        return playerUuid;
-    }
-
-    public void setPlayerUuid(UUID playerUuid) {
-        this.playerUuid = playerUuid;
     }
 
     public void setMusicFile(Path musicFile) {

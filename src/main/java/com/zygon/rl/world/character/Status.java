@@ -1,5 +1,6 @@
 package com.zygon.rl.world.character;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,23 +8,23 @@ import java.util.Map;
  *
  * @author zygon
  */
-public class Status {
+public final class Status {
 
     private final int age;
     private final int hitPoints;
-    private final Map<String, Integer> effects;
+    private final Map<String, StatusEffect> effects;
 
-    public Status(int age, int hitPoints, Map<String, Integer> effects) {
+    public Status(int age, int hitPoints, Map<String, StatusEffect> effects) {
         this.age = age;
         this.hitPoints = hitPoints;
-        this.effects = effects;
+        this.effects = Collections.unmodifiableMap(effects);
     }
 
     public int getAge() {
         return age;
     }
 
-    public Map<String, Integer> getEffects() {
+    public Map<String, StatusEffect> getEffects() {
         return effects;
     }
 
@@ -43,18 +44,15 @@ public class Status {
         return new Status(age, hitPoints + hps, effects);
     }
 
-    public Status addEffect(String effect) {
-        return addEffect(effect, null);
-    }
+    public Status addEffect(StatusEffect effect) {
+        Map<String, StatusEffect> effects = new HashMap<>(this.effects);
+        effects.put(effect.getId(), effect);
 
-    public Status addEffect(String effect, Integer value) {
-        Map<String, Integer> effects = new HashMap<>(this.effects);
-        effects.put(effect, value);
         return new Status(age, hitPoints, effects);
     }
 
     public Status removeEffect(String effect) {
-        Map<String, Integer> effects = new HashMap<>(this.effects);
+        Map<String, StatusEffect> effects = new HashMap<>(this.effects);
         effects.remove(effect);
         return new Status(age, hitPoints, effects);
     }

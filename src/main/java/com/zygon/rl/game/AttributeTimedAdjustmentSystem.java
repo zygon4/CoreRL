@@ -2,6 +2,7 @@ package com.zygon.rl.game;
 
 import com.zygon.rl.world.Calendar;
 import com.zygon.rl.world.character.CharacterSheet;
+import com.zygon.rl.world.character.StatusEffect;
 
 import java.util.function.Function;
 
@@ -44,13 +45,15 @@ public class AttributeTimedAdjustmentSystem extends GameSystem {
             if (numberOfAdjustments > 0) {
 
                 for (int i = 0; i < numberOfAdjustments; i++) {
-                    Integer currentValue = player.getStatus().getEffects().get(attributeName);
+                    StatusEffect watchedStatus = player.getStatus().getEffects().get(attributeName);
+                    Integer currentValue = watchedStatus.getValue();
 
                     int adjustment = attributeAdjustmentFn.apply(state);
                     int adjustedValue = currentValue != null ? currentValue.intValue() : 0 + adjustment;
+                    StatusEffect adjustedStatus = watchedStatus.setValue(adjustedValue);
 
                     state.getWorld().move(player.set(
-                            player.getStatus().addEffect(attributeName, adjustedValue)),
+                            player.getStatus().addEffect(adjustedStatus)),
                             state.getWorld().getPlayerLocation(),
                             state.getWorld().getPlayerLocation());
                 }
