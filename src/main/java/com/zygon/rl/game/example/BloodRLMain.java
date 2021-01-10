@@ -8,6 +8,7 @@ package com.zygon.rl.game.example;
 import com.zygon.rl.data.Element;
 import com.zygon.rl.data.context.Data;
 import com.zygon.rl.data.items.Melee;
+import com.zygon.rl.data.monster.Monster;
 import com.zygon.rl.data.npc.Npc;
 import com.zygon.rl.game.AttributeTimedAdjustmentSystem;
 import com.zygon.rl.game.Game;
@@ -99,6 +100,60 @@ public class BloodRLMain {
         }
     }
 
+    private static final class SummonFamiliar implements Ability {
+
+        @Override
+        public String getName() {
+            return "Summon Familiar";
+        }
+
+        @Override
+        public Ability.Target getTargeting() {
+            return Ability.Target.NONE;
+        }
+
+        @Override
+        public GameState use(GameState state, Optional<Element> empty,
+                Optional<Location> expectEmpty) {
+
+            GameState.Builder copy = state.copy();
+
+            Location summonSpot = getSummonLocation(
+                    state.getWorld().getPlayerLocation(), state.getWorld());
+
+            if (summonSpot != null) {
+                // TODO: something like a "turns to live" status
+                CharacterSheet familiar = new CharacterSheet(
+                        Monster.get("mon_simple_bat")
+                                .setName(state.getWorld().getPlayer().getName() + "'s familiar"),
+                        new Stats(4, 4, 2, 2, 2, 1),
+                        new Status(0, 10, Map.of()),
+                        null, Set.of(), Set.of());
+
+                state.getWorld().add(familiar, summonSpot);
+
+                // TODO: this is clunky to move the time
+                // TODO: also it skips over the world's actions. We need a more
+                // generic "energy" system so everyone gets time to act.
+                copy.setWorld(state.getWorld()
+                        .setCalendar(state.getWorld().getCalendar().addTime(
+                                TimeUnit.MINUTES.toSeconds(20))));
+
+                copy.addLog("You summon a familar!");
+            } else {
+                copy.addLog("Cannot summon a familar here.");
+            }
+
+            return copy.build();
+        }
+
+        private static Location getSummonLocation(Location caster, World world) {
+            return caster.getNeighbors(10).stream()
+                    .filter(world::canMove)
+                    .findAny().orElse(null);
+        }
+    }
+
     /**
      * @param args the command line arguments
      */
@@ -117,20 +172,21 @@ public class BloodRLMain {
                     new FileOutputStream(themeFile));
         }
 
+        Data.load();
+
         GameConfiguration config = new GameConfiguration();
         config.setGameName("BloodRL");
         config.setMusicFile(themeFile.toPath());
         config.setRandom(new Random());
 
         Ability drainBlood = new DrainBlood();
-        config.setCustomAbilities(Set.of(drainBlood));
+        Ability summonFamiliar = new SummonFamiliar();
 
         int daysPerYear = 20;
         int startingYear = 1208;
         World world = new World(new Calendar(
                 TimeUnit.HOURS.toSeconds(7), startingYear * daysPerYear, daysPerYear));
 
-        Data.load();
         Melee dagger = Melee.get("dagger");
         Melee scythe = Melee.get("scythe");
 
@@ -139,7 +195,7 @@ public class BloodRLMain {
                 new Stats(12, 12, 12, 10, 10, 12),
                 new Status(19, 100, Map.of(THIRST_STATUS.getId(), THIRST_STATUS)),
                 new Equipment(new Weapon(18, 4, scythe, 0)),
-                Set.of(drainBlood),
+                Set.of(drainBlood, summonFamiliar),
                 Set.of());
 
         world.add(pc, Location.create(0, 0));

@@ -4,17 +4,13 @@ import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
 import com.zygon.rl.world.action.Action;
 import com.zygon.rl.world.action.MeleeAttackAction;
-import com.zygon.rl.world.character.Ability;
 import com.zygon.rl.world.character.CharacterSheet;
 import com.zygon.rl.world.character.Equipment;
 import com.zygon.rl.world.character.Weapon;
 import org.hexworks.zircon.api.uievent.KeyCode;
 
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_1;
 import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_2;
@@ -41,14 +37,8 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
         defaultKeyCodes.add(Input.valueOf(KeyCode.ESCAPE.getCode()));
     }
 
-    private final Map<String, Ability> abilitiesByName;
-
     public DefaultOuterInputHandler(GameConfiguration gameConfiguration) {
         super(gameConfiguration, defaultKeyCodes);
-        this.abilitiesByName = gameConfiguration.getCustomAbilities() != null
-                ? gameConfiguration.getCustomAbilities().stream()
-                        .collect(Collectors.toMap(k -> k.getName(), v -> v))
-                : Collections.emptyMap();
     }
 
     @Override

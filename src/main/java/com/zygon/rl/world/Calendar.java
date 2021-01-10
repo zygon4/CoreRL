@@ -106,17 +106,17 @@ public class Calendar {
         return null;
     }
 
-    public Calendar addTime(long add) {
-        if (add > SEC_IN_DAY) {
+    public Calendar addTime(long addSeconds) {
+        if (addSeconds > SEC_IN_DAY) {
             // TODO: deal with this math later
-            throw new IllegalArgumentException("Adding " + add + " seconds not supported");
+            throw new IllegalArgumentException("Adding " + addSeconds + " seconds not supported");
         }
 
-        long calcSeconds = this.seconds + add > SEC_IN_DAY
-                ? (this.seconds + add) % SEC_IN_DAY
-                : this.seconds + add;
+        long calcSeconds = this.seconds + addSeconds > SEC_IN_DAY
+                ? (this.seconds + addSeconds) % SEC_IN_DAY
+                : this.seconds + addSeconds;
 
-        int calcDay = this.seconds + add > SEC_IN_DAY
+        int calcDay = this.seconds + addSeconds > SEC_IN_DAY
                 ? day + 1
                 : day;
 

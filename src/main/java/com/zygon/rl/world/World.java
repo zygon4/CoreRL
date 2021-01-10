@@ -75,8 +75,13 @@ public class World {
         return get == null || get.isEmpty();
     }
 
-    public Map<Location, List<CharacterSheet>> getAll(Location location, String type, int radius) {
-        return actors.getAllByType(location, type, radius);
+    public Map<Location, CharacterSheet> getAll(Location center, String type, int radius) {
+        Map<Location, List<CharacterSheet>> allByType = actors.getAllByType(center, type, radius);
+
+        // Should only be 1 character in a single space
+        return allByType.entrySet().stream()
+                .map(entry -> Map.entry(entry.getKey(), entry.getValue().get(0)))
+                .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
     }
 
     public List<CharacterSheet> getAll(Location location) {

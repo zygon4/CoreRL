@@ -1,0 +1,12 @@
+[
+    {
+        "id": "mon_simple_bat",
+        "type": "MONSTER",
+        "name": "?",
+        "description": "A bat",
+        "symbol": "P",
+        "color": "black",
+        "aggression": 4,
+        "flags": [ "FLIES" ]
+    }
+]

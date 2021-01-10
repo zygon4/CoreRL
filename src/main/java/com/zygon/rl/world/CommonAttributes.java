@@ -13,6 +13,7 @@ public enum CommonAttributes {
     IMPASSABLE,
     LOCKED,
     LIVING,
+    MONSTER,
     NPC,
     TEMPERMENT,
     TERRAIN_DIFFICULTY,

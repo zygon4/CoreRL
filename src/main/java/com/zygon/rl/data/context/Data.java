@@ -3,6 +3,7 @@ package com.zygon.rl.data.context;
 import com.zygon.rl.data.Element;
 import com.zygon.rl.data.items.Corpse;
 import com.zygon.rl.data.items.Melee;
+import com.zygon.rl.data.monster.Monster;
 import com.zygon.rl.data.npc.Npc;
 
 import java.io.IOException;
@@ -21,6 +22,7 @@ public class Data {
     static {
         try {
             Melee.load();
+            Monster.load();
             Npc.load();
             Corpse.load();
         } catch (IOException io) {
@@ -34,6 +36,10 @@ public class Data {
         // get key -> val vs. just gimme the map directly?
         for (var v : Melee.getAllIds()) {
             elementsById.put(v, Melee.get(v));
+        }
+
+        for (var v : Monster.getAllIds()) {
+            elementsById.put(v, Monster.get(v));
         }
 
         for (var v : Npc.getAllIds()) {

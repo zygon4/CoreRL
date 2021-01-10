@@ -32,62 +32,82 @@ final class AISystem extends GameSystem {
         final World world = state.getWorld();
         Location playerLocation = world.getPlayerLocation();
 
-        Map<Location, List<CharacterSheet>> closeCharacters = world.getAll(
+        Map<Location, CharacterSheet> closeCharacters = world.getAll(
                 playerLocation, null, REALITY_BUBBLE);
 
-        closeCharacters.forEach((currentLoc, characters) -> {
+        closeCharacters.forEach((currentLoc, character) -> {
 
-            for (CharacterSheet character : characters) {
+            Behavior behavior = get(character, currentLoc, world);
 
-                Action action = null;
+            Action action = null;
+            if (behavior != null) {
+                action = behavior.get(character);
+            }
 
-                // maybe have a type enum somewhere?
-                if (character.getType().equals(CommonAttributes.NPC.name())) {
-
-                    // Is near hostile? hostile status TBD
-                    if (currentLoc.getDistance(playerLocation) < 10) {
-                        List<Location> pathToPlayer = currentLoc.getPath(playerLocation,
-                                (l) -> world.canMove(l));
-
-                        if (pathToPlayer != null) {
-                            if (pathToPlayer.size() == 1) {
-                                // TODO: log
-                                //                            state = state.log(element.getName() + " attacks!");
-                                CharacterSheet player = world.getPlayer();
-
-                                // if player is alive..
-                                if (player != null) {
-                                    action = new MeleeAttackAction(world, getGameConfiguration(),
-                                            character, player, playerLocation);
-                                }
-                            } else {
-                                // can move may be calculated already in the pathing..
-                                if (world.canMove(pathToPlayer.get(0))) {
-                                    action = new MoveAction(world, character.getId(),
-                                            currentLoc, pathToPlayer.get(0));
-                                }
-                            }
-                        }// else the path became obstructed
-
-                    } else {
-                        if (random.nextDouble() > .75) {
-                            action = MoveAction.createRandomWalkAction(world,
-                                    character.getId(), currentLoc);
-                        }
-                    }
-                }
-
-                if (action != null) {
-                    if (action.canExecute()) {
-                        action.execute();
-                    } else {
-                        // TODO: log?
-                        System.out.println("Can't execute action " + action);
-                    }
+            if (action != null) {
+                if (action.canExecute()) {
+                    action.execute();
+                } else {
+                    // TODO: log?
+                    System.out.println("Can't execute action " + action);
                 }
             }
         });
 
         return state;
+    }
+
+    private Behavior get(CharacterSheet character, Location characterLocation,
+            World world) {
+
+        // This is hacked for the specific "familiar follower" usecase - expand it!
+        if (character.getType().equals(CommonAttributes.MONSTER.name())) {
+            // TODO: check for status effects that would cause a follow event e.g. familiar
+            // TODO: also the familiar should have a "owner" not just the player,
+            // so this is a hack.
+            // TODO: different familars stay closer than others.
+            return follow(character, characterLocation, world.getPlayerLocation(), world, 5);
+        } else if (character.getType().equals(CommonAttributes.NPC.name())) {
+
+            // TODO: attack whatever it's hostile to..
+            if (characterLocation.getNeighbors().contains(world.getPlayerLocation())) {
+                CharacterSheet player = world.getPlayer();
+                return (c) -> {
+                    return new MeleeAttackAction(world, getGameConfiguration(),
+                            c, player, world.getPlayerLocation());
+                };
+            } else {
+                // Again follow whoever is hostile
+                return follow(character, characterLocation, world.getPlayerLocation(), world, 1);
+            }
+        }
+        return null;
+    }
+
+    private Behavior follow(CharacterSheet follower, Location followerLocation,
+            Location destination, World world, int close) {
+
+        if (followerLocation.getDistance(destination) > close) {
+            List<Location> pathToDest = followerLocation.getPath(destination,
+                    (l) -> world.canMove(l));
+
+            if (pathToDest != null && pathToDest.size() > 1) {
+                if (world.canMove(pathToDest.get(0))) {
+                    return (character) -> {
+                        return new MoveAction(world, character.getId(),
+                                followerLocation, pathToDest.get(0));
+                    };
+                }
+            }
+        } else {
+            if (random.nextDouble() > .75) {
+                return (character) -> {
+                    return MoveAction.createRandomWalkAction(world,
+                            character.getId(), followerLocation);
+                };
+            }
+        }
+
+        return null;
     }
 }

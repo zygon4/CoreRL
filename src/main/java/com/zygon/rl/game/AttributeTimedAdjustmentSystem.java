@@ -52,9 +52,8 @@ public class AttributeTimedAdjustmentSystem extends GameSystem {
                     int adjustedValue = currentValue != null ? currentValue.intValue() : 0 + adjustment;
                     StatusEffect adjustedStatus = watchedStatus.setValue(adjustedValue);
 
-                    state.getWorld().move(player.set(
+                    state.getWorld().add(player.set(
                             player.getStatus().addEffect(adjustedStatus)),
-                            state.getWorld().getPlayerLocation(),
                             state.getWorld().getPlayerLocation());
                 }
                 cal = current;
