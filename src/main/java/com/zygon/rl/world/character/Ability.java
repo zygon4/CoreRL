@@ -31,14 +31,6 @@ public interface Ability {
     String getName();
 
     /**
-     * Returns the context when this ability is available.
-     *
-     * @return the context when this ability is available.
-     */
-    @Deprecated // used?
-    String availableContext();
-
-    /**
      * Returns the way in which this ability targets.
      *
      * @return the way in which this ability targets.

@@ -7,6 +7,7 @@ import com.zygon.rl.data.items.Melee;
  */
 public class Weapon {
 
+    // TODO: should be a more generic "weapon" template when there are more types.
     private final Melee template;
     private final int critRange; //lowest number weapon will crit on
     private final int critMod; //critical modifier

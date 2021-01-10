@@ -58,11 +58,6 @@ public class BloodRLMain {
         }
 
         @Override
-        public String availableContext() {
-            return "OUTER";
-        }
-
-        @Override
         public Target getTargeting() {
             // TODO: and 'held' or disabled
             return Target.ADJACENT;
