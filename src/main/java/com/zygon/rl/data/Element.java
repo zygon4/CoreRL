@@ -14,7 +14,7 @@ public class Element implements Identifable {
     private String name = null;
     private String description = null;
 
-    protected Element() {
+    public Element() {
 
     }
 
