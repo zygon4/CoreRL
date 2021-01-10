@@ -3,7 +3,7 @@
         "id": "corpse",
         "type": "CORPSE",
         "symbol": "x",
-        "color": "grey",
+        "color": "Crimson",
         "name": "Corpse of ",
         "description": "A corpse",
         "weight": 12

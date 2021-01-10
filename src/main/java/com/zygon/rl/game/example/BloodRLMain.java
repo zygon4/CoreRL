@@ -191,7 +191,7 @@ public class BloodRLMain {
         Melee scythe = Melee.get("scythe");
 
         CharacterSheet pc = new CharacterSheet(
-                new Element("player", "player", "@", "red", "Alucard", "He's cool"),
+                new Element("player", "player", "@", "PaleVioletRed", "Alucard", "He's cool"),
                 new Stats(12, 12, 12, 10, 10, 12),
                 new Status(19, 100, Map.of(THIRST_STATUS.getId(), THIRST_STATUS)),
                 new Equipment(new Weapon(18, 4, scythe, 0)),

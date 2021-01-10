@@ -4,8 +4,8 @@
         "type": "MONSTER",
         "name": "?",
         "description": "A bat",
-        "symbol": "P",
-        "color": "black",
+        "symbol": "b",
+        "color": "SandyBrown",
         "aggression": 4,
         "flags": [ "FLIES" ]
     }

@@ -11,6 +11,7 @@ import com.zygon.rl.game.Game;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.game.Input;
 import com.zygon.rl.util.Audio;
+import com.zygon.rl.util.ColorUtil;
 import com.zygon.rl.world.Attribute;
 import com.zygon.rl.world.Entity;
 import com.zygon.rl.world.Location;
@@ -297,14 +298,7 @@ final class GameView extends BaseView {
         return game.getState().getWorld().getPlayerLocation();
     }
 
-    private Tile toTile(Tile tile, Entity entity) {
-        WorldTile wt = WorldTile.get(entity);
-        return tile.asCharacterTile().get()
-                .withBackgroundColor(colorCache.getUnchecked(Color.BLACK))
-                .withForegroundColor(colorCache.getUnchecked(wt.getColor()))
-                .withCharacter(wt.getGlyph(entity));
-    }
-
+    @Deprecated
     private Tile toTile(Entity entity) {
         WorldTile wt = WorldTile.get(entity);
         return Tile.newBuilder()
@@ -313,19 +307,10 @@ final class GameView extends BaseView {
                 .buildCharacterTile();
     }
 
-    private Tile toTile(Tile tile, Element entity) {
-//        WorldTile wt = WorldTile.get(entity);
-        return tile.asCharacterTile().get()
-                .withBackgroundColor(GameUI.convert(Color.BLACK))
-                .withForegroundColor(GameUI.convert(Color.YELLOW))
-                .withCharacter(entity.getSymbol().charAt(0));
-    }
-
-    private Tile toTile(Element entity) {
-        //        WorldTile wt = WorldTile.get(entity);
+    private Tile toTile(Element element) {
         return Tile.newBuilder()
-                .withForegroundColor((GameUI.convert(Color.YELLOW)))
-                .withCharacter(entity.getSymbol().charAt(0))
+                .withForegroundColor((GameUI.convert(ColorUtil.get(element.getColor()))))
+                .withCharacter(element.getSymbol().charAt(0))
                 .buildCharacterTile();
     }
 
