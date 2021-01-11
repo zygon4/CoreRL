@@ -30,14 +30,13 @@ public class Melee extends Element {
 
     public static void load() throws FileNotFoundException, IOException {
 
-        List<Melee> melee = null;
         try ( Reader jsonReader = new BufferedReader(new InputStreamReader(
                 Melee.class.getResourceAsStream(MELEE_PATH)))) {
-            melee = StringUtil.JSON.fromJson(jsonReader, TYPE);
-        }
+            List<Melee> melee = StringUtil.JSON.fromJson(jsonReader, TYPE);
 
-        MELEE_BY_ID.putAll(melee.stream()
-                .collect(Collectors.toMap(m -> m.getId(), m -> m)));
+            MELEE_BY_ID.putAll(melee.stream()
+                    .collect(Collectors.toMap(m -> m.getId(), m -> m)));
+        }
     }
 
     public static Melee get(String id) {
