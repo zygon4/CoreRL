@@ -31,9 +31,10 @@ public class MoveAction extends Action {
         // needs to be that id at the location expected, and can move to the
         // next location
         World world = getWorld();
-        Element fromElements = world.getAll(from).stream()
+        List<CharacterSheet> all = world.getAll(from);
+        Element fromElements = all != null ? world.getAll(from).stream()
                 .filter(element -> element.getId().equals(id))
-                .findAny().orElse(null);
+                .findAny().orElse(null) : null;
         return fromElements != null && world.canMove(to);
     }
 

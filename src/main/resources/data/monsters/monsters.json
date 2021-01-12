@@ -8,7 +8,7 @@
         "color": "SandyBrown",
         "species": "MAMMAL",
         "aggression": 2,
-        "hitPoints": 8,
+        "hitPoints": 5,
         "flags": [ "FLIES" ]
     },
     {
@@ -20,7 +20,19 @@
         "color": "DarkSeaGreen",
         "species": "AMPHIBIAN",
         "aggression": 4,
-        "hitPoints": 30,
+        "hitPoints": 25,
+        "flags": []
+    },
+    {
+        "id": "mon_wolf",
+        "type": "MONSTER",
+        "name": "Wolf",
+        "description": "A wolf",
+        "symbol": "w",
+        "color": "BurlyWood",
+        "species": "MAMMAL",
+        "aggression": 16,
+        "hitPoints": 40,
         "flags": []
     }
 ]

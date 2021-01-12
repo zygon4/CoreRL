@@ -130,16 +130,19 @@ final class AISystem extends GameSystem {
 
         for (var possibleHostile : toDefendLoc.getNeighbors(close)) {
             CharacterSheet neighborToDefendLoc = world.get(possibleHostile);
-            if (neighborToDefendLoc != null && isHostile(neighborToDefendLoc)) {
+            if (neighborToDefendLoc != null
+                    && isHostile(neighborToDefendLoc)
+                    && !isPet(neighborToDefendLoc)) {
                 // found someone hostile to MY boss
                 // either hit em or chase em
                 if (defenderLoc.getNeighbors().contains(possibleHostile)) {
-
                     // "defender" is confusing here because it's the attacking
                     // character. They're defending someone else.
                     CharacterSheet defender = world.get(defenderLoc);
-                    return (c) -> new MeleeAttackAction(world, getGameConfiguration(),
-                            defender, neighborToDefendLoc, possibleHostile);
+                    if (defender != null) {
+                        return (c) -> new MeleeAttackAction(world, getGameConfiguration(),
+                                defender, neighborToDefendLoc, possibleHostile);
+                    }
                 } else {
                     return follow(defenderLoc, possibleHostile, world, 1);
                 }
@@ -192,5 +195,9 @@ final class AISystem extends GameSystem {
 
     private static boolean isHostile(CharacterSheet character) {
         return character.getStatus().isEffected(Effect.EffectNames.HOSTILE.getId());
+    }
+
+    private static boolean isPet(CharacterSheet character) {
+        return character.getStatus().isEffected(Effect.EffectNames.PET.getId());
     }
 }

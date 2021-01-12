@@ -5,6 +5,7 @@
  */
 package com.zygon.rl.game.example;
 
+import com.zygon.rl.data.Effect;
 import com.zygon.rl.data.Element;
 import com.zygon.rl.data.context.Data;
 import com.zygon.rl.data.items.Melee;
@@ -100,6 +101,12 @@ public class BloodRLMain {
 
     private static final class SummonFamiliar implements Ability {
 
+        private final Random random;
+
+        public SummonFamiliar(Random random) {
+            this.random = random;
+        }
+
         @Override
         public String getName() {
             return "Summon Familiar";
@@ -120,29 +127,43 @@ public class BloodRLMain {
                     state.getWorld().getPlayerLocation(), state.getWorld());
 
             if (summonSpot != null) {
-                // TODO: something like a "turns to live" status
-                CharacterSheet familiar = new CharacterSheet(
-                        // TODO: setting the name returns a vanilla element which breaks downstream
-                        Monster.get("mon_simple_bat"),
-                        new Stats(4, 4, 2, 2, 2, 1),
-                        new Status(0, 10, Set.of(new StatusEffect("effect_pet"))),
-                        null, Set.of(), Set.of());
-
-                state.getWorld().add(familiar, summonSpot);
-
-                // TODO: this is clunky to move the time
-                // TODO: also it skips over the world's actions. We need a more
-                // generic "energy" system so everyone gets time to act.
-                copy.setWorld(state.getWorld()
-                        .setCalendar(state.getWorld().getCalendar().addTime(
-                                TimeUnit.MINUTES.toSeconds(20))));
-
-                copy.addLog("You summon a familar!");
+                summon(summonSpot, state.getWorld(), copy, random);
             } else {
                 copy.addLog("Cannot summon a familar here.");
             }
 
             return copy.build();
+        }
+
+        private static void summon(Location summonSpot, World world, GameState.Builder copy, Random random) {
+            // TODO: something like a "turns to live" status
+            // TODO: create a util class to create runtime instances of monsters
+            CharacterSheet familiar = random.nextBoolean()
+                    ? new CharacterSheet(
+                            // TODO: setting the name returns a vanilla element which breaks downstream
+                            Monster.get("mon_simple_bat"),
+                            new Stats(2, 6, 4, 2, 2, 1),
+                            new Status(0, Monster.get("mon_simple_bat").getHitPoints(),
+                                    Set.of(new StatusEffect(Effect.EffectNames.PET.getId()))),
+                            null, Set.of(), Set.of())
+                    : new CharacterSheet(
+                            // TODO: setting the name returns a vanilla element which breaks downstream
+                            Monster.get("mon_wolf"),
+                            new Stats(6, 4, 4, 3, 2, 2),
+                            new Status(0, Monster.get("mon_simple_bat").getHitPoints(),
+                                    Set.of(new StatusEffect(Effect.EffectNames.PET.getId()))),
+                            null, Set.of(), Set.of());
+
+            world.add(familiar, summonSpot);
+
+            // TODO: this is clunky to move the time
+            // TODO: also it skips over the world's actions. We need a more
+            // generic "energy" system so everyone gets time to act.
+            copy.setWorld(world
+                    .setCalendar(world.getCalendar().addTime(
+                            TimeUnit.MINUTES.toSeconds(1))));
+
+            copy.addLog("You summon a " + familiar.getName() + " familar!");
         }
 
         private static Location getSummonLocation(Location caster, World world) {
@@ -178,7 +199,7 @@ public class BloodRLMain {
         config.setRandom(new Random());
 
         Ability drainBlood = new DrainBlood();
-        Ability summonFamiliar = new SummonFamiliar();
+        Ability summonFamiliar = new SummonFamiliar(config.getRandom());
 
         int daysPerYear = 20;
         int startingYear = 1208;
