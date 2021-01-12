@@ -10,7 +10,6 @@ import com.zygon.rl.data.context.Data;
 import com.zygon.rl.data.items.Melee;
 import com.zygon.rl.data.monster.Monster;
 import com.zygon.rl.data.npc.Npc;
-import com.zygon.rl.game.AttributeTimedAdjustmentSystem;
 import com.zygon.rl.game.Game;
 import com.zygon.rl.game.GameConfiguration;
 import com.zygon.rl.game.GameState;
@@ -35,7 +34,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Map;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
@@ -48,9 +47,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class BloodRLMain {
 
-    private static final StatusEffect THIRST_STATUS = new StatusEffect("blood_status_thirst",
-            "Blood Thirst", "You thirst for blood of the living", true, 150);
-
+//    private static final StatusEffect THIRST_STATUS = new StatusEffect("blood_status_thirst",
+//            "Blood Thirst", "You thirst for blood of the living", true, 150);
     private static final class DrainBlood implements Ability {
 
         @Override
@@ -82,8 +80,8 @@ public class BloodRLMain {
                 copy.addLog("You feed on the blood of " + victim.getName());
                 state.getWorld().remove(victim, victimLocation.get());
 
-                int hungerLevel = player.getStatus().getEffects().get(THIRST_STATUS.getId()).getValue();
-
+                // TODO: finish after re-implementing status effects engine
+//                int hungerLevel = player.getStatus().getEffects().get(THIRST_STATUS.getId()).getValue();
                 // this feels really clunky.. better than before but not perfect
 //                state.getWorld().move(
 //                        player.set(player.getStatus().addEffect("Hunger", hungerLevel - 10)),
@@ -127,7 +125,7 @@ public class BloodRLMain {
                         // TODO: setting the name returns a vanilla element which breaks downstream
                         Monster.get("mon_simple_bat"),
                         new Stats(4, 4, 2, 2, 2, 1),
-                        new Status(0, 10, Map.of()),
+                        new Status(0, 10, Set.of(new StatusEffect("effect_pet"))),
                         null, Set.of(), Set.of());
 
                 state.getWorld().add(familiar, summonSpot);
@@ -190,12 +188,16 @@ public class BloodRLMain {
         Melee dagger = Melee.get("dagger");
         Melee scythe = Melee.get("scythe");
 
+        Set<Ability> abilities = new LinkedHashSet<>();
+        abilities.add(drainBlood);
+        abilities.add(summonFamiliar);
+
         CharacterSheet pc = new CharacterSheet(
                 new Element("player", "player", "@", "PaleVioletRed", "Alucard", "He's cool"),
                 new Stats(12, 12, 12, 10, 10, 12),
-                new Status(19, 100, Map.of(THIRST_STATUS.getId(), THIRST_STATUS)),
+                new Status(19, 100, Set.of()),
                 new Equipment(new Weapon(18, 4, scythe, 0)),
-                Set.of(drainBlood, summonFamiliar),
+                abilities,
                 Set.of());
 
         world.add(pc, Location.create(0, 0));
@@ -208,7 +210,7 @@ public class BloodRLMain {
                     farmerData.setName(npcPerson.getName().toString())
                             .setDescription(farmerData.getDescription()),
                     new Stats(10, 8, 10, 8, 9, 6),
-                    new Status(44, 40, Map.of()),
+                    new Status(44, 40, Set.of()),
                     new Equipment(new Weapon(18, 2, dagger, 0)),
                     Set.of(),
                     Set.of());
@@ -227,7 +229,7 @@ public class BloodRLMain {
                 CharacterSheet npcSheet = new CharacterSheet(
                         frog,
                         new Stats(4, 4, 6, 3, 3, 3),
-                        new Status(2, frog.getHitPoints(), Map.of()),
+                        new Status(2, frog.getHitPoints(), Set.of()),
                         null,
                         Set.of(),
                         Set.of());
@@ -244,19 +246,19 @@ public class BloodRLMain {
                 .build();
 
         Game game = Game.builder(config)
-                .addGameSystem(new AttributeTimedAdjustmentSystem(config,
-                        THIRST_STATUS.getId(),
-                        TimeUnit.HOURS.toSeconds(1),
-                        gs -> 1,
-                        hungerValue -> {
-                            if (hungerValue < 0) {
-                                return "FULL";
-                            } else if (hungerValue > 99) {
-                                return "HUNGRY";
-                            } else {
-                                return null;
-                            }
-                        }))
+                //                .addGameSystem(new AttributeTimedAdjustmentSystem(config,
+                //                        THIRST_STATUS.getId(),
+                //                        TimeUnit.HOURS.toSeconds(1),
+                //                        gs -> 1,
+                //                        hungerValue -> {
+                //                            if (hungerValue < 0) {
+                //                                return "FULL";
+                //                            } else if (hungerValue > 99) {
+                //                                return "HUNGRY";
+                //                            } else {
+                //                                return null;
+                //                            }
+                //                        }))
                 .setState(initialState)
                 .build();
 

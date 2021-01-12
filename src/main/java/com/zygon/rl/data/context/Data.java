@@ -1,5 +1,6 @@
 package com.zygon.rl.data.context;
 
+import com.zygon.rl.data.Effect;
 import com.zygon.rl.data.Element;
 import com.zygon.rl.data.items.Corpse;
 import com.zygon.rl.data.items.Melee;
@@ -21,6 +22,7 @@ public class Data {
 
     static {
         try {
+            Effect.load();
             Melee.load();
             Monster.load();
             Npc.load();
@@ -34,6 +36,10 @@ public class Data {
     // And put above
     public static void load() {
         // get key -> val vs. just gimme the map directly?
+        for (var v : Effect.getAllIds()) {
+            elementsById.put(v, Effect.get(v));
+        }
+
         for (var v : Melee.getAllIds()) {
             elementsById.put(v, Melee.get(v));
         }

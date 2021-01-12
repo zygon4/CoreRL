@@ -7,7 +7,6 @@ package com.zygon.rl.world;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -123,27 +122,6 @@ public class Entities {
                     create(CommonAttributes.TERRAIN_DIFFICULTY.name(), "3.0").build(),
                     create(CommonAttributes.VIEW_BLOCK.name(), "1.0").build()))
             .build();
-
-    public static Entity createDoor() {
-        return DOOR.copy()
-                .setName("DOOR")
-                .setDescription("Door")
-                .build();
-    }
-
-    public static Entity.Builder createMonster(String name) {
-        return MONSTER.copy()
-                .setId(UUID.randomUUID())
-                .setName("MONSTER")
-                .setDescription("Monster");
-    }
-
-    public static Entity createWindow() {
-        return WINDOW.copy()
-                .setName("WINDOW")
-                .setDescription("Window")
-                .build();
-    }
 
     public static Attribute.Builder create(String name, String value) {
         return Attribute.builder()

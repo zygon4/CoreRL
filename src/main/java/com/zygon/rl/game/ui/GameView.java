@@ -135,7 +135,7 @@ final class GameView extends BaseView {
             updateMiniMap(miniMapLayer, game);
 
             Header promptHeader = Components.header()
-                    .withSize(20, 1)
+                    .withSize(50, 1)
                     .withPosition(1, gameScreen.getHeight() + 1)
                     .build();
             getScreen().addComponent(promptHeader);
@@ -346,13 +346,11 @@ final class GameView extends BaseView {
         ((TextArea) componentsByName.get("stats"))
                 .setText(statsBuilder.toString());
 
+        // Needs better layout
         String status = playerSheet.getStatus().getEffects().entrySet().stream()
-                .filter(entry -> entry.getValue().displayToPlayer())
-                .map(entry -> entry.getValue() != null
-                ? entry.getValue().getDisplayName() + (entry.getValue().getValue() != null
-                ? " " + entry.getValue().getValue() : "")
-                : "")
+                .map(entry -> Data.get(entry.getKey()).getName())
                 .collect(Collectors.joining("\n"));
+
         ((TextOverride) componentsByName.get("status"))
                 .setText("Age: " + playerSheet.getStatus().getAge() + "  "
                         + "HP: " + playerSheet.getStatus().getHitPoints() + "\n" + status);

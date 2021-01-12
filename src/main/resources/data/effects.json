@@ -1,0 +1,21 @@
+[
+    {
+        "id": "effect_pet",
+        "type": "EFFECT",
+        "name": "Pet",
+        "description": "A pet"
+    },
+    {
+        "id": "effect_terror",
+        "type": "EFFECT",
+        "name": "Terror",
+        "description": "You're terrified and must run away!",
+        "maxDuration": 8
+    },
+    {
+        "id": "effect_hostile",
+        "type": "EFFECT",
+        "name": "Hostile",
+        "description": "Hostile"
+    }
+]

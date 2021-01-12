@@ -51,7 +51,7 @@ public class MoveAction extends Action {
             if (world.canMove(to)) {
                 world.move(element, from, to);
             } else {
-                // TODO: log
+                // TODO: maybe log?
             }
         }
     }

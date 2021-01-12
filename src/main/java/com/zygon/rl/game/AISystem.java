@@ -1,5 +1,6 @@
 package com.zygon.rl.game;
 
+import com.zygon.rl.data.Effect;
 import com.zygon.rl.data.monster.Monster;
 import com.zygon.rl.data.monster.Species;
 import com.zygon.rl.world.CommonAttributes;
@@ -62,7 +63,26 @@ final class AISystem extends GameSystem {
     private Behavior get(CharacterSheet character, Location characterLocation,
             World world) {
 
-        // This is hacked for the specific "familiar follower" usecase - expand it!
+        if (character.getStatus().isEffected(Effect.EffectNames.PET.getId())) {
+            Location playerLocation = world.getPlayerLocation();
+            // player location can be null if dead
+            if (playerLocation != null) {
+                Behavior defend = defend(characterLocation, playerLocation, world, 5);
+                if (defend != null) {
+                    return defend;
+                } else {
+                    return follow(characterLocation, playerLocation, world, 5);
+                }
+            }
+        }
+
+        if (isHostile(character)) {
+            Location playerLocation = world.getPlayerLocation();
+            if (playerLocation != null) {
+                return hostile(characterLocation, world.getPlayerLocation(), world);
+            }
+        }
+
         if (character.getType().equals(CommonAttributes.MONSTER.name())) {
             Monster monTemplate = character.getElement();
             Species species = Species.valueOf(monTemplate.getSpecies());
@@ -70,40 +90,62 @@ final class AISystem extends GameSystem {
             // The actual behaviors should be different: e.g. "flock" vs "hunt"
             // with different flee/fight caracteristics.
             switch (species) {
-                case AMPHIBIAN:
-                    // If next to, attack, otherwise ignore
+                // This seems like a common pattern of behavior.
+                case AMPHIBIAN, MAMMAL -> {
+                    // If next to, attack
                     if (characterLocation.getNeighbors().contains(world.getPlayerLocation())) {
                         CharacterSheet player = world.getPlayer();
                         return (c) -> new MeleeAttackAction(world, getGameConfiguration(),
                                 c, player, world.getPlayerLocation());
                     } else {
-                        if (random.nextDouble() > .75) {
-                            return (c) -> MoveAction.createRandomWalkAction(world,
-                                    c.getId(), characterLocation);
+                        // If within aggression range follow
+                        if (characterLocation.getNeighbors(monTemplate.getAggression())
+                                .contains(world.getPlayerLocation())) {
+                            Location playerLocation = world.getPlayerLocation();
+                            // player location can be null if dead
+                            if (playerLocation != null) {
+                                return follow(characterLocation, playerLocation, world, 1);
+                            }
+                        } else {
+                            // Otherwise ignore
+                            return wander(characterLocation, world);
                         }
                     }
-                    break;
-                case MAMMAL:
-                    // THIs is a hack for bat's right now.
-                    // TODO: check for status effects that would cause a follow event e.g. familiar
-                    // TODO: also the familiar should have a "owner" not just the player,
-                    // so this is a hack.
-                    // TODO: different familars stay closer than others.
-                    return follow(characterLocation, world.getPlayerLocation(), world, 5);
+                }
             }
 
         } else if (character.getType().equals(CommonAttributes.NPC.name())) {
 
-            // TODO: attack whatever it's hostile to..
-            if (characterLocation.getNeighbors().contains(world.getPlayerLocation())) {
-                CharacterSheet player = world.getPlayer();
-                return (c) -> new MeleeAttackAction(world, getGameConfiguration(),
-                        c, player, world.getPlayerLocation());
+            if (isHostile(character)) {
+                return hostile(characterLocation, world.getPlayerLocation(), world);
             } else {
-                // Again follow whoever is hostile
-                return follow(characterLocation, world.getPlayerLocation(), world, 1);
+                return wander(characterLocation, world);
             }
         }
+
+        return null;
+    }
+
+    private Behavior defend(Location defenderLoc, Location toDefendLoc, World world, int close) {
+
+        for (var possibleHostile : toDefendLoc.getNeighbors(close)) {
+            CharacterSheet neighborToDefendLoc = world.get(possibleHostile);
+            if (neighborToDefendLoc != null && isHostile(neighborToDefendLoc)) {
+                // found someone hostile to MY boss
+                // either hit em or chase em
+                if (defenderLoc.getNeighbors().contains(possibleHostile)) {
+
+                    // "defender" is confusing here because it's the attacking
+                    // character. They're defending someone else.
+                    CharacterSheet defender = world.get(defenderLoc);
+                    return (c) -> new MeleeAttackAction(world, getGameConfiguration(),
+                            defender, neighborToDefendLoc, possibleHostile);
+                } else {
+                    return follow(defenderLoc, possibleHostile, world, 1);
+                }
+            }
+        }
+
         return null;
     }
 
@@ -127,5 +169,28 @@ final class AISystem extends GameSystem {
         }
 
         return null;
+    }
+
+    private Behavior hostile(Location hostileLocation, Location destination, World world) {
+        if (hostileLocation.getNeighbors().contains(world.getPlayerLocation())) {
+            CharacterSheet player = world.getPlayer();
+            return (c) -> new MeleeAttackAction(world, getGameConfiguration(),
+                    c, player, world.getPlayerLocation());
+        } else {
+            return follow(hostileLocation, destination, world, 1);
+        }
+    }
+
+    private Behavior wander(Location fromLocation, World world) {
+        if (random.nextDouble() > .75) {
+            return (c) -> MoveAction.createRandomWalkAction(world,
+                    c.getId(), fromLocation);
+        }
+
+        return null;
+    }
+
+    private static boolean isHostile(CharacterSheet character) {
+        return character.getStatus().isEffected(Effect.EffectNames.HOSTILE.getId());
     }
 }

@@ -1,7 +1,6 @@
 package com.zygon.rl.world.character;
 
 import com.zygon.rl.data.Element;
-import com.zygon.rl.world.CommonAttributes;
 
 import java.util.Collections;
 import java.util.Set;
@@ -15,9 +14,6 @@ import java.util.Set;
  * @author zygon
  */
 public final class CharacterSheet extends Element {
-
-    private static final StatusEffect DEAD_STATUS = new StatusEffect(
-            CommonAttributes.DEAD.name(), "Dead", "Dead", true, null);
 
     private final Element template;
     private final Stats stats;
@@ -63,18 +59,12 @@ public final class CharacterSheet extends Element {
     }
 
     public boolean isDead() {
-        return getStatus().getEffects().containsKey(CommonAttributes.DEAD.name());
+        return getStatus().getHitPoints() <= 0;
     }
 
     // TODO: maybe future - damage to a specific area
     public CharacterSheet loseHitPoints(int hps) {
-        Status updateStatus = getStatus().decHitPoints(hps);
-        if (updateStatus.getHitPoints() <= 0) {
-            // A case of the deads.. in the future we could have other effects
-            // here, or revive abilities, etc.
-            updateStatus = updateStatus.addEffect(DEAD_STATUS);
-        }
-        return set(updateStatus);
+        return set(getStatus().decHitPoints(hps));
     }
 
     public CharacterSheet set(Status status) {

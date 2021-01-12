@@ -12,7 +12,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.awt.Color;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -34,14 +33,14 @@ public class CombatResolveTest {
         CharacterSheet attacker = new CharacterSheet(
                 new Element("player", "player", "z", Color.PINK.toString(), "attacker", ""),
                 new Stats(10, 10, 10, 10, 10, 10),
-                new Status(20, 10, Map.of()),
+                new Status(20, 10, Set.of()),
                 new Equipment(new Weapon(20, 2, dagger, 0)),
                 Set.of(), Set.of());
 
         CharacterSheet defender = new CharacterSheet(
                 new Element("player", "player", "z", Color.PINK.toString(), "defender", ""),
                 new Stats(10, 10, 10, 10, 10, 10),
-                new Status(20, 10, Map.of()),
+                new Status(20, 10, Set.of()),
                 new Equipment(new Weapon(20, 2, dagger, 0)),
                 Set.of(), Set.of());
 

@@ -3,6 +3,8 @@ package com.zygon.rl.world.character;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -14,14 +16,23 @@ public final class Status {
     private final int hitPoints;
     private final Map<String, StatusEffect> effects;
 
-    public Status(int age, int hitPoints, Map<String, StatusEffect> effects) {
+    private Status(int age, int hitPoints, Map<String, StatusEffect> effects) {
         this.age = age;
         this.hitPoints = hitPoints;
-        this.effects = Collections.unmodifiableMap(effects);
+        this.effects = effects;
+    }
+
+    public Status(int age, int hitPoints, Set<StatusEffect> effects) {
+        this(age, hitPoints, Collections.unmodifiableMap(effects.stream()
+                .collect(Collectors.toMap(k -> k.getId(), v -> v))));
     }
 
     public int getAge() {
         return age;
+    }
+
+    public boolean isEffected(String effectId) {
+        return getEffects().get(effectId) != null;
     }
 
     public Map<String, StatusEffect> getEffects() {
