@@ -40,12 +40,14 @@ public class SpawnSystem extends GameSystem {
 
     private void spawn(Set<Location> spawnedLocations, World world, Location center) {
 
-        // round
-        Location roundedCenter = Location.create(25 * (Math.round(center.getX() / 25)),
-                25 * (Math.round(center.getY() / 25)));
+        int freq = getGameConfiguration().getWorldSpawn().getFrequency();
 
-        for (int y = roundedCenter.getY() + 200, realY = 0; y > roundedCenter.getY() - 200; y -= 25, realY++) {
-            for (int x = roundedCenter.getX() - 200, realX = 0; x < roundedCenter.getX() + 200; x += 25, realX++) {
+        // round
+        Location roundedCenter = Location.create(freq * (Math.round(center.getX() / freq)),
+                freq * (Math.round(center.getY() / freq)));
+
+        for (int y = roundedCenter.getY() + 200, realY = 0; y > roundedCenter.getY() - 200; y -= freq, realY++) {
+            for (int x = roundedCenter.getX() - 200, realX = 0; x < roundedCenter.getX() + 200; x += freq, realX++) {
 
                 Location location = Location.create(x, y);
 
@@ -64,13 +66,13 @@ public class SpawnSystem extends GameSystem {
                             String monsterId = getRandomSetElement(Monster.getAllIds());
                             Monster monster = Monster.get(monsterId);
 
-                            for (int i = 0; i < random.nextInt(3); i++) {
+                            for (int i = 0; i < random.nextInt(4); i++) {
                                 characters.add(getRandomPower(monster, monster.getHitPoints()));
                             }
                         } else {
                             String npcId = getRandomSetElement(Npc.getAllIds());
 
-                            for (int i = 0; i < random.nextInt(3); i++) {
+                            for (int i = 0; i < random.nextInt(4); i++) {
                                 characters.add(getRandomPower(Npc.get(npcId), random.nextInt(20) + 10));
                             }
                         }

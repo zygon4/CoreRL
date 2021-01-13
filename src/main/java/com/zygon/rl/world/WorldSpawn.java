@@ -6,5 +6,7 @@ package com.zygon.rl.world;
  */
 public interface WorldSpawn {
 
-    int getFrequency();
+    default int getFrequency() {
+        return 50;
+    }
 }

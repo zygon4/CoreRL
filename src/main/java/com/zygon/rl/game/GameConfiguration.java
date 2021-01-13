@@ -13,7 +13,8 @@ public class GameConfiguration {
     private String gameName = "";
     private Path musicFile;
     private Random random;
-    private WorldSpawn worldSpawn;
+    private WorldSpawn worldSpawn = new WorldSpawn() {
+    };
 
     public String getGameName() {
         return gameName;
