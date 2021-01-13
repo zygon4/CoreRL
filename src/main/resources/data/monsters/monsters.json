@@ -34,5 +34,41 @@
         "aggression": 16,
         "hitPoints": 40,
         "flags": []
+    },
+    {
+        "id": "mon_rat",
+        "type": "MONSTER",
+        "name": "Rat",
+        "description": "A rat",
+        "symbol": "r",
+        "color": "Green",
+        "species": "MAMMAL",
+        "aggression": 1,
+        "hitPoints": 8,
+        "flags": []
+    },
+    {
+        "id": "mon_bear",
+        "type": "MONSTER",
+        "name": "Bear",
+        "description": "A bear",
+        "symbol": "B",
+        "color": "Brown",
+        "species": "MAMMAL",
+        "aggression": 5,
+        "hitPoints": 100,
+        "flags": []
+    },
+    {
+        "id": "mon_deer",
+        "type": "MONSTER",
+        "name": "Deer",
+        "description": "A Deer",
+        "symbol": "D",
+        "color": "RosyBrown",
+        "species": "MAMMAL",
+        "aggression": 1,
+        "hitPoints": 30,
+        "flags": []
     }
 ]
