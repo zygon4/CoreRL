@@ -9,7 +9,6 @@ import com.zygon.rl.data.Effect;
 import com.zygon.rl.data.Element;
 import com.zygon.rl.data.context.Data;
 import com.zygon.rl.data.items.Melee;
-import com.zygon.rl.data.monster.Monster;
 import com.zygon.rl.game.Game;
 import com.zygon.rl.game.GameConfiguration;
 import com.zygon.rl.game.GameState;
@@ -17,12 +16,12 @@ import com.zygon.rl.game.ui.GameUI;
 import com.zygon.rl.world.Calendar;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
+import com.zygon.rl.world.action.SummonAction;
 import com.zygon.rl.world.character.Ability;
 import com.zygon.rl.world.character.CharacterSheet;
 import com.zygon.rl.world.character.Equipment;
 import com.zygon.rl.world.character.Stats;
 import com.zygon.rl.world.character.Status;
-import com.zygon.rl.world.character.StatusEffect;
 import com.zygon.rl.world.character.Weapon;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -94,6 +93,7 @@ public class BloodRLMain {
         }
     }
 
+    // TODO: reimplement Ability to return an Action to call
     private static final class SummonFamiliar implements Ability {
 
         private final Random random;
@@ -116,55 +116,29 @@ public class BloodRLMain {
         public GameState use(GameState state, Optional<Element> empty,
                 Optional<Location> expectEmpty) {
 
+            String id = random.nextBoolean() ? "mon_simple_bat" : "mon_wolf";
+
+            SummonAction summonAction = new SummonAction(
+                    state.getWorld().getPlayerLocation(), 1, id,
+                    Set.of(Effect.EffectNames.PET.getId()), random);
+
             GameState.Builder copy = state.copy();
 
-            Location summonSpot = getSummonLocation(
-                    state.getWorld().getPlayerLocation(), state.getWorld());
+            if (summonAction.canExecute(state)) {
+                summonAction.execute(state);
+                copy.addLog("You summon a familar!");
 
-            if (summonSpot != null) {
-                summon(summonSpot, state.getWorld(), copy, random);
+                // TODO: this is clunky to move the time
+                // TODO: also it skips over the world's actions. We need a more
+                // generic "energy" system so everyone gets time to act.
+                copy.setWorld(state.getWorld()
+                        .setCalendar(state.getWorld().getCalendar().addTime(
+                                TimeUnit.MINUTES.toSeconds(1))));
             } else {
                 copy.addLog("Cannot summon a familar here.");
             }
 
             return copy.build();
-        }
-
-        private static void summon(Location summonSpot, World world, GameState.Builder copy, Random random) {
-            // TODO: something like a "turns to live" status
-            // TODO: create a util class to create runtime instances of monsters
-            CharacterSheet familiar = random.nextBoolean()
-                    ? new CharacterSheet(
-                            // TODO: setting the name returns a vanilla element which breaks downstream
-                            Monster.get("mon_simple_bat"),
-                            new Stats(2, 6, 4, 2, 2, 1),
-                            new Status(0, Monster.get("mon_simple_bat").getHitPoints(),
-                                    Set.of(new StatusEffect(Effect.EffectNames.PET.getId()))),
-                            null, Set.of(), Set.of())
-                    : new CharacterSheet(
-                            // TODO: setting the name returns a vanilla element which breaks downstream
-                            Monster.get("mon_wolf"),
-                            new Stats(6, 4, 4, 3, 2, 2),
-                            new Status(0, Monster.get("mon_simple_bat").getHitPoints(),
-                                    Set.of(new StatusEffect(Effect.EffectNames.PET.getId()))),
-                            null, Set.of(), Set.of());
-
-            world.add(familiar, summonSpot);
-
-            // TODO: this is clunky to move the time
-            // TODO: also it skips over the world's actions. We need a more
-            // generic "energy" system so everyone gets time to act.
-            copy.setWorld(world
-                    .setCalendar(world.getCalendar().addTime(
-                            TimeUnit.MINUTES.toSeconds(1))));
-
-            copy.addLog("You summon a " + familiar.getName() + " familar!");
-        }
-
-        private static Location getSummonLocation(Location caster, World world) {
-            return caster.getNeighbors(10).stream()
-                    .filter(world::canMove)
-                    .findAny().orElse(null);
         }
     }
 

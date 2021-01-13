@@ -7,13 +7,13 @@ import com.zygon.rl.world.Entity;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
 import com.zygon.rl.world.WorldTile;
+import com.zygon.rl.world.action.Action;
+import com.zygon.rl.world.action.SummonAction;
 import com.zygon.rl.world.character.CharacterSheet;
 import com.zygon.rl.world.character.Stats;
 import com.zygon.rl.world.character.Status;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -33,13 +33,14 @@ public class SpawnSystem extends GameSystem {
 
     @Override
     public GameState apply(GameState state) {
-        spawn(spawnedLocations, state.getWorld(), state.getWorld().getPlayerLocation());
+        spawn(spawnedLocations, state, state.getWorld().getPlayerLocation());
 
         return state;
     }
 
-    private void spawn(Set<Location> spawnedLocations, World world, Location center) {
+    private void spawn(Set<Location> spawnedLocations, GameState state, Location center) {
 
+        World world = state.getWorld();
         int freq = getGameConfiguration().getWorldSpawn().getFrequency();
 
         // round
@@ -60,24 +61,24 @@ public class SpawnSystem extends GameSystem {
                     Entity entity = world.getTerrain(rngLocation);
                     WorldTile wt = WorldTile.get(entity);
 
+                    Action summonAction = null;
+
                     if (wt != WorldTile.PUDDLE) {
-                        List<CharacterSheet> characters = new ArrayList<>();
+
+                        String creatureId = null;
+
                         if (random.nextDouble() > .10) {
-                            String monsterId = getRandomSetElement(Monster.getAllIds());
-                            Monster monster = Monster.get(monsterId);
-
-                            for (int i = 0; i < random.nextInt(4); i++) {
-                                characters.add(getRandomPower(monster, monster.getHitPoints()));
-                            }
+                            creatureId = getRandomSetElement(Monster.getAllIds());
                         } else {
-                            String npcId = getRandomSetElement(Npc.getAllIds());
-
-                            for (int i = 0; i < random.nextInt(4); i++) {
-                                // TODO: set names
-                                characters.add(getRandomPower(Npc.get(npcId), random.nextInt(20) + 10));
-                            }
+                            // TODO: set names on resulting spawns
+                            creatureId = getRandomSetElement(Npc.getAllIds());
                         }
-                        characters.forEach(cs -> world.add(cs, location));
+
+                        summonAction = new SummonAction(rngLocation, random.nextInt(4), creatureId, random);
+                    }
+
+                    if (summonAction != null && summonAction.canExecute(state)) {
+                        summonAction.execute(state);
                     }
 
                     spawnedLocations.add(location);

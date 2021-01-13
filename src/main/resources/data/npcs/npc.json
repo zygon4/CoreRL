@@ -6,6 +6,9 @@
         "description": "Salt of the earth",
         "symbol": "P",
         "color": "Wheat",
-        "aggression": 2
+        "species": "HUMAN",
+        "aggression": 5,
+        "hitPoints": 50,
+        "flags": []
     }
 ]

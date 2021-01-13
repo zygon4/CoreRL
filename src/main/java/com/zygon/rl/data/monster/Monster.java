@@ -1,7 +1,7 @@
 package com.zygon.rl.data.monster;
 
+import com.zygon.rl.data.Creature;
 import com.google.gson.reflect.TypeToken;
-import com.zygon.rl.data.Element;
 import com.zygon.rl.util.StringUtil;
 
 import java.io.BufferedReader;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 /**
  *
  */
-public class Monster extends Element {
+public class Monster extends Creature {
 
     private static final Map<String, Monster> NPC_BY_ID = new HashMap<>();
 
@@ -47,24 +47,4 @@ public class Monster extends Element {
         return NPC_BY_ID.keySet();
     }
 
-    private String species;
-    private int aggression;
-    private int hitPoints;
-    private Set<String> flags;
-
-    public String getSpecies() {
-        return species;
-    }
-
-    public int getAggression() {
-        return aggression;
-    }
-
-    public int getHitPoints() {
-        return hitPoints;
-    }
-
-    public Set<String> getFlags() {
-        return flags;
-    }
 }

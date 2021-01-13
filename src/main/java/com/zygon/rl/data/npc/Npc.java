@@ -1,7 +1,7 @@
 package com.zygon.rl.data.npc;
 
 import com.google.gson.reflect.TypeToken;
-import com.zygon.rl.data.Element;
+import com.zygon.rl.data.Creature;
 import com.zygon.rl.util.StringUtil;
 
 import java.io.BufferedReader;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 /**
  *
  */
-public class Npc extends Element {
+public class Npc extends Creature {
 
     private static final Map<String, Npc> NPC_BY_ID = new HashMap<>();
 
@@ -43,11 +43,5 @@ public class Npc extends Element {
 
     public static Set<String> getAllIds() {
         return NPC_BY_ID.keySet();
-    }
-
-    private int aggression;
-
-    public int getAggression() {
-        return aggression;
     }
 }
