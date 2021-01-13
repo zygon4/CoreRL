@@ -29,15 +29,12 @@ public class Npc extends Element {
     private static final String RESOURCE_PATH = "/data/npcs/npc.json";
 
     public static void load() throws FileNotFoundException, IOException {
-
-        List<Npc> melee = null;
         try ( Reader jsonReader = new BufferedReader(new InputStreamReader(
                 Npc.class.getResourceAsStream(RESOURCE_PATH)))) {
-            melee = StringUtil.JSON.fromJson(jsonReader, TYPE);
+            List<Npc> melee = StringUtil.JSON.fromJson(jsonReader, TYPE);
+            NPC_BY_ID.putAll(melee.stream()
+                    .collect(Collectors.toMap(m -> m.getId(), m -> m)));
         }
-
-        NPC_BY_ID.putAll(melee.stream()
-                .collect(Collectors.toMap(m -> m.getId(), m -> m)));
     }
 
     public static Npc get(String id) {

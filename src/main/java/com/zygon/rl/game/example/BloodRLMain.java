@@ -10,13 +10,10 @@ import com.zygon.rl.data.Element;
 import com.zygon.rl.data.context.Data;
 import com.zygon.rl.data.items.Melee;
 import com.zygon.rl.data.monster.Monster;
-import com.zygon.rl.data.npc.Npc;
 import com.zygon.rl.game.Game;
 import com.zygon.rl.game.GameConfiguration;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.game.ui.GameUI;
-import com.zygon.rl.util.rng.family.FamilyTreeGenerator;
-import com.zygon.rl.util.rng.family.Person;
 import com.zygon.rl.world.Calendar;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
@@ -213,7 +210,7 @@ public class BloodRLMain {
 
         CharacterSheet pc = new CharacterSheet(
                 new Element("player", "player", "@", "PaleVioletRed", "Alucard", "He's cool"),
-                new Stats(12, 12, 12, 10, 10, 12),
+                new Stats(16, 16, 14, 12, 12, 16),
                 new Status(19, 100, Set.of()),
                 new Equipment(new Weapon(18, 4, scythe, 0)),
                 abilities,
@@ -221,41 +218,40 @@ public class BloodRLMain {
 
         world.add(pc, Location.create(0, 0));
 
-        Npc farmerData = Npc.get("npc_generic_farmer");
-        for (int i = -1; i < 1; i++) {
-            Person npcPerson = FamilyTreeGenerator.create();
-
-            CharacterSheet npcSheet = new CharacterSheet(
-                    farmerData.setName(npcPerson.getName().toString())
-                            .setDescription(farmerData.getDescription()),
-                    new Stats(10, 8, 10, 8, 9, 6),
-                    new Status(44, 40, Set.of()),
-                    new Equipment(new Weapon(18, 2, dagger, 0)),
-                    Set.of(),
-                    Set.of());
-
-            world.add(npcSheet, Location.create(i, 5));
-        }
-
-        Monster frog = Monster.get("mon_giant_frog");
-        for (int i = 0; i < 20; i++) {
-
-            Location rand = Location.create(
-                    20 + config.getRandom().nextInt(10),
-                    20 + config.getRandom().nextInt(10));
-
-            if (world.canMove(rand)) {
-                CharacterSheet npcSheet = new CharacterSheet(
-                        frog,
-                        new Stats(4, 4, 6, 3, 3, 3),
-                        new Status(2, frog.getHitPoints(), Set.of()),
-                        null,
-                        Set.of(),
-                        Set.of());
-                world.add(npcSheet, rand);
-            }
-        }
-
+//        Npc farmerData = Npc.get("npc_generic_farmer");
+//        for (int i = -1; i < 1; i++) {
+//            Person npcPerson = FamilyTreeGenerator.create();
+//
+//            CharacterSheet npcSheet = new CharacterSheet(
+//                    farmerData.setName(npcPerson.getName().toString())
+//                            .setDescription(farmerData.getDescription()),
+//                    new Stats(10, 8, 10, 8, 9, 6),
+//                    new Status(44, 40, Set.of()),
+//                    new Equipment(new Weapon(18, 2, dagger, 0)),
+//                    Set.of(),
+//                    Set.of());
+//
+//            world.add(npcSheet, Location.create(i, 5));
+//        }
+//
+//        Monster frog = Monster.get("mon_giant_frog");
+//        for (int i = 0; i < 20; i++) {
+//
+//            Location rand = Location.create(
+//                    20 + config.getRandom().nextInt(10),
+//                    20 + config.getRandom().nextInt(10));
+//
+//            if (world.canMove(rand)) {
+//                CharacterSheet npcSheet = new CharacterSheet(
+//                        frog,
+//                        new Stats(4, 4, 6, 3, 3, 3),
+//                        new Status(2, frog.getHitPoints(), Set.of()),
+//                        null,
+//                        Set.of(),
+//                        Set.of());
+//                world.add(npcSheet, rand);
+//            }
+//        }
         world.add(dagger.getId(), Location.create(0, 0));
         world.add(dagger.getId(), Location.create(0, -1));
         world.add("corpse", Location.create(0, 1));

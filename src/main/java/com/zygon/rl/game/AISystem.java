@@ -50,8 +50,8 @@ final class AISystem extends GameSystem {
             }
 
             if (action != null) {
-                if (action.canExecute()) {
-                    action.execute();
+                if (action.canExecute(state)) {
+                    state = action.execute(state);
                 } else {
                     state = state.log("Can't execute that");
                 }
@@ -96,7 +96,7 @@ final class AISystem extends GameSystem {
                     // If next to, attack
                     if (characterLocation.getNeighbors().contains(world.getPlayerLocation())) {
                         CharacterSheet player = world.getPlayer();
-                        return (c) -> new MeleeAttackAction(world, getGameConfiguration(),
+                        return (c) -> new MeleeAttackAction(getGameConfiguration(),
                                 c, player, world.getPlayerLocation());
                     } else {
                         // If within aggression range follow
@@ -141,7 +141,7 @@ final class AISystem extends GameSystem {
                     // character. They're defending someone else.
                     CharacterSheet defender = world.get(defenderLoc);
                     if (defender != null) {
-                        return (c) -> new MeleeAttackAction(world, getGameConfiguration(),
+                        return (c) -> new MeleeAttackAction(getGameConfiguration(),
                                 defender, neighborToDefendLoc, possibleHostile);
                     }
                 } else {
@@ -161,7 +161,7 @@ final class AISystem extends GameSystem {
 
             if (pathToDest != null && pathToDest.size() > 1) {
                 if (world.canMove(pathToDest.get(0))) {
-                    return (character) -> new MoveAction(world, character.getId(),
+                    return (character) -> new MoveAction(character.getId(),
                             followerLocation, pathToDest.get(0));
                 }
             }
@@ -178,7 +178,7 @@ final class AISystem extends GameSystem {
     private Behavior hostile(Location hostileLocation, Location destination, World world) {
         if (hostileLocation.getNeighbors().contains(world.getPlayerLocation())) {
             CharacterSheet player = world.getPlayer();
-            return (c) -> new MeleeAttackAction(world, getGameConfiguration(),
+            return (c) -> new MeleeAttackAction(getGameConfiguration(),
                     c, player, world.getPlayerLocation());
         } else {
             return follow(hostileLocation, destination, world, 1);

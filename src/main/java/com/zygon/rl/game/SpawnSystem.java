@@ -73,6 +73,7 @@ public class SpawnSystem extends GameSystem {
                             String npcId = getRandomSetElement(Npc.getAllIds());
 
                             for (int i = 0; i < random.nextInt(4); i++) {
+                                // TODO: set names
                                 characters.add(getRandomPower(Npc.get(npcId), random.nextInt(20) + 10));
                             }
                         }
@@ -88,9 +89,9 @@ public class SpawnSystem extends GameSystem {
     // species, etc.
 
     // TODO: this is clearly insufficient, maybe stats based on size?
-    private CharacterSheet getRandomPower(Element monster, int hitPoints) {
+    private CharacterSheet getRandomPower(Element actor, int hitPoints) {
         int stats = random.nextInt(4) + 1;
-        return new CharacterSheet(monster,
+        return new CharacterSheet(actor,
                 new Stats(stats, stats, stats, stats, stats, stats),
                 new Status(stats, hitPoints, Set.of()),
                 null, Set.of(), Set.of());

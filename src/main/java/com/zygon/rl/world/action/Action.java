@@ -1,25 +1,16 @@
 package com.zygon.rl.world.action;
 
-import com.zygon.rl.world.World;
+import com.zygon.rl.game.GameState;
 
 /**
- * Can be anything from move, to use ability, to simulate physics, to attack
+ * Can be anything from move, to use ability, to simulate physics, to attack.
+ * TODO: pass in state, get back state.
  *
  * @author zygon
  */
 public abstract class Action {
 
-    private final World world;
+    public abstract boolean canExecute(GameState state);
 
-    protected Action(World world) {
-        this.world = world;
-    }
-
-    public abstract boolean canExecute();
-
-    public abstract void execute();
-
-    public final World getWorld() {
-        return world;
-    }
+    public abstract GameState execute(GameState state);
 }

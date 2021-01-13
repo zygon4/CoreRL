@@ -1,6 +1,7 @@
 package com.zygon.rl.world.action;
 
 import com.zygon.rl.data.Element;
+import com.zygon.rl.game.GameState;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
 import com.zygon.rl.world.character.CharacterSheet;
@@ -19,18 +20,17 @@ public class MoveAction extends Action {
     private final Location from;
     private final Location to;
 
-    public MoveAction(World world, String id, Location from, Location to) {
-        super(world);
+    public MoveAction(String id, Location from, Location to) {
         this.id = id;
         this.from = from;
         this.to = to;
     }
 
     @Override
-    public boolean canExecute() {
+    public boolean canExecute(GameState state) {
         // needs to be that id at the location expected, and can move to the
         // next location
-        World world = getWorld();
+        World world = state.getWorld();
         List<CharacterSheet> all = world.getAll(from);
         Element fromElements = all != null ? world.getAll(from).stream()
                 .filter(element -> element.getId().equals(id))
@@ -39,8 +39,8 @@ public class MoveAction extends Action {
     }
 
     @Override
-    public void execute() {
-        World world = getWorld();
+    public GameState execute(GameState state) {
+        World world = state.getWorld();
 
         List<CharacterSheet> elements = world.getAll(from).stream()
                 .filter(element -> element.getId().equals(id))
@@ -55,6 +55,7 @@ public class MoveAction extends Action {
                 // TODO: maybe log?
             }
         }
+        return state;
     }
 
     public Location getFrom() {
@@ -76,7 +77,7 @@ public class MoveAction extends Action {
             Collections.shuffle(neighboringLocations);
             Location to = neighboringLocations.get(0);
 
-            return new MoveAction(world, id, from, to);
+            return new MoveAction(id, from, to);
         }
 
         return null;

@@ -4,6 +4,7 @@ import com.zygon.rl.data.Effect;
 import com.zygon.rl.data.items.Corpse;
 import com.zygon.rl.data.monster.Monster;
 import com.zygon.rl.game.GameConfiguration;
+import com.zygon.rl.game.GameState;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
 import com.zygon.rl.world.character.CharacterSheet;
@@ -26,9 +27,8 @@ public class MeleeAttackAction extends Action {
     private final CharacterSheet defender;
     private final Location defenderLocation;
 
-    public MeleeAttackAction(World world, GameConfiguration gameConfiguration,
+    public MeleeAttackAction(GameConfiguration gameConfiguration,
             CharacterSheet attacker, CharacterSheet defender, Location defenderLocation) {
-        super(world);
         this.gameConfiguration = gameConfiguration;
         this.attacker = Objects.requireNonNull(attacker, "Need attacker");
         this.defender = Objects.requireNonNull(defender, "Need defender");
@@ -36,34 +36,34 @@ public class MeleeAttackAction extends Action {
     }
 
     @Override
-    public boolean canExecute() {
+    public boolean canExecute(GameState state) {
         // No checking for range, etc.
         // TODO: check for dead attacker, other statuses?
         return true;
     }
 
     @Override
-    public void execute() {
+    public GameState execute(GameState state) {
         CombatResolver combat = new CombatResolver(gameConfiguration.getRandom());
         CombatResolver.Resolution combatDamage = combat.resolveCloseCombat(attacker, defender);
 
-        System.out.println(combatDamage);
+        state = state.log(combatDamage.toString());
 
         // Note: could also result in knockback (ie location change) or status
         // effects (wounds, etc).
         CharacterSheet updatedDefender = defender.loseHitPoints(combatDamage.getTotalDamage());
 
         if (!updatedDefender.isDead()) {
-            getWorld().add(updatedDefender, defenderLocation);
-            updateToHostile(updatedDefender, defenderLocation);
+            state.getWorld().add(updatedDefender, defenderLocation);
+            updateToHostile(state.getWorld(), updatedDefender, defenderLocation);
         } else {
-            System.out.println(updatedDefender.getName() + " is dead! " + defenderLocation);
-            getWorld().remove(updatedDefender, defenderLocation);
-            getWorld().add(getCorpseId(defender), defenderLocation);
+            state = state.log(updatedDefender.getName() + " died!");
+            state.getWorld().remove(updatedDefender, defenderLocation);
+            state.getWorld().add(getCorpseId(defender), defenderLocation);
         }
 
         // For all nearby creatures of the same type and species (if monster)
-        updateToHostile((couldBeHostile) -> {
+        updateToHostile(state.getWorld(), (couldBeHostile) -> {
             // if same type AND species AND NOT PET
             // Getting a bit weird.. let's see how it goes..
 
@@ -80,27 +80,29 @@ public class MeleeAttackAction extends Action {
 
             return false;
         }, defenderLocation);
+
+        return state;
     }
 
-    private void updateToHostile(CharacterSheet characterSheet, Location location) {
+    private void updateToHostile(World world, CharacterSheet characterSheet, Location location) {
         if (!characterSheet.getId().equals("player")) {
             if (!characterSheet.getStatus().isEffected(Effect.EffectNames.HOSTILE.getId())) {
                 CharacterSheet updatedToHostile = characterSheet.set(characterSheet.getStatus()
                         .addEffect(new StatusEffect(Effect.EffectNames.HOSTILE.getId())));
 
-                getWorld().add(updatedToHostile, location);
+                world.add(updatedToHostile, location);
             }
         }
     }
 
     // Also seems like a possible pattern..
-    private void updateToHostile(Predicate<CharacterSheet> isHostileFn, Location near) {
+    private void updateToHostile(World world, Predicate<CharacterSheet> isHostileFn, Location near) {
         near.getNeighbors(20).stream()
                 .forEach(n -> {
-                    CharacterSheet hostileCharacter = getWorld().get(n);
+                    CharacterSheet hostileCharacter = world.get(n);
                     if (hostileCharacter != null && isHostileFn.test(hostileCharacter)) {
 
-                        updateToHostile(hostileCharacter, n);
+                        updateToHostile(world, hostileCharacter, n);
                     }
                 });
     }

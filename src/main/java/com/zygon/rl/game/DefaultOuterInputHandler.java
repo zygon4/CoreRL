@@ -109,11 +109,12 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
 
                     // TODO: hostile status
                     if (interactable != null) {
-                        Action bumpAttack = new MeleeAttackAction(world,
+                        Action bumpAttack = new MeleeAttackAction(
                                 getGameConfiguration(), player, interactable, destination);
 
-                        if (bumpAttack.canExecute()) {
-                            bumpAttack.execute();
+                        GameState tmpState = copy.build();
+                        if (bumpAttack.canExecute(tmpState)) {
+                            copy = bumpAttack.execute(tmpState).copy();
                         }
 
                         // TODO: resolve damages, kill NPCs or player
