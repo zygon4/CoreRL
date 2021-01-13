@@ -67,13 +67,11 @@ public class BloodRLMain {
         public GameState use(GameState state, Optional<Element> empty,
                 Optional<Location> victimLocation) {
 
-            CharacterSheet player = state.getWorld().getPlayer();
-
             GameState.Builder copy = state.copy();
 
-            // TODO: add game log
             CharacterSheet victim = state.getWorld().get(victimLocation.get());
-            if (victim != null) {
+
+            if (victim != null && !victimLocation.get().equals(state.getWorld().getPlayerLocation())) {
                 // TODO: biting is a special case attack
                 // needs combat resolution
                 // TODO: calculate bite stats and what happens to the player, etc.

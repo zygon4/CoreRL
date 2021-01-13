@@ -38,7 +38,9 @@ final class AISystem extends GameSystem {
         Map<Location, CharacterSheet> closeCharacters = world.getAll(
                 playerLocation, null, REALITY_BUBBLE);
 
-        closeCharacters.forEach((currentLoc, character) -> {
+        for (var entry : closeCharacters.entrySet()) {
+            Location currentLoc = entry.getKey();
+            CharacterSheet character = entry.getValue();
 
             Behavior behavior = get(character, currentLoc, world);
 
@@ -51,11 +53,10 @@ final class AISystem extends GameSystem {
                 if (action.canExecute()) {
                     action.execute();
                 } else {
-                    // TODO: log?
-                    System.out.println("Can't execute action " + action);
+                    state = state.log("Can't execute that");
                 }
             }
-        });
+        }
 
         return state;
     }

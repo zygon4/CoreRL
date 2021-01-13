@@ -1,5 +1,7 @@
 package com.zygon.rl.game;
 
+import com.zygon.rl.world.WorldSpawn;
+
 import java.nio.file.Path;
 import java.util.Random;
 
@@ -11,6 +13,7 @@ public class GameConfiguration {
     private String gameName = "";
     private Path musicFile;
     private Random random;
+    private WorldSpawn worldSpawn;
 
     public String getGameName() {
         return gameName;
@@ -34,5 +37,13 @@ public class GameConfiguration {
 
     public void setRandom(Random random) {
         this.random = random;
+    }
+
+    public WorldSpawn getWorldSpawn() {
+        return worldSpawn;
+    }
+
+    public void setWorldSpawn(WorldSpawn worldSpawn) {
+        this.worldSpawn = worldSpawn;
     }
 }

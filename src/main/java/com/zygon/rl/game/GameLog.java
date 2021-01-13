@@ -26,6 +26,8 @@ public class GameLog {
         List<String> messages = new ArrayList<>(this.messages);
 
         // TODO: throttle repeated messages
+        // TODO: remove and print all to the screen only
+        System.out.println(message);
         messages.add(message);
 
         return new GameLog(messages);

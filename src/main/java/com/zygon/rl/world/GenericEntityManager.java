@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -50,18 +51,21 @@ public class GenericEntityManager<T extends Identifable> {
 
         Map<Location, List<T>> elementsByLocation = new HashMap<>();
 
-        location.getNeighbors(radius).stream().forEach(loc -> {
-            List<T> elements = get(loc);
-            if (elements != null && !elements.isEmpty()) {
-                List<T> filtered = elements.stream()
-                        .filter(filter)
-                        .collect(Collectors.toList());
+        Set<Location> neighbors = location.getNeighbors(radius);
+        if (neighbors != null) {
+            neighbors.stream().forEach(loc -> {
+                List<T> elements = get(loc);
+                if (elements != null && !elements.isEmpty()) {
+                    List<T> filtered = elements.stream()
+                            .filter(filter)
+                            .collect(Collectors.toList());
 
-                if (!filtered.isEmpty()) {
-                    elementsByLocation.put(loc, filtered);
+                    if (!filtered.isEmpty()) {
+                        elementsByLocation.put(loc, filtered);
+                    }
                 }
-            }
-        });
+            });
+        }
 
         return elementsByLocation;
     }
