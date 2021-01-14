@@ -92,7 +92,8 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                                 .setName("EXAMINE")
                                 .setHandler(new DirectionInputHandler(
                                         getGameConfiguration(),
-                                        l -> neighborsWithSomething.containsKey(l) ? new ExamineAction(l) : null,
+                                        l -> neighborsWithSomething.containsKey(l)
+                                        ? new ExamineAction(l) : null,
                                         state.getWorld().getPlayerLocation()))
                                 .setPrompt(GameState.InputContextPrompt.DIRECTION)
                                 .build()).build();
@@ -178,7 +179,8 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                 // Same movement cost everywhere for now..
                 // Same movement speed, etc
                 copy.setWorld(state.getWorld()
-                        .setCalendar(state.getWorld().getCalendar().addTime(DEFAULT_ACTION_TIME)));
+                        .setCalendar(state.getWorld()
+                                .getCalendar().addTime(DEFAULT_ACTION_TIME)));
             }
             default -> {
                 invalidInput(input);
@@ -194,6 +196,12 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
         switch (inputKeyCode) {
             case KEY_A -> {
                 return "Abilities";
+            }
+            case KEY_I -> {
+                return "Inventory";
+            }
+            case KEY_E -> {
+                return "Examine";
             }
             default -> {
                 return inputKeyCode.name();
