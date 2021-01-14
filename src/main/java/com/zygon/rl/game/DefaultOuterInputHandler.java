@@ -1,16 +1,23 @@
 package com.zygon.rl.game;
 
+import com.zygon.rl.data.Element;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
 import com.zygon.rl.world.action.Action;
+import com.zygon.rl.world.action.ExamineAction;
 import com.zygon.rl.world.action.MeleeAttackAction;
 import com.zygon.rl.world.character.CharacterSheet;
 import com.zygon.rl.world.character.Equipment;
 import com.zygon.rl.world.character.Weapon;
+import org.apache.commons.math3.util.Pair;
 import org.hexworks.zircon.api.uievent.KeyCode;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_1;
 import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_2;
@@ -33,6 +40,8 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
         defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_A.getCode()));
         // 'I' for inventory
         defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_I.getCode()));
+        // 'e' for examine adjacent
+        defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_E.getCode()));
         // ESC for game menu
         defaultKeyCodes.add(Input.valueOf(KeyCode.ESCAPE.getCode()));
     }
@@ -46,6 +55,50 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
         GameState.Builder copy = state.copy();
         KeyCode inputKeyCode = convert(input);
         switch (inputKeyCode) {
+            case KEY_E -> {
+                Map<Location, List<Element>> neighborsWithSomething
+                        = state.getWorld().getPlayerLocation().getNeighbors(true).stream()
+                                .map(loc -> {
+                                    List<Element> elements = state.getWorld().getAllElements(loc).stream()
+                                            .filter(el -> !el.getId().equals("player"))
+                                            .collect(Collectors.toList());
+
+                                    if (elements.isEmpty()) {
+                                        return null;
+                                    } else {
+                                        return Pair.create(loc, elements);
+                                    }
+                                })
+                                .filter(Objects::nonNull)
+                                .collect(Collectors.toMap(k -> k.getFirst(), v -> v.getSecond()));
+
+                if (neighborsWithSomething.isEmpty()) {
+                    copy.addLog("There is nothing to examine.");
+                } else {
+                    if (neighborsWithSomething.size() == 1) {
+                        Location loc = neighborsWithSomething.keySet().iterator().next();
+
+                        // TODO Don't want an action here.. want to tell the
+                        // screen to print the items at the location!!!
+                        Action examineAction = new ExamineAction(loc);
+                        if (examineAction.canExecute(state)) {
+                            examineAction.execute(state);
+                        }
+                    } else {
+                        // prompt for direction
+                        // TODO Don't want an action here.. want to tell the
+                        // screen to print the items at the location!!!
+                        copy.addInputContext(GameState.InputContext.builder()
+                                .setName("EXAMINE")
+                                .setHandler(new DirectionInputHandler(
+                                        getGameConfiguration(),
+                                        l -> neighborsWithSomething.containsKey(l) ? new ExamineAction(l) : null,
+                                        state.getWorld().getPlayerLocation()))
+                                .setPrompt(GameState.InputContextPrompt.DIRECTION)
+                                .build()).build();
+                    }
+                }
+            }
             case ESCAPE -> {
                 copy = copy.addInputContext(
                         GameState.InputContext.builder()
@@ -147,4 +200,5 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
             }
         }
     }
+
 }

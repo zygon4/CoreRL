@@ -121,8 +121,12 @@ public class Location {
      *
      * @return
      */
-    public Set<Location> getNeighbors() {
+    public Set<Location> getNeighbors(boolean incThis) {
         Set<Location> neighors = new HashSet<>();
+
+        if (incThis) {
+            neighors.add(this);
+        }
 
         neighors.add(Location.create(x + 1, y, z));
         neighors.add(Location.create(x + 1, y + 1, z));
@@ -137,6 +141,10 @@ public class Location {
         neighors.add(Location.create(x + 1, y - 1, z));
 
         return neighors;
+    }
+
+    public Set<Location> getNeighbors() {
+        return getNeighbors(false);
     }
 
     private static final int NUM_POINTS = 15;

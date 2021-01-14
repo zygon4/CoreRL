@@ -151,9 +151,9 @@ final class GameView extends BaseView {
                                 + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - turnStart));
 
                         if (game.getState().isPlayerDead()) {
-                            System.out.println("YOU DIED!\nYou lasted "
+                            game.copy().setState(game.getState().log("YOU DIED!\nYou lasted "
                                     + game.getState().getTurnCount() + " turns in the world of "
-                                    + game.getConfiguration().getGameName());
+                                    + game.getConfiguration().getGameName()));
                             System.exit(0);
 //                            replaceWith(new TitleView(tileGrid, getTheme(), game,
 //                                    // TODO: better death notice

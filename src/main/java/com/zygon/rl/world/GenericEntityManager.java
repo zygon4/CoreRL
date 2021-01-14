@@ -44,7 +44,14 @@ public class GenericEntityManager<T extends Identifable> {
     }
 
     public List<T> get(Location location) {
-        return entitiesByLocation.get(location);
+        List<T> entities = new ArrayList<>();
+
+        List<T> byLocation = entitiesByLocation.get(location);
+        if (byLocation != null) {
+            entities.addAll(byLocation);
+        }
+
+        return entities;
     }
 
     public Map<Location, List<T>> get(Location location, Predicate<T> filter, int radius) {

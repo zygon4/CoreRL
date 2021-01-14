@@ -94,7 +94,8 @@ public class World {
         List<Element> staticItems = staticObjects.get(location).stream()
                 .map(Identifable::getId)
                 .map(id -> {
-                    //I think having to use this syntax is a language difficiency
+                    // I think having to use this syntax is a language
+                    // difficiency wrt generics.
                     Element el = Data.get(id);
                     return el;
                 })
