@@ -36,6 +36,7 @@ public class CombatResolveTest {
                 new Stats(10, 10, 10, 10, 10, 10),
                 new Status(20, 10, Set.of()),
                 new Equipment(List.of(new Weapon(dagger, 20, 2, 0))),
+                null,
                 Set.of(), Set.of());
 
         CharacterSheet defender = new CharacterSheet(
@@ -43,6 +44,7 @@ public class CombatResolveTest {
                 new Stats(10, 10, 10, 10, 10, 10),
                 new Status(20, 10, Set.of()),
                 new Equipment(List.of(new Weapon(dagger, 20, 2, 0))),
+                null,
                 Set.of(), Set.of());
 
         CombatResolver.Resolution resolvedMelee = resolver.resolveCloseCombat(attacker, defender);

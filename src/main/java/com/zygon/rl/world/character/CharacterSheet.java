@@ -19,17 +19,19 @@ public final class CharacterSheet extends Element {
     private final Stats stats;
     private final Status status;
     private final Equipment equipment;
+    private final Inventory inventory;
     private final Set<Ability> abilities;
     private final Set<Spell> spells;
 
     public CharacterSheet(Element template, Stats stats, Status status,
-            Equipment equipment, Set<Ability> abilities, Set<Spell> spells) {
+            Equipment equipment, Inventory inventory, Set<Ability> abilities, Set<Spell> spells) {
         super(template);
 
         this.template = template;
         this.stats = stats;
         this.status = status;
         this.equipment = equipment != null ? equipment : new Equipment(null);
+        this.inventory = inventory != null ? inventory : new Inventory();
         this.abilities = Collections.unmodifiableSet(abilities);
         this.spells = Collections.unmodifiableSet(spells);
     }
@@ -40,6 +42,10 @@ public final class CharacterSheet extends Element {
 
     public Equipment getEquipment() {
         return equipment;
+    }
+
+    public Inventory getInventory() {
+        return inventory;
     }
 
     public Stats getStats() {
@@ -67,23 +73,38 @@ public final class CharacterSheet extends Element {
         return set(getStatus().decHitPoints(hps));
     }
 
+    public CharacterSheet get(Item item) {
+        CharacterSheet copy = new CharacterSheet(template, stats, status,
+                equipment, inventory.add(item), abilities, spells);
+
+        return copy;
+    }
+
+    public CharacterSheet drop(Item item) {
+        // TODO: drop equipped/wielded
+        CharacterSheet copy = new CharacterSheet(template, stats, status,
+                equipment, inventory.remove(item), abilities, spells);
+
+        return copy;
+    }
+
     public CharacterSheet set(Equipment equipment) {
         CharacterSheet copy = new CharacterSheet(template, stats, status,
-                equipment, abilities, spells);
+                equipment, inventory, abilities, spells);
 
         return copy;
     }
 
     public CharacterSheet set(Status status) {
         CharacterSheet copy = new CharacterSheet(template, stats, status,
-                equipment, abilities, spells);
+                equipment, inventory, abilities, spells);
 
         return copy;
     }
 
     public CharacterSheet set(Set<Ability> abilities) {
         CharacterSheet copy = new CharacterSheet(template, stats, status,
-                equipment, abilities, spells);
+                equipment, inventory, abilities, spells);
 
         return copy;
     }

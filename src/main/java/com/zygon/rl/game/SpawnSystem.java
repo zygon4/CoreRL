@@ -95,7 +95,7 @@ public class SpawnSystem extends GameSystem {
         return new CharacterSheet(actor,
                 new Stats(stats, stats, stats, stats, stats, stats),
                 new Status(stats, hitPoints, Set.of()),
-                null, Set.of(), Set.of());
+                null, null, Set.of(), Set.of());
     }
 
     private <E> E getRandomSetElement(Set<E> set) {

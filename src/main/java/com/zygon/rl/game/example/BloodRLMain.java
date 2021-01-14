@@ -20,6 +20,7 @@ import com.zygon.rl.world.action.SummonAction;
 import com.zygon.rl.world.character.Ability;
 import com.zygon.rl.world.character.CharacterSheet;
 import com.zygon.rl.world.character.Equipment;
+import com.zygon.rl.world.character.Inventory;
 import com.zygon.rl.world.character.Stats;
 import com.zygon.rl.world.character.Status;
 import com.zygon.rl.world.character.Weapon;
@@ -189,6 +190,7 @@ public class BloodRLMain {
                 new Status(19, 100, Set.of()),
                 new Equipment(List.of(new Weapon(scythe, 18, 4, 0)))
                         .wield(scythe.getId(), true),
+                new Inventory(),
                 abilities,
                 Set.of());
 
