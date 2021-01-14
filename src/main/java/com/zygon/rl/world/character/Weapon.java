@@ -3,9 +3,9 @@ package com.zygon.rl.world.character;
 import com.zygon.rl.data.items.Melee;
 
 /**
- * Also adding items/weapons Melee, so these need to be reconciled.
+ *
  */
-public class Weapon {
+public class Weapon extends Item {
 
     // TODO: should be a more generic "weapon" template when there are more types.
     private final Melee template;
@@ -13,7 +13,8 @@ public class Weapon {
     private final int critMod; //critical modifier
     private final int initMod; //Initiative Modifer
 
-    public Weapon(int critRange, int critMod, Melee template, int initMod) {
+    public Weapon(Melee template, int critRange, int critMod, int initMod) {
+        super(template);
         this.critRange = critRange;
         this.critMod = critMod;
         this.template = template;
@@ -40,14 +41,6 @@ public class Weapon {
 
     public int getCritRange() {
         return critRange;
-    }
-
-    public String getDescription() {
-        return template.getDescription();
-    }
-
-    public String getName() {
-        return template.getName();
     }
 
     public int getInitMod() {

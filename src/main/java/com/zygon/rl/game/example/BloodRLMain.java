@@ -32,6 +32,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
@@ -186,7 +187,8 @@ public class BloodRLMain {
                 new Element("player", "player", "@", "PaleVioletRed", "Alucard", "He's cool"),
                 new Stats(16, 16, 14, 12, 12, 16),
                 new Status(19, 100, Set.of()),
-                new Equipment(new Weapon(18, 4, scythe, 0)),
+                new Equipment(List.of(new Weapon(scythe, 18, 4, 0)))
+                        .wield(scythe.getId(), true),
                 abilities,
                 Set.of());
 

@@ -36,12 +36,14 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
     static {
         // Movement keys
         defaultKeyCodes.addAll(INPUTS_1_9);
-        // 'A' for abilities
+        // 'a' for abilities
         defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_A.getCode()));
-        // 'I' for inventory
-        defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_I.getCode()));
         // 'e' for examine adjacent
         defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_E.getCode()));
+        // 'i' for inventory
+        defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_I.getCode()));
+        // 'g' for get
+        defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_G.getCode()));
         // ESC for game menu
         defaultKeyCodes.add(Input.valueOf(KeyCode.ESCAPE.getCode()));
     }
@@ -101,12 +103,16 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                 }
             }
             case ESCAPE -> {
-                copy = copy.addInputContext(
+                copy.addInputContext(
                         GameState.InputContext.builder()
                                 .setName("GAME_MENU")
                                 .setHandler(new ModalInputHandler(getGameConfiguration()))
                                 .setPrompt(GameState.InputContextPrompt.MODAL)
                                 .build());
+            }
+            case KEY_G -> {
+                List<Element> items = state.getWorld().getAllElements(state.getWorld().getPlayerLocation());
+
             }
             // ability - present abilities
             case KEY_A -> {
@@ -115,7 +121,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                 AbilityInputHandler abilityHandler = AbilityInputHandler.create(
                         getGameConfiguration(), character.getAbilities());
 
-                copy = copy.addInputContext(
+                copy.addInputContext(
                         GameState.InputContext.builder()
                                 .setName("ABILITY")
                                 .setHandler(abilityHandler)
@@ -129,11 +135,17 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
 
                 StringBuilder eqSb = new StringBuilder();
 
-                Weapon weapon = eq.getEquippedWeapon();
-
-                if (weapon != null) {
-                    eqSb.append(eq.getEquippedWeapon()).append(" [RIGHT HAND]");
+                Weapon rWeap = eq.getEquippedRightWeapon();
+                if (rWeap != null) {
+                    eqSb.append(rWeap).append(" [RIGHT HAND]");
                 }
+                Weapon lWeap = eq.getEquippedLeftWeapon();
+                if (lWeap != null) {
+                    eqSb.append(lWeap).append(" [LEFT HAND]");
+                }
+                eq.getItems().forEach(item -> {
+                    eqSb.append(item.getName()).append(" - ").append(item.getDescription());
+                });
 
                 System.out.println(eqSb.toString());
                 // TODO: use built-in modals/lists. THis is esspecially important
@@ -197,11 +209,14 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
             case KEY_A -> {
                 return "Abilities";
             }
+            case KEY_E -> {
+                return "Examine";
+            }
             case KEY_I -> {
                 return "Inventory";
             }
-            case KEY_E -> {
-                return "Examine";
+            case KEY_G -> {
+                return "Get";
             }
             default -> {
                 return inputKeyCode.name();

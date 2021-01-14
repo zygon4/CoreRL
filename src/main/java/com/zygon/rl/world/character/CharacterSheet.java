@@ -67,6 +67,13 @@ public final class CharacterSheet extends Element {
         return set(getStatus().decHitPoints(hps));
     }
 
+    public CharacterSheet set(Equipment equipment) {
+        CharacterSheet copy = new CharacterSheet(template, stats, status,
+                equipment, abilities, spells);
+
+        return copy;
+    }
+
     public CharacterSheet set(Status status) {
         CharacterSheet copy = new CharacterSheet(template, stats, status,
                 equipment, abilities, spells);

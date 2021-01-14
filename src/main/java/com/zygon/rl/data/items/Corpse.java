@@ -1,7 +1,7 @@
 package com.zygon.rl.data.items;
 
 import com.google.gson.reflect.TypeToken;
-import com.zygon.rl.data.Element;
+import com.zygon.rl.data.ItemClass;
 import com.zygon.rl.util.StringUtil;
 
 import java.io.BufferedReader;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 /**
  *
  */
-public class Corpse extends Element {
+public class Corpse extends ItemClass {
 
     private static final Map<String, Corpse> BY_ID = new HashMap<>();
 
@@ -46,11 +46,5 @@ public class Corpse extends Element {
 
     public static Set<String> getAllIds() {
         return BY_ID.keySet();
-    }
-
-    private int weight;
-
-    public int getWeight() {
-        return weight;
     }
 }
