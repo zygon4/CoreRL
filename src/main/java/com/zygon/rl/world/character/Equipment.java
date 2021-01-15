@@ -1,5 +1,7 @@
 package com.zygon.rl.world.character;
 
+import com.zygon.rl.world.Item;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

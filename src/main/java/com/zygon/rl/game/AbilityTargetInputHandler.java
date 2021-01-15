@@ -3,6 +3,7 @@ package com.zygon.rl.game;
 import com.zygon.rl.data.Element;
 import com.zygon.rl.world.character.Ability;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -30,7 +31,7 @@ public class AbilityTargetInputHandler extends BaseInputHandler {
             Ability ability, Set<Element> targets) {
 
         // TODO: use location-based inputs vs alphabet
-        Map<Input, Element> targetsByInput = createAlphaInputs(targets);
+        Map<Input, Element> targetsByInput = createAlphaInputs(new ArrayList<>(targets));
         return new AbilityTargetInputHandler(gameConfiguration, ability, targetsByInput);
     }
 

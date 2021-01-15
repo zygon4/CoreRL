@@ -3,6 +3,7 @@ package com.zygon.rl.game;
 import com.zygon.rl.data.Element;
 import com.zygon.rl.world.character.Ability;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -22,7 +23,7 @@ final class AbilityInputHandler extends BaseInputHandler {
     // E.g. keyboard 'A' could activate the "throw" menu
     public static final AbilityInputHandler create(GameConfiguration gameConfiguration,
             Set<Ability> abilities) {
-        Map<Input, Ability> inputs = createAlphaInputs(abilities);
+        Map<Input, Ability> inputs = createAlphaInputs(new ArrayList<>(abilities));
         return new AbilityInputHandler(gameConfiguration, inputs);
     }
 

@@ -1,10 +1,14 @@
 package com.zygon.rl.game;
 
 import com.zygon.rl.data.Element;
+import com.zygon.rl.data.ItemClass;
+import com.zygon.rl.world.Item;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
 import com.zygon.rl.world.action.Action;
+import com.zygon.rl.world.action.DropItemAction;
 import com.zygon.rl.world.action.ExamineAction;
+import com.zygon.rl.world.action.GetItemAction;
 import com.zygon.rl.world.action.MeleeAttackAction;
 import com.zygon.rl.world.character.CharacterSheet;
 import com.zygon.rl.world.character.Equipment;
@@ -40,6 +44,8 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
         defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_A.getCode()));
         // 'e' for examine adjacent
         defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_E.getCode()));
+        // 'd' for get
+        defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_D.getCode()));
         // 'i' for inventory
         defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_I.getCode()));
         // 'g' for get
@@ -57,6 +63,27 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
         GameState.Builder copy = state.copy();
         KeyCode inputKeyCode = convert(input);
         switch (inputKeyCode) {
+            case KEY_D -> {
+                // This is pretty clunky, eh?
+                List<Item> items = state.getWorld().getPlayer().getInventory().getItems();
+
+                if (items.isEmpty()) {
+                    copy.addLog("There is nothing to drop.");
+                } else if (items.size() == 1) {
+                    Action getItem = new DropItemAction(items.get(0));
+                    if (getItem.canExecute(state)) {
+                        getItem.execute(state);
+                    }
+                } else {
+                    copy.addInputContext(
+                            GameState.InputContext.builder()
+                                    .setName("DROP")
+                                    .setHandler(ListItemInputHandler.create(getGameConfiguration(),
+                                            items, e -> new DropItemAction(e)))
+                                    .setPrompt(GameState.InputContextPrompt.LIST)
+                                    .build());
+                }
+            }
             case KEY_E -> {
                 Map<Location, List<Element>> neighborsWithSomething
                         = state.getWorld().getPlayerLocation().getNeighbors(true).stream()
@@ -111,8 +138,31 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                                 .build());
             }
             case KEY_G -> {
-                List<Element> items = state.getWorld().getAllElements(state.getWorld().getPlayerLocation());
+                // This is pretty clunky, eh?
+                List<Item> items = state.getWorld()
+                        .getAllElements(state.getWorld().getPlayerLocation()).stream()
+                        .filter(el -> {
+                            return ItemClass.class.isAssignableFrom(el.getClass());
+                        })
+                        .map(el -> new Item((ItemClass) el))
+                        .collect(Collectors.toList());
 
+                if (items.isEmpty()) {
+                    copy.addLog("There is nothing to get.");
+                } else if (items.size() == 1) {
+                    Action getItem = new GetItemAction(items.get(0));
+                    if (getItem.canExecute(state)) {
+                        getItem.execute(state);
+                    }
+                } else {
+                    copy.addInputContext(
+                            GameState.InputContext.builder()
+                                    .setName("GET")
+                                    .setHandler(ListItemInputHandler.create(getGameConfiguration(),
+                                            items, e -> new GetItemAction(e)))
+                                    .setPrompt(GameState.InputContextPrompt.LIST)
+                                    .build());
+                }
             }
             // ability - present abilities
             case KEY_A -> {
@@ -146,6 +196,12 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                 eq.getItems().forEach(item -> {
                     eqSb.append(item.getName()).append(" - ").append(item.getDescription());
                 });
+
+                eqSb.append("\n");
+
+                eqSb.append(character.getInventory().getItems().stream()
+                        .map(item -> item.getName() + " " + item.getDescription())
+                        .collect(Collectors.joining("\n")));
 
                 System.out.println(eqSb.toString());
                 // TODO: use built-in modals/lists. THis is esspecially important
@@ -211,6 +267,9 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
             }
             case KEY_E -> {
                 return "Examine";
+            }
+            case KEY_D -> {
+                return "Drop";
             }
             case KEY_I -> {
                 return "Inventory";

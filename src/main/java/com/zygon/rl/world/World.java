@@ -213,6 +213,10 @@ public class World {
         }
     }
 
+    public void remove(Element element, Location from) {
+        staticObjects.delete(element, from);
+    }
+
     public void remove(CharacterSheet character, Location from) {
         actors.delete(character, from);
         if (character.getId().equals("player")) {

@@ -1,5 +1,6 @@
 package com.zygon.rl.world.character;
 
+import com.zygon.rl.world.Item;
 import com.zygon.rl.data.items.Melee;
 
 /**

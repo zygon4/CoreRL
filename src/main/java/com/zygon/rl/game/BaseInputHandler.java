@@ -11,6 +11,7 @@ import org.hexworks.zircon.api.uievent.KeyCode;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -140,7 +141,7 @@ public abstract class BaseInputHandler implements LayerInputHandler {
 
     // maps alphabet characters (ordered) as inputs to the elements provided.
     // If more characters are needed, it'll pull them from the KeyCode enum.
-    protected static final <T> Map<Input, T> createAlphaInputs(Set<T> ts) {
+    protected static final <T> Map<Input, T> createAlphaInputs(List<T> ts) {
 
         Map<Input, T> inputs = new LinkedHashMap<>();
         int index = KeyCode.KEY_A.getCode();

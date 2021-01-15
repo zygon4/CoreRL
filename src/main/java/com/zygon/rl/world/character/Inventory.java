@@ -1,5 +1,7 @@
 package com.zygon.rl.world.character;
 
+import com.zygon.rl.world.Item;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,21 +32,25 @@ public final class Inventory {
         return new Inventory(updatedItems);
     }
 
+    // TODO: later
+    public boolean canAdd(Item item) {
+        return true;
+    }
+
     public Inventory remove(Item item) {
         List<Item> updatedItems = new ArrayList<>(items);
 
         Item removedItem = null;
+
         int itemIndex;
         for (itemIndex = 0; itemIndex < items.size(); itemIndex++) {
             if (items.get(itemIndex).getTemplate().getId().equals(item.getTemplate().getId())) {
-                removedItem = items.remove(itemIndex);
+                removedItem = updatedItems.remove(itemIndex);
                 break;
             }
         }
 
-        if (removedItem != null) {
-            updatedItems.remove(itemIndex);
-        } else {
+        if (removedItem == null) {
             throw new IllegalArgumentException("Item not found: " + item.getTemplate().getId());
         }
 

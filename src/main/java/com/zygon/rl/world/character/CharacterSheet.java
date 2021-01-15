@@ -1,5 +1,6 @@
 package com.zygon.rl.world.character;
 
+import com.zygon.rl.world.Item;
 import com.zygon.rl.data.Element;
 
 import java.util.Collections;
@@ -80,7 +81,7 @@ public final class CharacterSheet extends Element {
         return copy;
     }
 
-    public CharacterSheet drop(Item item) {
+    public CharacterSheet remove(Item item) {
         // TODO: drop equipped/wielded
         CharacterSheet copy = new CharacterSheet(template, stats, status,
                 equipment, inventory.remove(item), abilities, spells);
