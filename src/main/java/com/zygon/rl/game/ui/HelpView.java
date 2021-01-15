@@ -61,6 +61,8 @@ final class HelpView extends BaseView {
             modalPanel.addComponent(Components.textBox(45)
                     .addHeader("1,2,3,5,6,7,8,9 - movement", false)
                     .addHeader("a               - view abilities", false)
+                    .addHeader("g               - get item", false)
+                    .addHeader("d               - drop item", false)
                     .addHeader("i               - view inventory", false)
                     .addHeader("e               - examine surroundings", false)
                     .addHeader("esc             - game menu", false)
