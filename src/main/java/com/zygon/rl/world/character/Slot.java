@@ -10,6 +10,7 @@ public enum Slot {
     HEAD("Head"),
     TORSO("Torso"),
     ARM("Arm"),
+    HAND("Hand"),
     RING("Ring"),
     LEG("Leg"),
     FOOT("Foot");

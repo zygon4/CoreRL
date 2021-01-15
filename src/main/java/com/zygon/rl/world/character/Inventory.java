@@ -37,6 +37,16 @@ public final class Inventory {
         return true;
     }
 
+    public Item getItem(String id) {
+        return getItems().stream()
+                .filter(i -> i.getTemplate().getId().equals(id))
+                .findFirst().orElse(null);
+    }
+
+    public List<Item> getItems() {
+        return items;
+    }
+
     public Inventory remove(Item item) {
         List<Item> updatedItems = new ArrayList<>(items);
 
@@ -55,9 +65,5 @@ public final class Inventory {
         }
 
         return new Inventory(updatedItems);
-    }
-
-    public List<Item> getItems() {
-        return items;
     }
 }

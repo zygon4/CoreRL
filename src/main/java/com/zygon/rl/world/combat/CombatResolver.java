@@ -112,7 +112,8 @@ public class CombatResolver {
 
     private CombatResolver.Resolution resolveMelee(CharacterSheet attacker, CharacterSheet defender) {
 
-        Weapon weapon = attacker.getEquipment().getEquippedRightWeapon();
+        Weapon weapon = attacker.getEquipment().getWeapons().size() > 1
+                ? attacker.getEquipment().getWeapons().get(0) : null;
         // TODO: second weapon!
 
         int attackRoll = dice.rollD20();

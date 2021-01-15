@@ -1,7 +1,7 @@
 package com.zygon.rl.world.character;
 
-import com.zygon.rl.world.Item;
 import com.zygon.rl.data.items.Melee;
+import com.zygon.rl.world.Item;
 
 /**
  *
@@ -50,11 +50,6 @@ public class Weapon extends Item {
 
     public int getToHit() {
         return template.getToDamage();
-    }
-
-    @Override
-    public String toString() {
-        return getName() + " - " + getDescription();
     }
 
     private static int calcDamage(DiceRoller dice, int numDice, int damage) {

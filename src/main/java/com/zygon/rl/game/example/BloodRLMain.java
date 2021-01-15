@@ -18,9 +18,8 @@ import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
 import com.zygon.rl.world.action.SummonAction;
 import com.zygon.rl.world.character.Ability;
+import com.zygon.rl.world.character.Armor;
 import com.zygon.rl.world.character.CharacterSheet;
-import com.zygon.rl.world.character.Equipment;
-import com.zygon.rl.world.character.Inventory;
 import com.zygon.rl.world.character.Stats;
 import com.zygon.rl.world.character.Status;
 import com.zygon.rl.world.character.Weapon;
@@ -33,7 +32,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
@@ -188,11 +186,21 @@ public class BloodRLMain {
                 new Element("player", "player", "@", "PaleVioletRed", "Alucard", "He's cool"),
                 new Stats(16, 16, 14, 12, 12, 16),
                 new Status(19, 100, Set.of()),
-                new Equipment(List.of(new Weapon(scythe, 18, 4, 0)))
-                        .wield(scythe.getId(), true),
-                new Inventory(),
+                null,
+                null,
                 abilities,
                 Set.of());
+
+        com.zygon.rl.data.items.Armor dataBoots = com.zygon.rl.data.items.Armor.get("boots_leather");
+
+        Armor boots = new Armor(dataBoots);
+        Weapon weapon = new Weapon(scythe, 18, 4, 0);
+
+        pc = pc.add(boots);
+        pc = pc.add(weapon);
+
+        pc = pc.equip(boots);
+        pc = pc.wield(weapon);
 
         world.add(pc, Location.create(0, 0));
 

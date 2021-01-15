@@ -1,9 +1,10 @@
 package com.zygon.rl.world.character;
 
-import com.zygon.rl.world.Item;
 import com.zygon.rl.data.Element;
+import com.zygon.rl.world.Item;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -15,6 +16,16 @@ import java.util.Set;
  * @author zygon
  */
 public final class CharacterSheet extends Element {
+
+    // This should come from the race of character
+    private static final Equipment STANDARD_EQ = Equipment.create(
+            Map.of(Slot.HEAD, 1,
+                    Slot.TORSO, 1,
+                    Slot.ARM, 2,
+                    Slot.HAND, 2,
+                    Slot.RING, 4,
+                    Slot.LEG, 2,
+                    Slot.FOOT, 2));
 
     private final Element template;
     private final Stats stats;
@@ -31,7 +42,7 @@ public final class CharacterSheet extends Element {
         this.template = template;
         this.stats = stats;
         this.status = status;
-        this.equipment = equipment != null ? equipment : new Equipment(null);
+        this.equipment = equipment != null ? equipment : STANDARD_EQ;
         this.inventory = inventory != null ? inventory : new Inventory();
         this.abilities = Collections.unmodifiableSet(abilities);
         this.spells = Collections.unmodifiableSet(spells);
@@ -74,7 +85,27 @@ public final class CharacterSheet extends Element {
         return set(getStatus().decHitPoints(hps));
     }
 
-    public CharacterSheet get(Item item) {
+    public CharacterSheet equip(Armor armor) {
+
+        Item item = inventory.getItem(armor.getTemplate().getId());
+
+        // get the item
+        if (item != null) {
+            Equipment newEq = equipment;
+
+            if (equipment.canWear(armor)) {
+                newEq = equipment.wear(armor);
+            }
+
+            return new CharacterSheet(template, stats, status,
+                    newEq, inventory.remove(item), abilities, spells);
+
+        }
+
+        return null;
+    }
+
+    public CharacterSheet add(Item item) {
         CharacterSheet copy = new CharacterSheet(template, stats, status,
                 equipment, inventory.add(item), abilities, spells);
 
@@ -89,6 +120,7 @@ public final class CharacterSheet extends Element {
         return copy;
     }
 
+    // hopefully not necessary, use the helper functions
     public CharacterSheet set(Equipment equipment) {
         CharacterSheet copy = new CharacterSheet(template, stats, status,
                 equipment, inventory, abilities, spells);
@@ -108,5 +140,25 @@ public final class CharacterSheet extends Element {
                 equipment, inventory, abilities, spells);
 
         return copy;
+    }
+
+    public CharacterSheet wield(Weapon weapon) {
+
+        Item item = inventory.getItem(weapon.getTemplate().getId());
+
+        // get the item
+        if (item != null) {
+            Equipment newEq = equipment.wield(weapon);
+
+            if (newEq == null) {
+                return null;
+            }
+
+            return new CharacterSheet(template, stats, status,
+                    newEq, inventory.remove(item), abilities, spells);
+
+        }
+
+        return null;
     }
 }

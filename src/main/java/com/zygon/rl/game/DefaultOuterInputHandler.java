@@ -185,19 +185,30 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
 
                 StringBuilder eqSb = new StringBuilder();
 
-                Weapon rWeap = eq.getEquippedRightWeapon();
-                if (rWeap != null) {
-                    eqSb.append(rWeap).append(" [RIGHT HAND]");
-                }
-                Weapon lWeap = eq.getEquippedLeftWeapon();
-                if (lWeap != null) {
-                    eqSb.append(lWeap).append(" [LEFT HAND]");
-                }
-                eq.getItems().forEach(item -> {
-                    eqSb.append(item.getName()).append(" - ").append(item.getDescription());
-                });
+                List<Weapon> weapons = eq.getWeapons();
 
-                eqSb.append("\n");
+                eqSb.append("EQUIPMENT:\n");
+
+                if (weapons.size() > 0) {
+                    Weapon rWeap = weapons.get(0);
+                    if (rWeap != null) {
+                        eqSb.append("[RIGHT HAND]").append(rWeap).append("\n");
+                    }
+                }
+
+                if (weapons.size() > 1) {
+                    Weapon lWeap = weapons.get(1);
+                    if (lWeap != null) {
+                        eqSb.append("[LEFT HAND]").append(lWeap).append("\n");
+                    }
+                }
+
+                eqSb.append(character.getEquipment().getEquipmentBySlot().entrySet().stream()
+                        .map(slot -> slot.getValue().stream().map(armor -> slot.getKey().getName() + " - " + armor.getName() + " - " + armor.getDescription())
+                        .collect(Collectors.joining("  \n")))
+                        .collect(Collectors.joining("\n")));
+
+                eqSb.append("\nINVENTORY:\n");
 
                 eqSb.append(character.getInventory().getItems().stream()
                         .map(item -> item.getName() + " " + item.getDescription())

@@ -25,4 +25,9 @@ public class Item {
     public String getName() {
         return template.getName();
     }
+
+    @Override
+    public String toString() {
+        return getName() + " - " + getDescription();
+    }
 }

@@ -4,7 +4,6 @@ import com.zygon.rl.data.Element;
 import com.zygon.rl.data.context.Data;
 import com.zygon.rl.data.items.Melee;
 import com.zygon.rl.world.character.CharacterSheet;
-import com.zygon.rl.world.character.Equipment;
 import com.zygon.rl.world.character.Stats;
 import com.zygon.rl.world.character.Status;
 import com.zygon.rl.world.character.Weapon;
@@ -12,7 +11,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.awt.Color;
-import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -30,22 +28,27 @@ public class CombatResolveTest {
 
         Data.load();
         Melee dagger = Melee.get("dagger");
+        Weapon weapon = new Weapon(dagger, 20, 2, 0);
 
         CharacterSheet attacker = new CharacterSheet(
                 new Element("player", "player", "z", Color.PINK.toString(), "attacker", ""),
                 new Stats(10, 10, 10, 10, 10, 10),
                 new Status(20, 10, Set.of()),
-                new Equipment(List.of(new Weapon(dagger, 20, 2, 0))),
+                null,
                 null,
                 Set.of(), Set.of());
+
+        attacker = attacker.add(weapon).wield(weapon);
 
         CharacterSheet defender = new CharacterSheet(
                 new Element("player", "player", "z", Color.PINK.toString(), "defender", ""),
                 new Stats(10, 10, 10, 10, 10, 10),
                 new Status(20, 10, Set.of()),
-                new Equipment(List.of(new Weapon(dagger, 20, 2, 0))),
+                null,
                 null,
                 Set.of(), Set.of());
+
+        defender = defender.add(weapon).wield(weapon);
 
         CombatResolver.Resolution resolvedMelee = resolver.resolveCloseCombat(attacker, defender);
 

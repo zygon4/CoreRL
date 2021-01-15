@@ -32,7 +32,7 @@ public class GetItemAction extends Action {
         if (canExecute(player)) {
             World world = state.getWorld();
             world.remove(item.getTemplate(), world.getPlayerLocation());
-            world.add(player.get(item), world.getPlayerLocation());
+            world.add(player.add(item), world.getPlayerLocation());
             return state.log("Picked up " + item.getName());
         }
 

@@ -1,0 +1,22 @@
+[
+    {
+        "id": "boots_leather",
+        "type": "ARMOR",
+        "symbol": "[",
+        "color": "DarkGray",
+        "name": "pair of boots",
+        "description": "Good leather boots",
+        "weight": 2,
+        "slots" : [ "FOOT", "FOOT" ]
+    },
+    {
+        "id": "boots_fur",
+        "type": "ARMOR",
+        "symbol": "[",
+        "color": "Brown",
+        "name": "pair of fur boots",
+        "description": "boots lined with fur",
+        "weight": 3,
+        "slots" : [ "FOOT", "FOOT" ]
+    }
+]
