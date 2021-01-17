@@ -2,6 +2,7 @@ package com.zygon.rl.data.context;
 
 import com.zygon.rl.data.Effect;
 import com.zygon.rl.data.Element;
+import com.zygon.rl.data.field.FieldData;
 import com.zygon.rl.data.items.Armor;
 import com.zygon.rl.data.items.Corpse;
 import com.zygon.rl.data.items.Melee;
@@ -25,6 +26,7 @@ public class Data {
         try {
             Armor.load();
             Effect.load();
+            FieldData.load();
             Melee.load();
             Monster.load();
             Npc.load();
@@ -44,6 +46,10 @@ public class Data {
 
         for (var v : Effect.getAllIds()) {
             elementsById.put(v, Effect.get(v));
+        }
+
+        for (var v : FieldData.getAllIds()) {
+            elementsById.put(v, FieldData.get(v));
         }
 
         for (var v : Melee.getAllIds()) {

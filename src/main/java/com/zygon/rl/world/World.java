@@ -24,6 +24,8 @@ public class World {
     private static final System.Logger logger = System.getLogger(World.class.getCanonicalName());
 
     private final Calendar calendar;
+    // These were originally plain static objects, but now they take on some
+    // runtime characteristics. E.g. fields have a half-life
     private final GenericEntityManager<Identifable> staticObjects;
     private final ElementEntityManager<CharacterSheet> actors;
     // got lazy, partially immutable
@@ -46,8 +48,8 @@ public class World {
         this(new Calendar(20).addTime(TimeUnit.DAYS.toSeconds(1000)));
     }
 
-    public void add(String id, Location location) {
-        staticObjects.add(() -> id, location);
+    public void add(Identifable id, Location location) {
+        staticObjects.add(id, location);
     }
 
     public void add(CharacterSheet character, Location location) {
@@ -121,14 +123,13 @@ public class World {
         return actors.getElement(location);
     }
 
-    public List<String> getAll(Location location, String type) {
+    public List<Identifable> getAll(Location location, String type) {
         // Need to fetch the data out of the templates to check the type
         List<Identifable> identifiables = staticObjects.get(location);
 
         return identifiables != null
                 ? identifiables.stream()
                         .filter(id -> type == null || Data.get(id.getId()).getType().equals(type))
-                        .map(Identifable::getId)
                         .collect(Collectors.toList())
                 : List.of();
     }
@@ -213,8 +214,8 @@ public class World {
         }
     }
 
-    public void remove(Element element, Location from) {
-        staticObjects.delete(element, from);
+    public void remove(Identifable id, Location from) {
+        staticObjects.delete(id, from);
     }
 
     public void remove(CharacterSheet character, Location from) {

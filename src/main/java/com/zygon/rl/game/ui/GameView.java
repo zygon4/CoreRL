@@ -6,6 +6,7 @@ import com.google.common.cache.LoadingCache;
 import com.stewsters.util.shadow.twoDimention.LitMap2d;
 import com.stewsters.util.shadow.twoDimention.ShadowCaster2d;
 import com.zygon.rl.data.Element;
+import com.zygon.rl.data.Identifable;
 import com.zygon.rl.data.context.Data;
 import com.zygon.rl.game.Game;
 import com.zygon.rl.game.GameState;
@@ -414,9 +415,9 @@ final class GameView extends BaseView {
                         gameScreen.draw(actorTile, uiScreenPosition);
                     } else {
 
-                        List<String> staticObjectIds = game.getState().getWorld().getAll(loc, null);
+                        List<Identifable> staticObjectIds = game.getState().getWorld().getAll(loc, null);
                         Element object = !staticObjectIds.isEmpty()
-                                ? Data.get(staticObjectIds.get(0)) : null;
+                                ? Data.get(staticObjectIds.get(0).getId()) : null;
 
                         // 2) Next draw item if available
                         if (object != null) {

@@ -2,6 +2,8 @@ package com.zygon.rl.game;
 
 import com.zygon.rl.data.Element;
 import com.zygon.rl.data.ItemClass;
+import com.zygon.rl.data.field.FieldData;
+import com.zygon.rl.world.Field;
 import com.zygon.rl.world.Item;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
@@ -10,6 +12,7 @@ import com.zygon.rl.world.action.DropItemAction;
 import com.zygon.rl.world.action.ExamineAction;
 import com.zygon.rl.world.action.GetItemAction;
 import com.zygon.rl.world.action.MeleeAttackAction;
+import com.zygon.rl.world.action.SetIdentifiableAction;
 import com.zygon.rl.world.character.CharacterSheet;
 import com.zygon.rl.world.character.Equipment;
 import com.zygon.rl.world.character.Weapon;
@@ -50,6 +53,13 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
         defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_I.getCode()));
         // 'g' for get
         defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_G.getCode()));
+        // 's' for get
+
+        // These are for testing spells out and how fields will act.. not permanent
+        // However, i can see a hotkeys being assigned..
+        defaultKeyCodes.add(Input.valueOf(KeyCode.F1.getCode()));
+        defaultKeyCodes.add(Input.valueOf(KeyCode.F2.getCode()));
+        defaultKeyCodes.add(Input.valueOf(KeyCode.F3.getCode()));
         // ESC for game menu
         defaultKeyCodes.add(Input.valueOf(KeyCode.ESCAPE.getCode()));
     }
@@ -78,7 +88,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                     copy.addInputContext(
                             GameState.InputContext.builder()
                                     .setName("DROP")
-                                    .setHandler(ListItemInputHandler.create(getGameConfiguration(),
+                                    .setHandler(ListActionInputHandler.create(getGameConfiguration(),
                                             items, e -> new DropItemAction(e)))
                                     .setPrompt(GameState.InputContextPrompt.LIST)
                                     .build());
@@ -158,7 +168,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                     copy.addInputContext(
                             GameState.InputContext.builder()
                                     .setName("GET")
-                                    .setHandler(ListItemInputHandler.create(getGameConfiguration(),
+                                    .setHandler(ListActionInputHandler.create(getGameConfiguration(),
                                             items, e -> new GetItemAction(e)))
                                     .setPrompt(GameState.InputContextPrompt.LIST)
                                     .build());
@@ -261,6 +271,66 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                         .setCalendar(state.getWorld()
                                 .getCalendar().addTime(DEFAULT_ACTION_TIME)));
             }
+            case F1 -> {
+                CharacterSheet player = state.getWorld().getPlayer();
+
+                Field field = new Field(FieldData.get("fd_poison_gas"), Field.PropagationDirection.TARGET,
+                        Field.PropagationStyle.STRAIGHT, Field.PropagationPotency.STRONG,
+                        state.getWorld().getPlayerLocation(), 50);
+
+                Set<Action> n = state.getWorld().getPlayerLocation().getNeighbors(4).stream()
+                        .map(l -> new SetIdentifiableAction(l, field))
+                        .collect(Collectors.toSet());
+
+                GameState newState = state;
+                for (Action a : n) {
+                    if (a.canExecute(newState)) {
+                        newState = a.execute(newState);
+                    }
+                }
+
+                copy = newState.copy();
+            }
+            case F2 -> {
+                CharacterSheet player = state.getWorld().getPlayer();
+
+                Field field = new Field(FieldData.get("fd_poison_gas"), Field.PropagationDirection.EMIT,
+                        Field.PropagationStyle.STRAIGHT, Field.PropagationPotency.STRONG,
+                        state.getWorld().getPlayerLocation(), 20);
+
+                Set<Action> n = state.getWorld().getPlayerLocation().getNeighbors(1).stream()
+                        .map(l -> new SetIdentifiableAction(l, field))
+                        .collect(Collectors.toSet());
+
+                GameState newState = state;
+                for (Action a : n) {
+                    if (a.canExecute(newState)) {
+                        newState = a.execute(newState);
+                    }
+                }
+
+                copy = newState.copy();
+            }
+            case F3 -> {
+                CharacterSheet player = state.getWorld().getPlayer();
+
+                Field field = new Field(FieldData.get("fd_electricity"), Field.PropagationDirection.EMIT,
+                        Field.PropagationStyle.STRAIGHT, Field.PropagationPotency.WEAK,
+                        state.getWorld().getPlayerLocation(), 150);
+
+                Location playerLoc = state.getWorld().getPlayerLocation();
+
+                Action n = new SetIdentifiableAction(Location.create(playerLoc.getX() + 20, playerLoc.getY()), field);
+
+                GameState newState = state;
+
+                if (n.canExecute(newState)) {
+                    newState = n.execute(newState);
+                }
+
+                copy = newState.copy();
+            }
+
             default -> {
                 invalidInput(input);
                 // Invalid but keep context as is
@@ -287,6 +357,15 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
             }
             case KEY_G -> {
                 return "Get";
+            }
+            case F1 -> {
+                return "F1";
+            }
+            case F2 -> {
+                return "F2";
+            }
+            case F3 -> {
+                return "F3";
             }
             default -> {
                 return inputKeyCode.name();

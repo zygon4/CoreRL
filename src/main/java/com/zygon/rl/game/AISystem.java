@@ -1,27 +1,30 @@
 package com.zygon.rl.game;
 
 import com.zygon.rl.data.Effect;
+import com.zygon.rl.data.field.FieldData;
 import com.zygon.rl.data.monster.Monster;
 import com.zygon.rl.data.monster.Species;
 import com.zygon.rl.world.CommonAttributes;
+import com.zygon.rl.world.Field;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
 import com.zygon.rl.world.action.Action;
+import com.zygon.rl.world.action.FieldInteractionAction;
 import com.zygon.rl.world.action.MeleeAttackAction;
 import com.zygon.rl.world.action.MoveAction;
 import com.zygon.rl.world.character.CharacterSheet;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 /**
  *
  * @author zygon
  */
 final class AISystem extends GameSystem {
-
-    private static final int REALITY_BUBBLE = 50;
 
     private final Random random;
 
@@ -42,6 +45,16 @@ final class AISystem extends GameSystem {
             Location currentLoc = entry.getKey();
             CharacterSheet character = entry.getValue();
 
+            // First resolve fields in the air
+            Collection<Action> fieldActions = getEnvironmentalActions(world, currentLoc, character);
+
+            for (Action fd : fieldActions) {
+                if (fd.canExecute(state)) {
+                    state = fd.execute(state);
+                }
+            }
+
+            // Next the AIs behave
             Behavior behavior = get(character, currentLoc, world);
 
             Action action = null;
@@ -59,6 +72,16 @@ final class AISystem extends GameSystem {
         }
 
         return state;
+    }
+
+    private Collection<Action> getEnvironmentalActions(World world, Location location, CharacterSheet character) {
+
+        // First resolve fields in the air
+        return world.getAll(location, FieldData.getTypeName()).stream()
+                .map(fd -> (Field) fd)
+                .map(field -> new FieldInteractionAction(getGameConfiguration(), character, location, field))
+                .collect(Collectors.toList());
+
     }
 
     private Behavior get(CharacterSheet character, Location characterLocation,

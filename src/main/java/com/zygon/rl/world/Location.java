@@ -119,12 +119,13 @@ public class Location {
     /**
      * Returns the immediate neighbors.
      *
+     * @param includeThis - include this location in the result
      * @return
      */
-    public Set<Location> getNeighbors(boolean incThis) {
+    public Set<Location> getNeighbors(boolean includeThis) {
         Set<Location> neighors = new HashSet<>();
 
-        if (incThis) {
+        if (includeThis) {
             neighors.add(this);
         }
 
@@ -149,10 +150,10 @@ public class Location {
 
     private static final int NUM_POINTS = 15;
 
-    public Set<Location> getNeighbors(int radius) {
+    public Set<Location> getNeighbors(int radius, boolean includeThis) {
         // always include all immediate neighbors (special case of radius = 1)
         // TODO: maybe just collapse the methods?
-        Set<Location> neighors = new HashSet<>(getNeighbors());
+        Set<Location> neighors = new HashSet<>(getNeighbors(includeThis));
 
         double radiusDouble = 0;
         int numPoints = 0;
@@ -176,6 +177,10 @@ public class Location {
         }
 
         return neighors;
+    }
+
+    public Set<Location> getNeighbors(int radius) {
+        return getNeighbors(radius, false);
     }
 
     public int getX() {

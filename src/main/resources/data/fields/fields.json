@@ -1,0 +1,26 @@
+[
+    {
+        "id": "fd_poison_gas",
+        "type": "FIELD",
+        "symbol": "~",
+        "color": "YellowGreen",
+        "name": "poison gas",
+        "description": "Poison gas"
+    },
+    {
+        "id": "fd_web",
+        "type": "FIELD",
+        "symbol": "#",
+        "color": "Gray",
+        "name": "cobb webs",
+        "description": "sticky cobb webs"
+    },
+    {
+        "id": "fd_electricity",
+        "type": "FIELD",
+        "symbol": "V",
+        "color": "Silver",
+        "name": "electricity",
+        "description": "Electricity"
+    }
+]

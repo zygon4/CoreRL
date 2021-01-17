@@ -25,7 +25,7 @@ public class GenericEntityManager<T extends Identifable> {
         List<T> existing = entitiesByLocation.get(location);
 
         AtomicBoolean removedFirst = new AtomicBoolean(false);
-        List<T> newElements = existing.stream()
+        List<T> newElements = existing == null ? List.of() : existing.stream()
                 .filter(ele -> {
                     if (ele.getId().equals(id.getId()) && !removedFirst.get()) {
                         removedFirst.set(true);

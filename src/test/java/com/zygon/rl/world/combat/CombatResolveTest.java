@@ -1,5 +1,6 @@
 package com.zygon.rl.world.combat;
 
+import com.zygon.rl.world.DamageResolution;
 import com.zygon.rl.data.Element;
 import com.zygon.rl.data.context.Data;
 import com.zygon.rl.data.items.Melee;
@@ -50,7 +51,7 @@ public class CombatResolveTest {
 
         defender = defender.add(weapon).wield(weapon);
 
-        CombatResolver.Resolution resolvedMelee = resolver.resolveCloseCombat(attacker, defender);
+        DamageResolution resolvedMelee = resolver.resolveCloseCombat(attacker, defender);
 
         Assert.assertNotNull(resolvedMelee);
         // TODO: expect simple result, no weapons/armor

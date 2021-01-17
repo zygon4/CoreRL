@@ -8,6 +8,7 @@ package com.zygon.rl.game.example;
 import com.zygon.rl.data.Effect;
 import com.zygon.rl.data.Element;
 import com.zygon.rl.data.context.Data;
+import com.zygon.rl.data.items.Corpse;
 import com.zygon.rl.data.items.Melee;
 import com.zygon.rl.game.Game;
 import com.zygon.rl.game.GameConfiguration;
@@ -238,9 +239,9 @@ public class BloodRLMain {
 //                world.add(npcSheet, rand);
 //            }
 //        }
-        world.add(dagger.getId(), Location.create(0, 0));
-        world.add(dagger.getId(), Location.create(0, -1));
-        world.add("corpse", Location.create(0, 1));
+        world.add(dagger, Location.create(0, 0));
+        world.add(dagger, Location.create(0, -1));
+        world.add(Corpse.get("corpse"), Location.create(0, 1));
 
         GameState initialState = GameState.builder(config)
                 .setWorld(world)

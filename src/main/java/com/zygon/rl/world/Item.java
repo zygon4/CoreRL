@@ -1,12 +1,13 @@
 package com.zygon.rl.world;
 
+import com.zygon.rl.data.Identifable;
 import com.zygon.rl.data.ItemClass;
 
 /**
  *
  * @author zygon
  */
-public class Item {
+public class Item implements Identifable {
 
     private final ItemClass template;
 
@@ -16,6 +17,11 @@ public class Item {
 
     public ItemClass getTemplate() {
         return template;
+    }
+
+    @Override
+    public String getId() {
+        return template.getId();
     }
 
     public String getDescription() {

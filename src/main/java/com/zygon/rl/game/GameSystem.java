@@ -8,6 +8,8 @@ import java.util.function.Function;
  */
 public abstract class GameSystem implements Function<GameState, GameState> {
 
+    protected static final int REALITY_BUBBLE = 50;
+
     private final GameConfiguration gameConfiguration;
 
     protected GameSystem(GameConfiguration gameConfiguration) {

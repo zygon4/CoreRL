@@ -60,6 +60,11 @@ public final class CharacterSheet extends Element {
         return inventory;
     }
 
+    // TODO: Calculated from species/traits/status/eq
+    public int getSpeed() {
+        return 100;
+    }
+
     public Stats getStats() {
         return stats;
     }

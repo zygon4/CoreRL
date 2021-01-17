@@ -93,6 +93,7 @@ public final class Game {
 
         private Builder(GameConfiguration gameConfiguration) {
             this.gameSystems.add(new DefaultGameSystem(gameConfiguration));
+            this.gameSystems.add(new FieldPropagationSystem(gameConfiguration));
             this.gameSystems.add(new SpawnSystem(gameConfiguration));
             this.gameSystems.add(new AISystem(gameConfiguration));
             this.configuration = gameConfiguration;
