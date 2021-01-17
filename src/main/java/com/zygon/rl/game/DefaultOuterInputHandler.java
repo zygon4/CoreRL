@@ -202,14 +202,14 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                 if (weapons.size() > 0) {
                     Weapon rWeap = weapons.get(0);
                     if (rWeap != null) {
-                        eqSb.append("[RIGHT HAND]").append(rWeap).append("\n");
+                        eqSb.append("[RIGHT HAND] ").append(rWeap).append("\n");
                     }
                 }
 
                 if (weapons.size() > 1) {
                     Weapon lWeap = weapons.get(1);
                     if (lWeap != null) {
-                        eqSb.append("[LEFT HAND]").append(lWeap).append("\n");
+                        eqSb.append("[LEFT HAND] ").append(lWeap).append("\n");
                     }
                 }
 

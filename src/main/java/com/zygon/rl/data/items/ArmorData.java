@@ -19,31 +19,33 @@ import java.util.stream.Collectors;
 /**
  *
  */
-public class Armor extends ItemClass {
+public class ArmorData extends ItemClass {
 
-    private static final Map<String, Armor> BY_ID = new HashMap<>();
+    private static final Map<String, ArmorData> BY_ID = new HashMap<>();
 
-    private static final Type TYPE = new TypeToken<List<Armor>>() {
+    private static final Type TYPE = new TypeToken<List<ArmorData>>() {
     }.getType();
 
-    private static final String ARMOR_BOOTS_PATH = "/data/items/armor_boots.json";
+    private static final String ARMOR_FEET_PATH = "/data/items/armor_feet.json";
+    private static final String ARMOR_LEGS_PATH = "/data/items/armor_legs.json";
 
     public static void load(String path) throws FileNotFoundException, IOException {
         try ( Reader jsonReader = new BufferedReader(new InputStreamReader(
-                Armor.class.getResourceAsStream(ARMOR_BOOTS_PATH)))) {
-            List<Armor> melee = StringUtil.JSON.fromJson(jsonReader, TYPE);
+                ArmorData.class.getResourceAsStream(path)))) {
+            List<ArmorData> items = StringUtil.JSON.fromJson(jsonReader, TYPE);
 
-            BY_ID.putAll(melee.stream()
+            BY_ID.putAll(items.stream()
                     .collect(Collectors.toMap(m -> m.getId(), m -> m)));
         }
     }
 
     public static void load() throws FileNotFoundException, IOException {
-        load(ARMOR_BOOTS_PATH);
+        load(ARMOR_FEET_PATH);
+        load(ARMOR_LEGS_PATH);
         // TODO: more
     }
 
-    public static Armor get(String id) {
+    public static ArmorData get(String id) {
         return BY_ID.get(id);
     }
 

@@ -354,7 +354,9 @@ final class GameView extends BaseView {
 
         ((TextOverride) componentsByName.get("status"))
                 .setText("Age: " + playerSheet.getStatus().getAge() + "  "
-                        + "HP: " + playerSheet.getStatus().getHitPoints() + "\n" + status);
+                        + "HP: " + playerSheet.getStatus().getHitPoints()
+                        + " Spd: " + playerSheet.getSpeed() + "\n"
+                        + status);
         //
         // TODO: list NPCs nearby
         // TODO: log area is SLOW

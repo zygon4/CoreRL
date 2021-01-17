@@ -1,5 +1,6 @@
 package com.zygon.rl.world.character;
 
+import com.zygon.rl.data.items.ArmorData;
 import com.zygon.rl.world.Item;
 
 /**
@@ -7,16 +8,16 @@ import com.zygon.rl.world.Item;
  */
 public class Armor extends Item {
 
-    private final com.zygon.rl.data.items.Armor template;
+    private final ArmorData template;
 
-    public Armor(com.zygon.rl.data.items.Armor template) {
+    public Armor(ArmorData template) {
         super(template);
 
         this.template = template;
     }
 
     @Override
-    public com.zygon.rl.data.items.Armor getTemplate() {
+    public ArmorData getTemplate() {
         return template;
     }
 }

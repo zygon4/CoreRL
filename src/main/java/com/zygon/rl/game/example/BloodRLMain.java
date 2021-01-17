@@ -8,6 +8,7 @@ package com.zygon.rl.game.example;
 import com.zygon.rl.data.Effect;
 import com.zygon.rl.data.Element;
 import com.zygon.rl.data.context.Data;
+import com.zygon.rl.data.items.ArmorData;
 import com.zygon.rl.data.items.Corpse;
 import com.zygon.rl.data.items.Melee;
 import com.zygon.rl.game.Game;
@@ -192,15 +193,19 @@ public class BloodRLMain {
                 abilities,
                 Set.of());
 
-        com.zygon.rl.data.items.Armor dataBoots = com.zygon.rl.data.items.Armor.get("boots_leather");
+        ArmorData dataBoots = ArmorData.get("boots_leather");
+        ArmorData dataPants = ArmorData.get("legs_dress_pants");
 
         Armor boots = new Armor(dataBoots);
+        Armor pants = new Armor(dataPants);
         Weapon weapon = new Weapon(scythe, 18, 4, 0);
 
         pc = pc.add(boots);
+        pc = pc.add(pants);
         pc = pc.add(weapon);
 
         pc = pc.equip(boots);
+        pc = pc.equip(pants);
         pc = pc.wield(weapon);
 
         world.add(pc, Location.create(0, 0));

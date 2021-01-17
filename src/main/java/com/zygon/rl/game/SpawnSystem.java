@@ -1,6 +1,5 @@
 package com.zygon.rl.game;
 
-import com.zygon.rl.data.Element;
 import com.zygon.rl.data.monster.Monster;
 import com.zygon.rl.data.npc.Npc;
 import com.zygon.rl.world.Entity;
@@ -9,9 +8,6 @@ import com.zygon.rl.world.World;
 import com.zygon.rl.world.WorldTile;
 import com.zygon.rl.world.action.Action;
 import com.zygon.rl.world.action.SummonAction;
-import com.zygon.rl.world.character.CharacterSheet;
-import com.zygon.rl.world.character.Stats;
-import com.zygon.rl.world.character.Status;
 
 import java.util.HashSet;
 import java.util.Random;
@@ -71,6 +67,7 @@ public class SpawnSystem extends GameSystem {
                             creatureId = getRandomSetElement(Monster.getAllIds());
                         } else {
                             // TODO: set names on resulting spawns
+                            // TODO: equipment/items on NPCs
                             creatureId = getRandomSetElement(Npc.getAllIds());
                         }
 
@@ -85,17 +82,6 @@ public class SpawnSystem extends GameSystem {
                 }
             }
         }
-    }
-    // spawn system needs a lot of params like what to spawn and where, how many of that
-    // species, etc.
-
-    // TODO: this is clearly insufficient, maybe stats based on size?
-    private CharacterSheet getRandomPower(Element actor, int hitPoints) {
-        int stats = random.nextInt(4) + 1;
-        return new CharacterSheet(actor,
-                new Stats(stats, stats, stats, stats, stats, stats),
-                new Status(stats, hitPoints, Set.of()),
-                null, null, Set.of(), Set.of());
     }
 
     private <E> E getRandomSetElement(Set<E> set) {

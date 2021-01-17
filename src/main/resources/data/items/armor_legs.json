@@ -1,0 +1,22 @@
+[
+    {
+        "id": "legs_leather_pants",
+        "type": "ARMOR",
+        "symbol": "[",
+        "color": "Brown",
+        "name": "pair of leather pants",
+        "description": "Good leather pants",
+        "weight": 3,
+        "slots" : [ "LEG", "LEG" ]
+    },
+    {
+        "id": "legs_dress_pants",
+        "type": "ARMOR",
+        "symbol": "[",
+        "color": "Black",
+        "name": "pair of dress pants",
+        "description": "A fancy pair of pants",
+        "weight": 2,
+        "slots" : [ "LEG", "LEG" ]
+    }
+]
