@@ -17,7 +17,7 @@ Features:
 
 TODOs:
 - Better UI interaction
-    - UI should render log (currently printed to stdout)
+    - Log is ugly
     - UI should have an inventory UI (currently printed to stdout)
 - Character creation wizard
 - Save/load of games
