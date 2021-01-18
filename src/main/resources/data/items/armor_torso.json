@@ -1,0 +1,32 @@
+[
+    {
+        "id": "torso_wool_coat",
+        "type": "ARMOR",
+        "symbol": "[",
+        "color": "DarkGray",
+        "name": "wool coat",
+        "description": "Thick wool coat",
+        "weight": 8,
+        "slots" : [ "TORSO" ]
+    },
+    {
+        "id": "torso_tunic_plain",
+        "type": "ARMOR",
+        "symbol": "[",
+        "color": "LightSlateGray",
+        "name": "plain tunic",
+        "description": "A simple tunic",
+        "weight": 4,
+        "slots" : [ "TORSO" ]
+    },
+     {
+        "id": "torso_tunic_black",
+        "type": "ARMOR",
+        "symbol": "[",
+        "color": "Black",
+        "name": "black tunic",
+        "description": "A black tunic",
+        "weight": 4,
+        "slots" : [ "TORSO" ]
+    }
+]

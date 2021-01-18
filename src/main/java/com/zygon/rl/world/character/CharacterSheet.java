@@ -90,6 +90,12 @@ public final class CharacterSheet extends Element {
         return set(getStatus().decHitPoints(hps));
     }
 
+    /**
+     * Equips an item *from the inventory*.
+     *
+     * @param armor
+     * @return
+     */
     public CharacterSheet equip(Armor armor) {
 
         Item item = inventory.getItem(armor.getTemplate().getId());

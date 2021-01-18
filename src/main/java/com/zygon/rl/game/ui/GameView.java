@@ -362,7 +362,7 @@ final class GameView extends BaseView {
         TextArea logArea = (TextArea) componentsByName.get("log");
 
         // TODO: doesn't wrap, need to insert newlines?
-        String collect = game.getState().getLog().getRecent(5).stream()
+        String collect = game.getState().getLog().getRecent(10).stream()
                 .map(log -> WordUtils.wrap(log, SIDEBAR_SCREEN_WIDTH - 2, null, true))
                 .collect(Collectors.joining("\n"));
 
