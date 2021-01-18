@@ -5,7 +5,7 @@ Features:
 - Swing app using Zircon
 - Renders a HUD with minimap
 - Open world (using noise function)
-- Character sheet includes status/eq slots, inventory, equipment, spells and abilities
+- Character sheet is inspired by D&D includes status/eq slots, inventory, equipment, spells and abilities
 - Simple melee combat
 - Action command pattern for common action reuse
 - Monster spawns which have aggression and hostile status (ie will attack you)
