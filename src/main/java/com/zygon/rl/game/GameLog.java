@@ -82,9 +82,6 @@ public class GameLog {
             messages.add(CountedMessage.create(message));
         }
 
-        // TODO: remove and print all to the screen only
-        System.out.println(getLast(messages));
-
         return new GameLog(messages);
     }
 

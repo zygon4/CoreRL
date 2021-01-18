@@ -82,7 +82,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                 } else if (items.size() == 1) {
                     Action getItem = new DropItemAction(items.get(0));
                     if (getItem.canExecute(state)) {
-                        getItem.execute(state);
+                        copy = getItem.execute(state).copy();
                     }
                 } else {
                     copy.addInputContext(
@@ -162,7 +162,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                 } else if (items.size() == 1) {
                     Action getItem = new GetItemAction(items.get(0));
                     if (getItem.canExecute(state)) {
-                        getItem.execute(state);
+                        copy = getItem.execute(state).copy();
                     }
                 } else {
                     copy.addInputContext(

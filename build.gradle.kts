@@ -16,6 +16,7 @@ repositories {
 
 dependencies {
     api("org.apache.commons:commons-math3:3.6.1")
+    implementation("org.apache.commons:commons-text:1.9")
 
     implementation("com.github.stewsters:stewsters-util:0.19")
 

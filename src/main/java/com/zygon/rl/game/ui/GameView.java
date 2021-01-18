@@ -21,6 +21,7 @@ import com.zygon.rl.world.WorldTile;
 import com.zygon.rl.world.character.CharacterSheet;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import org.apache.commons.text.WordUtils;
 import org.hexworks.zircon.api.Components;
 import org.hexworks.zircon.api.Functions;
 import org.hexworks.zircon.api.behavior.TextOverride;
@@ -30,7 +31,6 @@ import org.hexworks.zircon.api.component.ColorTheme;
 import org.hexworks.zircon.api.component.Component;
 import org.hexworks.zircon.api.component.ComponentAlignment;
 import org.hexworks.zircon.api.component.Header;
-import org.hexworks.zircon.api.component.LogArea;
 import org.hexworks.zircon.api.component.TextArea;
 import org.hexworks.zircon.api.component.VBox;
 import org.hexworks.zircon.api.data.Position;
@@ -233,10 +233,9 @@ final class GameView extends BaseView {
         componentsByName.put("status", Components.label()
                 .withSize(SIDEBAR_SCREEN_WIDTH - 2, 5).build());
         // TODO: full screen log area (view?) to see/search all
-        LogArea logArea = Components.logArea()
+        componentsByName.put("log", Components.textArea()
                 .withSize(SIDEBAR_SCREEN_WIDTH - 2, 20)
-                .withLogRowHistorySize(5).build();
-        componentsByName.put("log", logArea);
+                .build());
 
         String playerName = getPlayer(game).getName();
         return new SideBar(componentsByName,
@@ -359,13 +358,15 @@ final class GameView extends BaseView {
                         + status);
         //
         // TODO: list NPCs nearby
-        // TODO: log area is SLOW
-        //            LogArea logArea = (LogArea) componentsByName.get("log");
-        //            logArea.clear();
-        //
-        //            for (String recent : game.getState().getLog().getRecent(5)) {
-        //                logArea.addHeader(recent, false);
-        //            }
+        // TODO: log area is SLOW so use text area
+        TextArea logArea = (TextArea) componentsByName.get("log");
+
+        // TODO: doesn't wrap, need to insert newlines?
+        String collect = game.getState().getLog().getRecent(5).stream()
+                .map(log -> WordUtils.wrap(log, SIDEBAR_SCREEN_WIDTH - 2, null, true))
+                .collect(Collectors.joining("\n"));
+
+        logArea.setText(collect);
     }
 
     private void updateGameScreen(Layer gameScreen, Game game) {
