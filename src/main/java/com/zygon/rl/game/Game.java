@@ -53,6 +53,7 @@ public final class Game {
         // TODO: logging input would make the game re-playable as long
         // as the game systems used are seeded and consistent.
         //
+        // TODO: implement a stateful speed/energy for the player (look at AI)
         GameState newState = inputHandler.apply(state, input);
 
         // Apply the game systems in order when there is no game context

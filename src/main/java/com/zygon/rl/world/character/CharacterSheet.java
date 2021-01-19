@@ -1,5 +1,6 @@
 package com.zygon.rl.world.character;
 
+import com.zygon.rl.data.Creature;
 import com.zygon.rl.data.Element;
 import com.zygon.rl.world.Item;
 
@@ -27,7 +28,7 @@ public final class CharacterSheet extends Element {
                     Slot.LEG, 2,
                     Slot.FOOT, 2));
 
-    private final Element template;
+    private final Creature template;
     private final Stats stats;
     private final Status status;
     private final Equipment equipment;
@@ -35,7 +36,7 @@ public final class CharacterSheet extends Element {
     private final Set<Ability> abilities;
     private final Set<Spell> spells;
 
-    public CharacterSheet(Element template, Stats stats, Status status,
+    public CharacterSheet(Creature template, Stats stats, Status status,
             Equipment equipment, Inventory inventory, Set<Ability> abilities, Set<Spell> spells) {
         super(template);
 
@@ -60,9 +61,9 @@ public final class CharacterSheet extends Element {
         return inventory;
     }
 
-    // TODO: Calculated from species/traits/status/eq
+    // TODO: Calculate final from species/traits/status/eq
     public int getSpeed() {
-        return 100;
+        return template.getSpeed();
     }
 
     public Stats getStats() {
@@ -88,6 +89,17 @@ public final class CharacterSheet extends Element {
     // TODO: maybe future - damage to a specific area
     public CharacterSheet loseHitPoints(int hps) {
         return set(getStatus().decHitPoints(hps));
+    }
+
+    // Call before acting
+    public CharacterSheet powerUp() {
+        int boost = getSpeed();
+        return set(getStatus().incEnergy(boost));
+    }
+
+    // Call after acting
+    public CharacterSheet coolDown() {
+        return set(getStatus().resetEnergy());
     }
 
     /**

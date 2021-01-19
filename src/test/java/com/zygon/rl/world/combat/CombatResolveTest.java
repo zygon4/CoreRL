@@ -1,9 +1,9 @@
 package com.zygon.rl.world.combat;
 
-import com.zygon.rl.world.DamageResolution;
-import com.zygon.rl.data.Element;
+import com.zygon.rl.data.Creature;
 import com.zygon.rl.data.context.Data;
 import com.zygon.rl.data.items.Melee;
+import com.zygon.rl.world.DamageResolution;
 import com.zygon.rl.world.character.CharacterSheet;
 import com.zygon.rl.world.character.Stats;
 import com.zygon.rl.world.character.Status;
@@ -32,7 +32,7 @@ public class CombatResolveTest {
         Weapon weapon = new Weapon(dagger, 20, 2, 0);
 
         CharacterSheet attacker = new CharacterSheet(
-                new Element("player", "player", "z", Color.PINK.toString(), "attacker", ""),
+                new Creature("player", "player", "z", Color.PINK.toString(), "attacker", ""),
                 new Stats(10, 10, 10, 10, 10, 10),
                 new Status(20, 10, Set.of()),
                 null,
@@ -42,7 +42,7 @@ public class CombatResolveTest {
         attacker = attacker.add(weapon).wield(weapon);
 
         CharacterSheet defender = new CharacterSheet(
-                new Element("player", "player", "z", Color.PINK.toString(), "defender", ""),
+                new Creature("player", "player", "z", Color.PINK.toString(), "defender", ""),
                 new Stats(10, 10, 10, 10, 10, 10),
                 new Status(20, 10, Set.of()),
                 null,

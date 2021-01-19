@@ -9,6 +9,7 @@
         "species": "MAMMAL",
         "aggression": 2,
         "hitPoints": 5,
+        "speed": 140,
         "flags": [ "FLIES" ]
     },
     {
@@ -21,6 +22,7 @@
         "species": "AMPHIBIAN",
         "aggression": 4,
         "hitPoints": 25,
+        "speed": 80,
         "flags": []
     },
     {
@@ -33,6 +35,7 @@
         "species": "MAMMAL",
         "aggression": 16,
         "hitPoints": 40,
+        "speed": 100,
         "flags": []
     },
     {
@@ -45,6 +48,7 @@
         "species": "MAMMAL",
         "aggression": 1,
         "hitPoints": 8,
+        "speed": 40,
         "flags": []
     },
     {
@@ -57,6 +61,7 @@
         "species": "MAMMAL",
         "aggression": 5,
         "hitPoints": 100,
+        "speed": 100,
         "flags": []
     },
     {
@@ -69,6 +74,7 @@
         "species": "MAMMAL",
         "aggression": 1,
         "hitPoints": 30,
+        "speed": 120,
         "flags": []
     }
 ]

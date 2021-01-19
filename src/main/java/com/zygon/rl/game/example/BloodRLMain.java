@@ -5,6 +5,7 @@
  */
 package com.zygon.rl.game.example;
 
+import com.zygon.rl.data.Creature;
 import com.zygon.rl.data.Effect;
 import com.zygon.rl.data.Element;
 import com.zygon.rl.data.context.Data;
@@ -181,7 +182,7 @@ public class BloodRLMain {
         abilities.add(summonFamiliar);
 
         CharacterSheet pc = new CharacterSheet(
-                new Element("player", "player", "@", "PaleVioletRed", "Alucard", "He's cool"),
+                new Creature("player", "player", "@", "PaleVioletRed", "Alucard", "He's cool"),
                 new Stats(16, 16, 14, 12, 12, 16),
                 new Status(19, 100, Set.of()),
                 null,

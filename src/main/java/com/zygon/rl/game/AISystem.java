@@ -54,20 +54,29 @@ final class AISystem extends GameSystem {
                 }
             }
 
-            // Next the AIs behave
-            Behavior behavior = get(character, currentLoc, world);
+            // Possible that the powerup->act->cooldown pattern could  go more
+            // generically in an Action/Behavior.
+            character = character.powerUp();
 
-            Action action = null;
-            if (behavior != null) {
-                action = behavior.get(character);
-            }
+            if (character.getStatus().canAct()) {
 
-            if (action != null) {
-                if (action.canExecute(state)) {
-                    state = action.execute(state);
-                } else {
-                    state = state.log("Can't execute that");
+                // Next the AIs behave
+                Behavior behavior = get(character, currentLoc, world);
+
+                Action action = null;
+                if (behavior != null) {
+                    action = behavior.get(character);
                 }
+
+                if (action != null) {
+                    if (action.canExecute(state)) {
+                        state = action.execute(state);
+                    } else {
+                        state = state.log("Can't execute that");
+                    }
+                }
+
+                state.getWorld().add(character.coolDown(), playerLocation);
             }
         }
 

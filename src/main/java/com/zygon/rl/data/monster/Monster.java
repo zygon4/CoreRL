@@ -1,7 +1,7 @@
 package com.zygon.rl.data.monster;
 
-import com.zygon.rl.data.Creature;
 import com.google.gson.reflect.TypeToken;
+import com.zygon.rl.data.Creature;
 import com.zygon.rl.util.StringUtil;
 
 import java.io.BufferedReader;
@@ -46,5 +46,4 @@ public class Monster extends Creature {
     public static Set<String> getAllIds() {
         return NPC_BY_ID.keySet();
     }
-
 }
