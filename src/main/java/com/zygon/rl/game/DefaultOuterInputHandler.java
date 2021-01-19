@@ -232,8 +232,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
             case NUMPAD_5, DIGIT_5 -> {
                 // TODO: wait action
                 copy.addLog("Waiting");
-                copy.setWorld(state.getWorld()
-                        .setCalendar(state.getWorld().getCalendar().addTime(DEFAULT_ACTION_TIME)));
+                copy.setWorld(state.getWorld().addTime(DEFAULT_ACTION_TIME));
                 break;
             }
             case NUMPAD_1, NUMPAD_2, NUMPAD_3, NUMPAD_4, /* NOT 5*/ NUMPAD_6, NUMPAD_7, NUMPAD_8, NUMPAD_9,
@@ -267,9 +266,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
 
                 // Same movement cost everywhere for now..
                 // Same movement speed, etc
-                copy.setWorld(state.getWorld()
-                        .setCalendar(state.getWorld()
-                                .getCalendar().addTime(DEFAULT_ACTION_TIME)));
+                copy.setWorld(state.getWorld().addTime(DEFAULT_ACTION_TIME));
             }
             case F1 -> {
                 CharacterSheet player = state.getWorld().getPlayer();

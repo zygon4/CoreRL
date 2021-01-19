@@ -228,4 +228,8 @@ public class World {
     public World setCalendar(Calendar calendar) {
         return new World(calendar, staticObjects, actors, playerLocation);
     }
+
+    public World addTime(long addSeconds) {
+        return new World(calendar.addTime(addSeconds), staticObjects, actors, playerLocation);
+    }
 }

@@ -1,6 +1,5 @@
 package com.zygon.rl.game;
 
-// Would almost prefer a central "world" interface
 import com.zygon.rl.world.World;
 
 import java.util.Objects;

@@ -45,7 +45,7 @@ final class AISystem extends GameSystem {
             Location currentLoc = entry.getKey();
             CharacterSheet character = entry.getValue();
 
-            // First resolve fields in the air
+            // First resolve fields in the air where the the character is.
             Collection<Action> fieldActions = getEnvironmentalActions(world, currentLoc, character);
 
             for (Action fd : fieldActions) {

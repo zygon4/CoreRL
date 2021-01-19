@@ -84,9 +84,7 @@ public class BloodRLMain {
 //                        player.set(player.getStatus().addEffect("Hunger", hungerLevel - 10)),
 //                        state.getWorld().getPlayerLocation(),
 //                        state.getWorld().getPlayerLocation());
-                copy.setWorld(state.getWorld()
-                        .setCalendar(state.getWorld().getCalendar().addTime(30)));
-
+                copy.setWorld(state.getWorld().addTime(30));
             } else {
                 copy.addLog("Cannot drain that");
             }
@@ -133,9 +131,7 @@ public class BloodRLMain {
                 // TODO: this is clunky to move the time
                 // TODO: also it skips over the world's actions. We need a more
                 // generic "energy" system so everyone gets time to act.
-                copy.setWorld(state.getWorld()
-                        .setCalendar(state.getWorld().getCalendar().addTime(
-                                TimeUnit.MINUTES.toSeconds(1))));
+                copy.setWorld(state.getWorld().addTime(TimeUnit.MINUTES.toSeconds(1)));
             } else {
                 copy.addLog("Cannot summon a familar here.");
             }
