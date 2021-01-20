@@ -9,7 +9,7 @@
         "species": "HUMAN",
         "aggression": 5,
         "hitPoints": 50,
-        "speed": 100,
+        "speed": 60,
         "flags": []
     }
 ]

@@ -1,22 +1,52 @@
 [
     {
+        "id": "legs_cotton_pants",
+        "type": "ARMOR",
+        "symbol": "[",
+        "color": "Tan",
+        "name": "pair of cotton pants",
+        "description": "A simple pair of pants",
+        "weight": 1,
+        "slots" : [ "LEG", "LEG" ]
+    },
+    {
         "id": "legs_leather_pants",
         "type": "ARMOR",
         "symbol": "[",
         "color": "Brown",
-        "name": "pair of leather pants",
+        "name": "pair of tough leather pants",
         "description": "Good leather pants",
-        "weight": 3,
+        "weight": 2,
         "slots" : [ "LEG", "LEG" ]
     },
     {
-        "id": "legs_dress_pants",
+        "id": "legs_wool_pants",
         "type": "ARMOR",
         "symbol": "[",
-        "color": "Black",
-        "name": "pair of dress pants",
-        "description": "A fancy pair of pants",
-        "weight": 2,
+        "color": "Gray",
+        "name": "pair of wool pants",
+        "description": "A pair of wool pants",
+        "weight": 1,
+        "slots" : [ "LEG", "LEG" ]
+    },
+    {
+        "id": "legs_velvet_pants",
+        "type": "ARMOR",
+        "symbol": "[",
+        "color": "Purple",
+        "name": "pair of velvet pants",
+        "description": "A fancy pair of velvet pants",
+        "weight": 1,
+        "slots" : [ "LEG", "LEG" ]
+    },
+    {
+        "id": "legs_silk_pants",
+        "type": "ARMOR",
+        "symbol": "[",
+        "color": "LightYellow",
+        "name": "pair of silk pants",
+        "description": "A soft pair of pants",
+        "weight": 1,
         "slots" : [ "LEG", "LEG" ]
     }
 ]

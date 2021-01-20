@@ -192,8 +192,10 @@ public class BloodRLMain {
 
         ArmorData dataTunic = ArmorData.get("torso_tunic_black");
         ArmorData dataBoots = ArmorData.get("boots_leather");
-        ArmorData dataPants = ArmorData.get("legs_dress_pants");
+        ArmorData dataPants = ArmorData.get("legs_velvet_pants");
+        ArmorData dataArms = ArmorData.get("arms_leather_vambraces");
 
+        Armor arms = new Armor(dataArms);
         Armor tunic = new Armor(dataTunic);
         Armor pants = new Armor(dataPants);
         Armor boots = new Armor(dataBoots);
@@ -202,6 +204,7 @@ public class BloodRLMain {
         pc = pc.add(boots).equip(boots);
         pc = pc.add(pants).equip(pants);
         pc = pc.add(tunic).equip(tunic);
+        pc = pc.add(arms).equip(arms);
         pc = pc.add(weapon).wield(weapon);
 
         world.add(pc, Location.create(0, 0));

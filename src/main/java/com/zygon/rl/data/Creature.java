@@ -16,6 +16,10 @@ public class Creature extends Element {
     public Creature() {
     }
 
+    public Creature(Element template) {
+        super(template);
+    }
+
     public Creature(String id, String type, String symbol, String color, String name, String description) {
         super(id, type, symbol, color, name, description);
     }

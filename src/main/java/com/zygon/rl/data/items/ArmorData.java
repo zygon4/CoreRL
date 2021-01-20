@@ -26,6 +26,7 @@ public class ArmorData extends ItemClass {
     private static final Type TYPE = new TypeToken<List<ArmorData>>() {
     }.getType();
 
+    private static final String ARMOR_ARMS_PATH = "/data/items/armor_arms.json";
     private static final String ARMOR_TORSO_PATH = "/data/items/armor_torso.json";
     private static final String ARMOR_LEGS_PATH = "/data/items/armor_legs.json";
     private static final String ARMOR_FEET_PATH = "/data/items/armor_feet.json";
@@ -41,6 +42,7 @@ public class ArmorData extends ItemClass {
     }
 
     public static void load() throws FileNotFoundException, IOException {
+        load(ARMOR_ARMS_PATH);
         load(ARMOR_TORSO_PATH);
         load(ARMOR_LEGS_PATH);
         load(ARMOR_FEET_PATH);

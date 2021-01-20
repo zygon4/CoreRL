@@ -14,15 +14,6 @@ public class Element implements Identifable {
     private String name = null;
     private String description = null;
 
-    public Element() {
-
-    }
-
-    protected Element(Element element) {
-        this(element.getId(), element.getType(), element.getSymbol(),
-                element.getColor(), element.getName(), element.getDescription());
-    }
-
     public Element(String id, String type, String symbol, String color, String name, String description) {
         this.id = id;
         this.type = type;
@@ -30,6 +21,15 @@ public class Element implements Identifable {
         this.color = color;
         this.name = name;
         this.description = description;
+    }
+
+    public Element() {
+
+    }
+
+    protected Element(Element element) {
+        this(element.getId(), element.getType(), element.getSymbol(),
+                element.getColor(), element.getName(), element.getDescription());
     }
 
     @Override
