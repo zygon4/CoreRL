@@ -9,27 +9,27 @@ import com.zygon.rl.data.ItemClass;
  */
 public class Item implements Identifable {
 
-    private final ItemClass template;
+    private final ItemClass item;
 
     public Item(ItemClass template) {
-        this.template = template;
+        this.item = template;
     }
 
     public ItemClass getTemplate() {
-        return template;
+        return item;
     }
 
     @Override
     public String getId() {
-        return template.getId();
+        return item.getId();
     }
 
     public String getDescription() {
-        return template.getDescription();
+        return item.getDescription();
     }
 
     public String getName() {
-        return template.getName();
+        return item.getName();
     }
 
     @Override

@@ -69,19 +69,26 @@ final class AISystem extends GameSystem {
                 if (action != null) {
                     if (action.canExecute(state)) {
                         state = action.execute(state);
+                        // Hate casting!!
+                        if (action.getClass().isAssignableFrom(MoveAction.class)) {
+                            currentLoc = ((MoveAction) action).getTo();
+                        }
                     } else {
                         state = state.log("Can't execute that");
                     }
                 }
 
-                state.getWorld().add(character.coolDown(), playerLocation);
+                character = character.coolDown();
             }
+
+            state.getWorld().add(character, currentLoc);
         }
 
         return state;
     }
 
-    private Collection<Action> getEnvironmentalActions(World world, Location location, CharacterSheet character) {
+    private Collection<Action> getEnvironmentalActions(World world, Location location,
+            CharacterSheet character) {
 
         // First resolve fields in the air
         return world.getAll(location, FieldData.getTypeName()).stream()

@@ -9,25 +9,25 @@ import com.zygon.rl.world.Item;
 public class Weapon extends Item {
 
     // TODO: should be a more generic "weapon" template when there are more types.
-    private final Melee template;
+    private final Melee melee;
     private final int critRange; //lowest number weapon will crit on
     private final int critMod; //critical modifier
     private final int initMod; //Initiative Modifer
 
-    public Weapon(Melee template, int critRange, int critMod, int initMod) {
-        super(template);
+    public Weapon(Melee melee, int critRange, int critMod, int initMod) {
+        super(melee);
         this.critRange = critRange;
         this.critMod = critMod;
-        this.template = template;
+        this.melee = melee;
         this.initMod = initMod;
     }
 
     private int calculateHit(DiceRoller dice, int toDamage) {
-        return calcDamage(dice, template.getDice(), template.getDamage()) + toDamage;
+        return calcDamage(dice, melee.getDice(), melee.getDamage()) + toDamage;
     }
 
     public int calculateHit(DiceRoller dice) {
-        return calculateHit(dice, template.getToDamage());
+        return calculateHit(dice, melee.getToDamage());
     }
 
     public int calculateCrit(DiceRoller dice) {
@@ -37,7 +37,7 @@ public class Weapon extends Item {
             damageDealt += calculateHit(dice, 0);
         }
 
-        return damageDealt + template.getToDamage();
+        return damageDealt + melee.getToDamage();
     }
 
     public int getCritRange() {
@@ -49,7 +49,7 @@ public class Weapon extends Item {
     }
 
     public int getToHit() {
-        return template.getToDamage();
+        return melee.getToDamage();
     }
 
     private static int calcDamage(DiceRoller dice, int numDice, int damage) {
