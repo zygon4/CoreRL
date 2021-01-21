@@ -21,10 +21,12 @@ public class TargetingInputHandler extends DirectionInputHandler {
     private final Location targetLocation;
     private final Set<Location> targetPath = new HashSet<>();
     private final Map<Input, Function<Location, Action>> targetActionByInput;
+    private final boolean popContextOnAction;
 
     public TargetingInputHandler(GameConfiguration gameConfiguration,
             Location centralLocation, Location targetLocation,
-            Map<Input, Function<Location, Action>> targetActionByInput) {
+            Map<Input, Function<Location, Action>> targetActionByInput,
+            boolean popContextOnAction) {
         super(gameConfiguration, centralLocation,
                 addInputs(Set.of(Input.valueOf(ESCAPE.getCode())), targetActionByInput.keySet()));
 
@@ -37,11 +39,12 @@ public class TargetingInputHandler extends DirectionInputHandler {
         }
 
         this.targetActionByInput = Collections.unmodifiableMap(targetActionByInput);
+        this.popContextOnAction = popContextOnAction;
     }
 
     public TargetingInputHandler(GameConfiguration gameConfiguration, Location centralLocation,
             Map<Input, Function<Location, Action>> targetActionByInput) {
-        this(gameConfiguration, centralLocation, null, targetActionByInput);
+        this(gameConfiguration, centralLocation, null, targetActionByInput, false);
     }
 
     @Override
@@ -56,6 +59,9 @@ public class TargetingInputHandler extends DirectionInputHandler {
 
             if (action.canExecute(newState)) {
                 newState = action.execute(newState);
+                if (popContextOnAction) {
+                    newState = popInputContext(newState);
+                }
             }
         } else {
 
@@ -63,11 +69,12 @@ public class TargetingInputHandler extends DirectionInputHandler {
             Location target = getTarget(targetLocation, input);
 
             if (target != null) {
-                newState = popInputContext(state).copy()
+                newState = popInputContext(newState).copy()
                         .addInputContext(GameState.InputContext.builder()
                                 .setName("TARGET")
                                 .setHandler(new TargetingInputHandler(
-                                        getGameConfiguration(), getCentralLocation(), target, targetActionByInput))
+                                        getGameConfiguration(), getCentralLocation(),
+                                        target, targetActionByInput, popContextOnAction))
                                 .setPrompt(GameState.InputContextPrompt.DIRECTION)
                                 .build()).build();
             } else {

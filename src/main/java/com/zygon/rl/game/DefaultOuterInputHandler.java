@@ -331,7 +331,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                         GameState.InputContext.builder()
                                 .setName("TARGET")
                                 .setHandler(new TargetingInputHandler(
-                                        getGameConfiguration(), playerLocation, examine))
+                                        getGameConfiguration(), playerLocation, null, examine, true))
                                 .setPrompt(GameState.InputContextPrompt.DIRECTION)
                                 .build());
             }
