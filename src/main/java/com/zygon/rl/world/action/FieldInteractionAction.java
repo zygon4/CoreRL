@@ -30,7 +30,7 @@ public class FieldInteractionAction extends DamageAction {
 
     @Override
     public boolean canExecute(GameState state) {
-        return true;
+        return state.getWorld().get(getDefenderLocation()) != null;
     }
 
     @Override

@@ -315,23 +315,25 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                 copy = newState.copy();
             }
             case F3 -> {
-                CharacterSheet player = state.getWorld().getPlayer();
-
                 Field field = new Field(FieldData.get("fd_electricity"), Field.PropagationDirection.EMIT,
                         Field.PropagationStyle.STRAIGHT, Field.PropagationPotency.WEAK,
                         state.getWorld().getPlayerLocation(), 150);
 
-                Location playerLoc = state.getWorld().getPlayerLocation();
+                Location playerLocation = state.getWorld().getPlayerLocation();
+                Function<Location, Action> getFieldSetFn = (l) -> new SetIdentifiableAction(l, field);
+                Map<Input, Function<Location, Action>> examine = Map.of(
+                        Input.valueOf(KeyCode.ENTER.getCode()),
+                        getFieldSetFn,
+                        Input.valueOf(KeyCode.NUMPAD_5.getCode()),
+                        getFieldSetFn);
 
-                Action n = new SetIdentifiableAction(Location.create(playerLoc.getX() + 20, playerLoc.getY()), field);
-
-                GameState newState = state;
-
-                if (n.canExecute(newState)) {
-                    newState = n.execute(newState);
-                }
-
-                copy = newState.copy();
+                copy.addInputContext(
+                        GameState.InputContext.builder()
+                                .setName("TARGET")
+                                .setHandler(new TargetingInputHandler(
+                                        getGameConfiguration(), playerLocation, examine))
+                                .setPrompt(GameState.InputContextPrompt.DIRECTION)
+                                .build());
             }
             case KEY_X -> {
                 Location playerLocation = state.getWorld().getPlayerLocation();

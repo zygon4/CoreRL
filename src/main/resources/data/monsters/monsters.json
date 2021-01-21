@@ -61,7 +61,7 @@
         "species": "MAMMAL",
         "aggression": 5,
         "hitPoints": 100,
-        "speed": 100,
+        "speed": 90,
         "flags": []
     },
     {
@@ -75,6 +75,19 @@
         "aggression": 1,
         "hitPoints": 30,
         "speed": 120,
+        "flags": []
+    },
+    {
+        "id": "mon_opossum",
+        "type": "MONSTER",
+        "name": "Opossum",
+        "description": "An Opossum",
+        "symbol": "o",
+        "color": "DarkSlateGray",
+        "species": "MAMMAL",
+        "aggression": 1,
+        "hitPoints": 10,
+        "speed": 80,
         "flags": []
     }
 ]

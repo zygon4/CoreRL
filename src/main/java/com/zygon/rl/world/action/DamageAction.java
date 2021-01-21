@@ -20,6 +20,8 @@ import java.util.function.Predicate;
  */
 public abstract class DamageAction extends Action {
 
+    private static final System.Logger logger = System.getLogger(DamageAction.class.getCanonicalName());
+
     private final GameConfiguration gameConfiguration;
     private final CharacterSheet damaged;
     private final Location defenderLocation;
@@ -55,10 +57,16 @@ public abstract class DamageAction extends Action {
         // effects (wounds, etc).
         CharacterSheet updatedDefender = damaged.loseHitPoints(damage.getTotalDamage());
 
+        logger.log(System.Logger.Level.TRACE,
+                "DAMAGE: " + updatedDefender.getId() + " at " + defenderLocation);
+
         if (!updatedDefender.isDead()) {
             state.getWorld().add(updatedDefender, defenderLocation);
             updateToHostile(state.getWorld(), updatedDefender, defenderLocation);
         } else {
+            logger.log(System.Logger.Level.TRACE,
+                    "DEAD: " + updatedDefender.getId() + " at " + defenderLocation);
+
             state = state.log(updatedDefender.getName() + " died!");
             state.getWorld().remove(updatedDefender, defenderLocation);
             state.getWorld().add(getCorpseId(damaged), defenderLocation);

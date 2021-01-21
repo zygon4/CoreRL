@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
  */
 public class MoveAction extends Action {
 
+    private static final System.Logger logger = System.getLogger(MoveAction.class.getCanonicalName());
+
     private final String id;
     private final Location from;
     private final Location to;
@@ -50,6 +52,8 @@ public class MoveAction extends Action {
         // move NPCs..
         for (CharacterSheet element : elements) {
             if (world.canMove(to)) {
+                logger.log(System.Logger.Level.TRACE,
+                        "MOVE: " + element.getId() + " from " + from + " to" + to);
                 world.move(element, from, to);
             } else {
                 // TODO: maybe log?
