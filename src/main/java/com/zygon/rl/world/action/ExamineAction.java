@@ -30,9 +30,15 @@ public class ExamineAction extends Action {
     public GameState execute(GameState state) {
 
         List<Element> allElements = state.getWorld().getAllElements(examine);
-        String examineLog = allElements.stream()
-                .map(e -> e.getName() + ") " + e.getDescription())
-                .collect(Collectors.joining("\n"));
+
+        String examineLog = null;
+        if (allElements.isEmpty()) {
+            examineLog = "There is nothing to examine.";
+        } else {
+            examineLog = allElements.stream()
+                    .map(e -> e.getName() + ") " + e.getDescription())
+                    .collect(Collectors.joining("\n"));
+        }
 
         return state.log(examineLog);
     }

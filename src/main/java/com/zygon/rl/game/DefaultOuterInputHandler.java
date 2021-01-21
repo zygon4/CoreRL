@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_1;
@@ -34,6 +35,7 @@ import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_6;
 import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_7;
 import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_8;
 import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_9;
+import static org.hexworks.zircon.api.uievent.KeyCode.ESCAPE;
 
 public final class DefaultOuterInputHandler extends BaseInputHandler {
 
@@ -60,6 +62,10 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
         defaultKeyCodes.add(Input.valueOf(KeyCode.F1.getCode()));
         defaultKeyCodes.add(Input.valueOf(KeyCode.F2.getCode()));
         defaultKeyCodes.add(Input.valueOf(KeyCode.F3.getCode()));
+
+        // 'x' look around
+        defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_X.getCode()));
+
         // ESC for game menu
         defaultKeyCodes.add(Input.valueOf(KeyCode.ESCAPE.getCode()));
     }
@@ -121,7 +127,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                         // screen to print the items at the location!!!
                         Action examineAction = new ExamineAction(loc);
                         if (examineAction.canExecute(state)) {
-                            examineAction.execute(state);
+                            copy = examineAction.execute(state).copy();
                         }
                     } else {
                         // prompt for direction
@@ -129,7 +135,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                         // screen to print the items at the location!!!
                         copy.addInputContext(GameState.InputContext.builder()
                                 .setName("EXAMINE")
-                                .setHandler(new DirectionInputHandler(
+                                .setHandler(new ActionDirectionInputHandler(
                                         getGameConfiguration(),
                                         l -> neighborsWithSomething.containsKey(l)
                                         ? new ExamineAction(l) : null,
@@ -327,7 +333,22 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
 
                 copy = newState.copy();
             }
+            case KEY_X -> {
+                Location playerLocation = state.getWorld().getPlayerLocation();
+                Function<Location, Action> getExFn = (l) -> new ExamineAction(l);
+                Map<Input, Function<Location, Action>> examine = Map.of(
+                        Input.valueOf(KeyCode.ENTER.getCode()),
+                        getExFn,
+                        Input.valueOf(KeyCode.NUMPAD_5.getCode()),
+                        getExFn);
 
+                copy.addInputContext(
+                        GameState.InputContext.builder()
+                                .setName("TARGET")
+                                .setHandler(new TargetingInputHandler(getGameConfiguration(), playerLocation, examine))
+                                .setPrompt(GameState.InputContextPrompt.DIRECTION)
+                                .build());
+            }
             default -> {
                 invalidInput(input);
                 // Invalid but keep context as is
@@ -363,6 +384,9 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
             }
             case F3 -> {
                 return "F3";
+            }
+            case KEY_X -> {
+                return "Look around";
             }
             default -> {
                 return inputKeyCode.name();

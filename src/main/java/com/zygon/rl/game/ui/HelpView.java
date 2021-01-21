@@ -65,6 +65,7 @@ final class HelpView extends BaseView {
                     .addHeader("d               - drop item", false)
                     .addHeader("i               - view inventory", false)
                     .addHeader("e               - examine surroundings", false)
+                    .addHeader("x               - look around", false)
                     .addHeader("esc             - game menu", false)
                     .build());
             getScreen().openModal(new Dialog(getScreen(), modalPanel));

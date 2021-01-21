@@ -11,6 +11,7 @@ import com.zygon.rl.data.context.Data;
 import com.zygon.rl.game.Game;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.game.Input;
+import com.zygon.rl.game.TargetingInputHandler;
 import com.zygon.rl.util.Audio;
 import com.zygon.rl.util.ColorUtil;
 import com.zygon.rl.world.Attribute;
@@ -51,6 +52,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -309,11 +311,15 @@ final class GameView extends BaseView {
                 .buildCharacterTile();
     }
 
-    private Tile toTile(Element element) {
+    private Tile toTile(Color color, char symbol) {
         return Tile.newBuilder()
-                .withForegroundColor((GameUI.convert(ColorUtil.get(element.getColor()))))
-                .withCharacter(element.getSymbol().charAt(0))
+                .withForegroundColor(colorCache.getUnchecked(color))
+                .withCharacter(symbol)
                 .buildCharacterTile();
+    }
+
+    private Tile toTile(Element element) {
+        return toTile(ColorUtil.get(element.getColor()), element.getSymbol().charAt(0));
     }
 
     private void updateSideBar(SideBar sideBar, Game game) {
@@ -373,6 +379,17 @@ final class GameView extends BaseView {
         Location playerLocation = getPlayerLocation(game);
         int xHalf = gameScreen.getSize().getWidth() / 2;
         int yHalf = gameScreen.getSize().getHeight() / 2;
+
+        GameState.InputContext inputCtx = game.getState().getInputContext().peek();
+
+        Location target = null;
+        Predicate<Location> isOnTargetPath = null;
+        if (inputCtx.getName().equals("TARGET")) {
+            // Casting is evil but shielding with a Predicate
+            TargetingInputHandler lookHandler = (TargetingInputHandler) inputCtx.getHandler();
+            target = lookHandler.getTargetLocation();
+            isOnTargetPath = (l) -> lookHandler.isOnPath(l);
+        }
 
         // Note these are zero-based
         float[][] lightResistances = fovHelper.generateSimpleResistances(
@@ -434,6 +451,16 @@ final class GameView extends BaseView {
                         }
                     }
 
+                    // Overlay path/targeting, should be a layering/transparent effect
+                    Tile targetTile = null;
+                    if (target != null && loc.equals(target)) {
+                        targetTile = toTile(Color.WHITE, 'O');
+                    } else if (isOnTargetPath != null && isOnTargetPath.test(loc)) {
+                        targetTile = toTile(Color.WHITE, '#');
+                    }
+                    if (targetTile != null) {
+                        gameScreen.draw(targetTile, uiScreenPosition);
+                    }
                 } else {
                     gameScreen.draw(BLANK_TILE, uiScreenPosition);
                 }

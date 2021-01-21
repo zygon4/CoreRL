@@ -1,9 +1,19 @@
 package com.zygon.rl.game;
 
 import com.zygon.rl.world.Location;
-import com.zygon.rl.world.action.Action;
 
-import java.util.function.Function;
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_1;
+import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_2;
+import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_3;
+import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_4;
+import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_5;
+import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_6;
+import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_7;
+import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_8;
+import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_9;
 
 /**
  * Handles directions, could be used for spells/other actions in the future.
@@ -11,23 +21,28 @@ import java.util.function.Function;
  *
  * @author zygon
  */
-public class DirectionInputHandler extends BaseInputHandler {
+public abstract class DirectionInputHandler extends BaseInputHandler {
 
-    private final Function<Location, Action> getActionFn;
     private final Location centralLocation;
 
     public DirectionInputHandler(GameConfiguration gameConfiguration,
-            Function<Location, Action> action, Location centralLocation) {
-        super(gameConfiguration, INPUTS_1_9);
+            Location centralLocation, Set<Input> additional) {
+        super(gameConfiguration, addInputs(additional));
 
-        this.getActionFn = action;
         this.centralLocation = centralLocation;
     }
 
-    @Override
-    public GameState apply(GameState state, Input input) {
+    public Location getCentralLocation() {
+        return centralLocation;
+    }
 
-        GameState newState = state;
+    @Override
+    public String getDisplayText(Input input) {
+        // is this good enough for now?
+        return input.toString();
+    }
+
+    protected Location getTarget(Location centralLocation, Input input) {
         Location target = null;
 
         switch (convert(input)) {
@@ -68,16 +83,11 @@ public class DirectionInputHandler extends BaseInputHandler {
             }
         }
 
-        if (target != null) {
-            Action action = getActionFn.apply(target);
-            if (action.canExecute(state)) {
-                action.execute(state);
-            }
-        } else {
-            invalidInput(input);
-        }
+        return target;
+    }
 
-        return popInputContext(newState);
+    protected Location getTarget(Input input) {
+        return getTarget(getCentralLocation(), input);
     }
 
     @Override
@@ -85,13 +95,17 @@ public class DirectionInputHandler extends BaseInputHandler {
         return popInputContext(state);
     }
 
-    @Override
-    public String getDisplayText(Input input) {
-        // is this good enough for now?
-        return input.toString();
+    private static Set<Input> addInputs(Set<Input> additional) {
+        return addInputs(INPUTS_1_9, additional);
     }
 
-    private static GameState popInputContext(GameState state) {
+    protected static Set<Input> addInputs(Set<Input> i1, Set<Input> i2) {
+        Set<Input> inputs = new HashSet<>(i1);
+        inputs.addAll(i2);
+        return inputs;
+    }
+
+    protected static GameState popInputContext(GameState state) {
         return state.copy()
                 .removeInputContext()
                 .build();
