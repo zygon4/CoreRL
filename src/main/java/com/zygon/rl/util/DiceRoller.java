@@ -1,4 +1,4 @@
-package com.zygon.rl.world.character;
+package com.zygon.rl.util;
 
 import java.util.Random;
 

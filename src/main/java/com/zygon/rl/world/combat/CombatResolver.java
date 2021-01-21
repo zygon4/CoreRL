@@ -3,7 +3,7 @@ package com.zygon.rl.world.combat;
 import com.zygon.rl.world.DamageResolution;
 import com.zygon.rl.world.DamageType;
 import com.zygon.rl.world.character.CharacterSheet;
-import com.zygon.rl.world.character.DiceRoller;
+import com.zygon.rl.util.DiceRoller;
 import com.zygon.rl.world.character.Weapon;
 
 import java.util.Random;

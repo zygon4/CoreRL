@@ -1,5 +1,6 @@
 package com.zygon.rl.world.character;
 
+import com.zygon.rl.util.DiceRoller;
 import com.zygon.rl.data.items.Melee;
 import com.zygon.rl.world.Item;
 
