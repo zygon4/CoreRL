@@ -54,11 +54,11 @@ public class GenericEntityManager<T extends Identifable> {
         return entities;
     }
 
-    public Map<Location, List<T>> get(Location location, Predicate<T> filter, int radius) {
+    public Map<Location, List<T>> get(Location location, Predicate<T> filter, int radius, boolean includeCenter) {
 
         Map<Location, List<T>> elementsByLocation = new HashMap<>();
 
-        Set<Location> neighbors = location.getNeighbors(radius);
+        Set<Location> neighbors = location.getNeighbors(radius, includeCenter);
         if (neighbors != null) {
             neighbors.stream().forEach(loc -> {
                 List<T> elements = get(loc);

@@ -44,13 +44,7 @@ public final class Game {
      */
     public Game turn(Input input) {
 
-        // TODO: not sure.. handle elsewhere!
-        if (state.isPlayerDead()) {
-            throw new IllegalStateException();
-        }
-
-        //
-        // TODO: logging input would make the game re-playable as long
+        // Logging input would make the game re-playable as long
         // as the game systems used are seeded and consistent.
         //
         // TODO: implement a stateful speed/energy for the player (look at AI)
@@ -66,6 +60,17 @@ public final class Game {
                 // If they need a name to distinguish, can add later
                 logger.log(System.Logger.Level.TRACE, "Game system " + gs.getClass().getCanonicalName()
                         + " " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - gameSystemStart));
+
+                if (newState.isPlayerDead()) {
+                    String deathMessage = "YOU DIED!\nYou lasted "
+                            + newState.getTurnCount() + " turns in the world of "
+                            + getConfiguration().getGameName();
+
+                    // TODO: print nicely to screen
+                    System.out.println(deathMessage);
+                    System.exit(0);
+                }
+
             }
         }
 
@@ -95,6 +100,7 @@ public final class Game {
         private Builder(GameConfiguration gameConfiguration) {
             this.gameSystems.add(new DefaultGameSystem(gameConfiguration));
             this.gameSystems.add(new FieldPropagationSystem(gameConfiguration));
+            this.gameSystems.add(new FieldEffectSystem(gameConfiguration));
             this.gameSystems.add(new SpawnSystem(gameConfiguration));
             this.gameSystems.add(new AISystem(gameConfiguration));
             this.configuration = gameConfiguration;

@@ -17,10 +17,10 @@ public class ElementEntityManager<T extends Element> extends GenericEntityManage
         return elements != null && !elements.isEmpty() ? elements.get(0) : null;
     }
 
-    public Map<Location, List<T>> getAllByType(Location location, String type, int radius) {
+    public Map<Location, List<T>> getAllByType(Location location, String type, int radius, boolean includeCenter) {
         return get(location,
                 (el) -> type == null || el.getType().equals(type),
-                radius);
+                radius, includeCenter);
     }
 
     public List<T> getByType(Location location, String type) {

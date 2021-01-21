@@ -153,16 +153,6 @@ final class GameView extends BaseView {
                         logger.log(System.Logger.Level.TRACE, "turn (ms) "
                                 + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - turnStart));
 
-                        if (game.getState().isPlayerDead()) {
-                            game.copy().setState(game.getState().log("YOU DIED!\nYou lasted "
-                                    + game.getState().getTurnCount() + " turns in the world of "
-                                    + game.getConfiguration().getGameName()));
-                            System.exit(0);
-//                            replaceWith(new TitleView(tileGrid, getTheme(), game,
-//                                    // TODO: better death notice
-//                                    "YOU DIED!\nYou lasted " + game.getState().getTurnCount() + " turns"));
-                        }
-
                         long updateGameScreen = System.nanoTime();
                         updateGameScreen(gameScreenLayer, game);
                         logger.log(System.Logger.Level.TRACE, "game screen (ms) "

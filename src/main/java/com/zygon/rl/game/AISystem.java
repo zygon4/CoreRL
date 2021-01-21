@@ -45,48 +45,34 @@ final class AISystem extends GameSystem {
             Location currentLoc = entry.getKey();
             CharacterSheet character = entry.getValue();
 
-            // First resolve fields in the air where the the character is.
-            Collection<Action> fieldActions = getEnvironmentalActions(state.getWorld(), currentLoc, character);
+            character = character.powerUp();
 
-            for (Action fd : fieldActions) {
-                if (fd.canExecute(state)) {
-                    state = fd.execute(state);
+            while (character.getStatus().canAct()) {
+
+                // Next the AIs behave
+                Behavior behavior = get(character, currentLoc, state.getWorld());
+
+                Action action = null;
+                if (behavior != null) {
+                    action = behavior.get(character);
                 }
-            }
 
-            character = state.getWorld().get(currentLoc);
-
-            // character could have died
-            if (character != null) {
-                character = character.powerUp();
-
-                while (character.getStatus().canAct()) {
-
-                    // Next the AIs behave
-                    Behavior behavior = get(character, currentLoc, state.getWorld());
-
-                    Action action = null;
-                    if (behavior != null) {
-                        action = behavior.get(character);
-                    }
-
-                    if (action != null) {
-                        if (action.canExecute(state)) {
-                            state = action.execute(state);
-                            // Hate casting!!
-                            if (action.getClass().isAssignableFrom(MoveAction.class)) {
-                                currentLoc = ((MoveAction) action).getTo();
-                            }
-                        } else {
-                            state = state.log("Can't execute that");
+                if (action != null) {
+                    if (action.canExecute(state)) {
+                        state = action.execute(state);
+                        // Hate casting!!
+                        if (action.getClass().isAssignableFrom(MoveAction.class)) {
+                            currentLoc = ((MoveAction) action).getTo();
                         }
+                    } else {
+                        state = state.log("Can't execute that");
                     }
-
-                    character = character.coolDown();
                 }
 
-                state.getWorld().add(character, currentLoc);
+                character = character.coolDown();
             }
+
+            state.getWorld().add(character, currentLoc);
         }
 
         return state;
