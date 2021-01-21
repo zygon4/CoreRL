@@ -16,12 +16,13 @@ public class Creature extends Element {
     public Creature() {
     }
 
-    public Creature(Element template) {
+    public Creature(Element template, String species, int aggression, int hitPoints, int speed, Set<String> flags) {
         super(template);
-    }
-
-    public Creature(String id, String type, String symbol, String color, String name, String description) {
-        super(id, type, symbol, color, name, description);
+        this.species = species;
+        this.aggression = aggression;
+        this.hitPoints = hitPoints;
+        this.speed = speed;
+        this.flags = flags;
     }
 
     public String getSpecies() {

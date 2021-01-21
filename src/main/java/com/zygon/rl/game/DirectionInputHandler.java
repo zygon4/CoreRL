@@ -90,11 +90,6 @@ public abstract class DirectionInputHandler extends BaseInputHandler {
         return getTarget(getCentralLocation(), input);
     }
 
-    @Override
-    public GameState handleInvalidInput(GameState state) {
-        return popInputContext(state);
-    }
-
     private static Set<Input> addInputs(Set<Input> additional) {
         return addInputs(INPUTS_1_9, additional);
     }

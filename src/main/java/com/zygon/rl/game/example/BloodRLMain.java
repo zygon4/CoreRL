@@ -12,6 +12,7 @@ import com.zygon.rl.data.context.Data;
 import com.zygon.rl.data.items.ArmorData;
 import com.zygon.rl.data.items.Corpse;
 import com.zygon.rl.data.items.Melee;
+import com.zygon.rl.data.monster.Species;
 import com.zygon.rl.game.Game;
 import com.zygon.rl.game.GameConfiguration;
 import com.zygon.rl.game.GameState;
@@ -181,8 +182,9 @@ public class BloodRLMain {
         abilities.add(drainBlood);
         abilities.add(summonFamiliar);
 
+        Element eleTemplate = new Element("player", "player", "@", "PaleVioletRed", "Alucard", "He's cool");
         CharacterSheet pc = new CharacterSheet(
-                new Creature("player", "player", "@", "PaleVioletRed", "Alucard", "He's cool"),
+                new Creature(eleTemplate, Species.MAMMAL.name(), 100, 120, 100, Set.of()),
                 new Stats(16, 16, 14, 12, 12, 16),
                 new Status(19, 100, Set.of()),
                 null,

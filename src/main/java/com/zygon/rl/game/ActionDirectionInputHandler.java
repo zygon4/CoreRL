@@ -40,9 +40,4 @@ public class ActionDirectionInputHandler extends DirectionInputHandler {
 
         return popInputContext(newState);
     }
-
-    @Override
-    public GameState handleInvalidInput(GameState state) {
-        return popInputContext(state);
-    }
 }

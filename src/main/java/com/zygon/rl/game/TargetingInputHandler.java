@@ -85,9 +85,4 @@ public class TargetingInputHandler extends DirectionInputHandler {
     public boolean isOnPath(Location location) {
         return targetPath.contains(location);
     }
-
-    @Override
-    public GameState handleInvalidInput(GameState state) {
-        return popInputContext(state);
-    }
 }
