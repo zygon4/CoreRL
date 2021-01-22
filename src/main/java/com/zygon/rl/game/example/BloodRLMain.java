@@ -26,6 +26,7 @@ import com.zygon.rl.world.character.Armor;
 import com.zygon.rl.world.character.CharacterSheet;
 import com.zygon.rl.world.character.Stats;
 import com.zygon.rl.world.character.Status;
+import com.zygon.rl.world.character.StatusEffect;
 import com.zygon.rl.world.character.Weapon;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -122,7 +123,7 @@ public class BloodRLMain {
 
             SummonAction summonAction = new SummonAction(
                     state.getWorld().getPlayerLocation(), 1, id,
-                    Set.of(Effect.EffectNames.PET.getId()), random);
+                    Set.of(Effect.EffectNames.PET.getEffect()), random);
 
             GameState.Builder copy = state.copy();
 
@@ -182,11 +183,13 @@ public class BloodRLMain {
         abilities.add(drainBlood);
         abilities.add(summonFamiliar);
 
+        Effect effect = Effect.get("effect_terror");
+
         Element eleTemplate = new Element("player", "player", "@", "PaleVioletRed", "Alucard", "He's cool");
         CharacterSheet pc = new CharacterSheet(
                 new Creature(eleTemplate, Species.MAMMAL.name(), 100, 120, 100, Set.of()),
                 new Stats(16, 16, 14, 12, 12, 16),
-                new Status(19, 100, Set.of()),
+                new Status(19, 100, Set.of(new StatusEffect(effect))),
                 null,
                 null,
                 abilities,

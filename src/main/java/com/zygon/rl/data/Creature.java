@@ -16,7 +16,8 @@ public class Creature extends Element {
     public Creature() {
     }
 
-    public Creature(Element template, String species, int aggression, int hitPoints, int speed, Set<String> flags) {
+    public Creature(Element template, String species, int aggression,
+            int hitPoints, int speed, Set<String> flags) {
         super(template);
         this.species = species;
         this.aggression = aggression;

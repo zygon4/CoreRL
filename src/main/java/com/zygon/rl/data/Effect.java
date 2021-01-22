@@ -1,7 +1,6 @@
 package com.zygon.rl.data;
 
 import com.google.gson.reflect.TypeToken;
-import com.zygon.rl.data.context.Data;
 import com.zygon.rl.util.StringUtil;
 
 import java.io.BufferedReader;
@@ -22,17 +21,41 @@ import java.util.stream.Collectors;
  */
 public final class Effect extends Element {
 
-    public static enum EffectNames {
-        HOSTILE(Data.get("effect_hostile")),
-        PET(Data.get("effect_pet"));
+    public static class StatMod {
 
-        private final Element effect;
+        private final String name;
+        private final int amount;
+
+        public StatMod(String name, int amount) {
+            this.name = name;
+            this.amount = amount;
+        }
+
+        public int getAmount() {
+            return amount;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
+
+    // Not sure if this can keep up..
+    public static enum EffectNames {
+        HOSTILE(Effect.get("effect_hostile")),
+        PET(Effect.get("effect_pet"));
+
+        private final Effect effect;
 
         public String getId() {
             return effect.getId();
         }
 
-        private EffectNames(Element effect) {
+        public Effect getEffect() {
+            return effect;
+        }
+
+        private EffectNames(Effect effect) {
             this.effect = effect;
         }
     }
@@ -64,8 +87,13 @@ public final class Effect extends Element {
     }
 
     private int maxDuration;
+    private List<StatMod> statMods;
 
     public int getMaxDuration() {
         return maxDuration;
+    }
+
+    public List<StatMod> getStatMods() {
+        return statMods;
     }
 }

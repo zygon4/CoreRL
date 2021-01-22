@@ -1,5 +1,7 @@
 package com.zygon.rl.world.character;
 
+import com.zygon.rl.data.Effect;
+
 /**
  * Maybe the runtime version of Effect for player status?
  *
@@ -7,13 +9,13 @@ package com.zygon.rl.world.character;
  */
 public final class StatusEffect {
 
-    private final String effectId;
+    private final Effect effectId;
 
-    public StatusEffect(String id) {
+    public StatusEffect(Effect id) {
         this.effectId = id;
     }
 
-    public String getId() {
+    public Effect getEffect() {
         return effectId;
     }
 }

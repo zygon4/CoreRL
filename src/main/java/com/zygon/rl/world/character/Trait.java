@@ -1,7 +1,7 @@
 package com.zygon.rl.world.character;
 
 /**
- * Trait vs skill?
+ * Traits are permanent, cannot be removed. They are permanent effects.
  *
  * @author zygon
  */

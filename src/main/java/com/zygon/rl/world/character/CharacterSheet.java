@@ -1,10 +1,12 @@
 package com.zygon.rl.world.character;
 
 import com.zygon.rl.data.Creature;
+import com.zygon.rl.data.Effect;
 import com.zygon.rl.data.Element;
 import com.zygon.rl.world.Item;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -67,7 +69,46 @@ public final class CharacterSheet extends Element {
     }
 
     public Stats getStats() {
-        return stats;
+
+        Stats baseStats = stats;
+
+        int strMod = 0;
+        int dexMod = 0;
+        int conMod = 0;
+        int intMod = 0;
+        int wisMod = 0;
+        int chaMod = 0;
+
+        for (StatusEffect se : getStatus().getEffects().values()) {
+            List<Effect.StatMod> statMods = se.getEffect().getStatMods();
+            if (statMods != null) {
+                for (Effect.StatMod mod : statMods) {
+                    switch (mod.getName()) {
+                        case "STR" ->
+                            strMod += mod.getAmount();
+                        case "DEX" ->
+                            dexMod += mod.getAmount();
+                        case "CON" ->
+                            conMod += mod.getAmount();
+                        case "INT" ->
+                            intMod += mod.getAmount();
+                        case "WIS" ->
+                            wisMod += mod.getAmount();
+                        case "CHA" ->
+                            chaMod += mod.getAmount();
+                    }
+                }
+
+                baseStats = new Stats(baseStats.getStrength() + strMod,
+                        baseStats.getDexterity() + dexMod,
+                        baseStats.getConstitution() + conMod,
+                        baseStats.getIntelligence() + intMod,
+                        baseStats.getWisdom() + wisMod,
+                        baseStats.getCharisma() + chaMod);
+            }
+        }
+
+        return baseStats;
     }
 
     public Status getStatus() {

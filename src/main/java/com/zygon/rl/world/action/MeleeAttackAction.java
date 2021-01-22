@@ -76,7 +76,7 @@ public class MeleeAttackAction extends DamageAction {
         if (!characterSheet.getId().equals("player")) {
             if (!characterSheet.getStatus().isEffected(Effect.EffectNames.HOSTILE.getId())) {
                 CharacterSheet updatedToHostile = characterSheet.set(characterSheet.getStatus()
-                        .addEffect(new StatusEffect(Effect.EffectNames.HOSTILE.getId())));
+                        .addEffect(new StatusEffect(Effect.EffectNames.HOSTILE.getEffect())));
 
                 world.add(updatedToHostile, location);
             }

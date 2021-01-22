@@ -3,14 +3,16 @@
         "id": "effect_pet",
         "type": "EFFECT",
         "name": "Pet",
-        "description": "A pet"
+        "description": "A pet",
+        "statMods": [ { "name":"INT", "amount":-1 } ]
     },
     {
         "id": "effect_terror",
         "type": "EFFECT",
         "name": "Terror",
         "description": "You're terrified and must run away!",
-        "maxDuration": 8
+        "maxDuration": 8,
+        "statMods": [ { "name":"INT", "amount":-2 }, { "name":"WIS", "amount":-2 } ]
     },
     {
         "id": "effect_hostile",

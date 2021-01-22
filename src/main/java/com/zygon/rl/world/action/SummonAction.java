@@ -1,6 +1,7 @@
 package com.zygon.rl.world.action;
 
 import com.zygon.rl.data.Creature;
+import com.zygon.rl.data.Effect;
 import com.zygon.rl.data.context.Data;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.world.Location;
@@ -29,12 +30,12 @@ public class SummonAction extends Action {
     private final Location location;
     private final int count;
     private final String id;
-    private final Set<String> effects;
+    private final Set<Effect> effects;
     private final Random random;
 
     // This is intended to be a actor-only summon, but summoning random items
     // is pretty valid as well. This will need enhancement.
-    public SummonAction(Location location, int count, String id, Set<String> effects, Random random) {
+    public SummonAction(Location location, int count, String id, Set<Effect> effects, Random random) {
         this.location = location;
         this.count = count;
         this.id = id;

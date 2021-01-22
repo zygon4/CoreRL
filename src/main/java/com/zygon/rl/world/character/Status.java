@@ -29,7 +29,7 @@ public final class Status {
 
     public Status(int age, int hitPoints, Set<StatusEffect> effects) {
         this(age, hitPoints, 0, Collections.unmodifiableMap(effects.stream()
-                .collect(Collectors.toMap(k -> k.getId(), v -> v))));
+                .collect(Collectors.toMap(k -> k.getEffect().getId(), v -> v))));
     }
 
     public boolean canAct() {
@@ -66,7 +66,7 @@ public final class Status {
 
     public Status addEffect(StatusEffect effect) {
         Map<String, StatusEffect> effects = new HashMap<>(this.effects);
-        effects.put(effect.getId(), effect);
+        effects.put(effect.getEffect().getId(), effect);
 
         return new Status(age, hitPoints, energy, effects);
     }
