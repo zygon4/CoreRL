@@ -37,7 +37,7 @@ final class AbilityInputHandler extends BaseInputHandler {
             case ADJACENT -> {
                 newState = newState.copy()
                         .addInputContext(GameState.InputContext.builder()
-                                .setName("TARGET")
+                                .setName("ABILITY")
                                 .setHandler(new AbilityDirectionInputHandler(
                                         getGameConfiguration(), ability, state.getWorld().getPlayerLocation()))
                                 .setPrompt(GameState.InputContextPrompt.DIRECTION)
