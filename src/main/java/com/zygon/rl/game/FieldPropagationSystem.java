@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
  */
 /*pkg*/ final class FieldPropagationSystem extends GameSystem {
 
+    private static final System.Logger logger = System.getLogger(FieldPropagationSystem.class.getCanonicalName());
+
     public FieldPropagationSystem(GameConfiguration gameConfiguration) {
         super(gameConfiguration);
     }
@@ -37,6 +39,10 @@ import java.util.stream.Collectors;
                 .collect(Collectors.toList());
 
         for (Field fd : fields) {
+
+            logger.log(System.Logger.Level.TRACE, "FIELD) " + fd.getId()
+                    + " From " + location + " " + fd.getStrength());
+
             // First remove all
             world.remove(fd, location);
 
@@ -45,6 +51,9 @@ import java.util.stream.Collectors;
             for (var entry : propagated.entrySet()) {
                 Location propLoc = entry.getKey();
                 Field propField = entry.getValue();
+
+                logger.log(System.Logger.Level.TRACE, "FIELD) " + fd.getId()
+                        + " to " + propLoc + " " + propField.getStrength());
 
                 SetIdentifiableAction set = new SetIdentifiableAction(propLoc, propField);
                 if (set.canExecute(state)) {

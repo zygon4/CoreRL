@@ -317,7 +317,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
             case F3 -> {
                 Field field = new Field(FieldData.get("fd_electricity"), Field.PropagationDirection.EMIT,
                         Field.PropagationStyle.STRAIGHT, Field.PropagationPotency.WEAK,
-                        state.getWorld().getPlayerLocation(), 150);
+                        state.getWorld().getPlayerLocation(), 80);
 
                 Location playerLocation = state.getWorld().getPlayerLocation();
                 Function<Location, Action> getFieldSetFn = (l) -> new SetIdentifiableAction(l, field);
