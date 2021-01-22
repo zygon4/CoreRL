@@ -137,8 +137,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                                 .setName("EXAMINE")
                                 .setHandler(new ActionDirectionInputHandler(
                                         getGameConfiguration(),
-                                        l -> neighborsWithSomething.containsKey(l)
-                                        ? new ExamineAction(l) : null,
+                                        l -> new ExamineAction(l),
                                         state.getWorld().getPlayerLocation()))
                                 .setPrompt(GameState.InputContextPrompt.DIRECTION)
                                 .build()).build();
