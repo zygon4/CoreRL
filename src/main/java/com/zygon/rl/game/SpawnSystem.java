@@ -19,6 +19,8 @@ import java.util.Set;
  */
 public class SpawnSystem extends GameSystem {
 
+    // This can theoretically grow unbounded, or maybe it should very slowly
+    // age out
     private final Set<Location> spawnedLocations = new HashSet<>();
     private final Random random;
 
