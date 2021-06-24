@@ -2,6 +2,7 @@ package com.zygon.rl.world;
 
 import com.zygon.rl.data.Element;
 import com.zygon.rl.data.Identifable;
+import com.zygon.rl.data.Terrain;
 import com.zygon.rl.data.context.Data;
 import com.zygon.rl.util.NoiseUtil;
 import com.zygon.rl.world.character.CharacterSheet;
@@ -67,8 +68,8 @@ public class World {
             return false;
         }
 
-        Entity terrain = getTerrain(destination);
-        if (terrain.hasAttribute(CommonAttributes.IMPASSABLE.name())) {
+        Terrain terrain = getTerrain(destination);
+        if (terrain.getFlag(CommonAttributes.IMPASSABLE.name()) != null) {
             return false;
         }
 
@@ -162,10 +163,7 @@ public class World {
     private static final NoiseUtil terrainNoise = new NoiseUtil(new Random().nextInt(), 1.0, 1.0);
     private static final NoiseUtil npcNoise = new NoiseUtil(new Random().nextInt(), 1.0, 1.0);
 
-    // TODO: this should be completely customizable via json/config
-    // This is also weird because terrain tiles are NOT being set in the world ECS
-    // this is just a convenient way to get tile information.
-    public Entity getTerrain(Location location) {
+    public Terrain getTerrain(Location location) {
         double terrainVal = terrainNoise.getScaledValue(location.getX(), location.getY());
 
         ByteBuffer.wrap(NOISE_BYTES).putDouble(terrainVal);
@@ -173,35 +171,35 @@ public class World {
         int noise = Math.abs(noiseFactor % 9);
 
         if (terrainVal < .4) {
-            return Entities.PUDDLE;
+            return Terrain.Ids.PUDDLE.get();
         } else if (terrainVal < .5) {
             if (noise > 3) {
-                return Entities.DIRT;
+                return Terrain.Ids.DIRT.get();
             } else {
-                return Entities.GRASS;
+                return Terrain.Ids.GRASS.get();
             }
         } else if (terrainVal < .6) {
             if (noise > 4) {
-                return Entities.TALL_GRASS;
+                return Terrain.Ids.TALL_GRASS.get();
             } else if (noise > 2) {
-                return Entities.TREE;
+                return Terrain.Ids.TREE.get();
             } else {
-                return Entities.GRASS;
+                return Terrain.Ids.GRASS.get();
             }
         } else if (terrainVal < .7) {
             if (noise > 3) {
-                return Entities.GRASS;
+                return Terrain.Ids.GRASS.get();
             } else {
-                return Entities.TALL_GRASS;
+                return Terrain.Ids.TALL_GRASS.get();
             }
         } else if (terrainVal < .8) {
             if (noise > 6) {
-                return Entities.TREE;
+                return Terrain.Ids.TREE.get();
             } else {
-                return Entities.DIRT;
+                return Terrain.Ids.DIRT.get();
             }
         } else {
-            return Entities.WALL;
+            return Terrain.Ids.WALL.get();
         }
     }
 

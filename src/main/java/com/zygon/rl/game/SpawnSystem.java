@@ -1,11 +1,10 @@
 package com.zygon.rl.game;
 
+import com.zygon.rl.data.Terrain;
 import com.zygon.rl.data.monster.Monster;
 import com.zygon.rl.data.npc.Npc;
-import com.zygon.rl.world.Entity;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
-import com.zygon.rl.world.WorldTile;
 import com.zygon.rl.world.action.Action;
 import com.zygon.rl.world.action.SummonAction;
 
@@ -55,13 +54,10 @@ public class SpawnSystem extends GameSystem {
                     int noiseY = -20 + random.nextInt(40);
 
                     Location rngLocation = Location.create(location.getX() + noiseX, y + noiseY);
-
-                    Entity entity = world.getTerrain(rngLocation);
-                    WorldTile wt = WorldTile.get(entity);
-
+                    Terrain terrain = world.getTerrain(location);
                     Action summonAction = null;
 
-                    if (wt != WorldTile.PUDDLE) {
+                    if (!terrain.getId().equals(Terrain.Ids.PUDDLE.getId())) {
 
                         String creatureId = null;
 

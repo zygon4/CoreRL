@@ -35,11 +35,6 @@ public class Entities {
             .setDescription("Floor")
             .build();
 
-    public static Entity DIRT = Entity.builder()
-            .setName("DIRT")
-            .setDescription("Dirt")
-            .build();
-
     public static Entity DOOR = Entity.builder()
             .setName("DOOR")
             .setDescription("Door")
@@ -49,25 +44,12 @@ public class Entities {
                     create(CommonAttributes.VIEW_BLOCK.name(), "1.0").build()))
             .build();
 
-    public static Entity GRASS = Entity.builder()
-            .setName("GRASS")
-            .setDescription("Grass")
-            .build();
-
     public static Entity ROCK = Entity.builder()
             .setName("ROCK")
             .setDescription("Rock")
             .setAttributes(getAttributes(
                     create(CommonAttributes.TERRAIN_DIFFICULTY.name(), "0.25").build(),
                     create(CommonAttributes.VIEW_BLOCK.name(), "0.1").build()))
-            .build();
-
-    public static Entity TREE = Entity.builder()
-            .setName("TREE")
-            .setDescription("Tree")
-            .setAttributes(getAttributes(
-                    IMPASSABLE,
-                    create(CommonAttributes.VIEW_BLOCK.name(), "1.0").build()))
             .build();
 
     public static Entity MONSTER = Entity.builder()
@@ -89,28 +71,6 @@ public class Entities {
                     HEALTH,
                     IMPASSABLE,
                     create(CommonAttributes.VIEW_BLOCK.name(), "0.25").build()))
-            .build();
-
-    public static Entity PUDDLE = Entity.builder()
-            .setName("PUDDLE")
-            .setDescription("A puddle")
-            .setAttributes(getAttributes(
-                    create(CommonAttributes.TERRAIN_DIFFICULTY.name(), "0.25").build()))
-            .build();
-
-    public static Entity TALL_GRASS = Entity.builder()
-            .setName("TALL_GRASS")
-            .setDescription("Tall grass")
-            .setAttributes(getAttributes(
-                    create(CommonAttributes.VIEW_BLOCK.name(), "0.10").build()))
-            .build();
-
-    public static Entity WALL = Entity.builder()
-            .setName("WALL")
-            .setDescription("Wall")
-            .setAttributes(getAttributes(
-                    IMPASSABLE,
-                    create(CommonAttributes.VIEW_BLOCK.name(), "1.0").build()))
             .build();
 
     public static Entity WINDOW = Entity.builder()

@@ -22,7 +22,11 @@ public final class ColorUtil {
     }
 
     public static Color get(String name) {
-        return COLORS.get(name).getColor();
+        ColorInfo colorInfo = COLORS.get(name);
+        if (colorInfo == null) {
+            throw new UnsupportedOperationException("Cannot find color: " + name);
+        }
+        return colorInfo.getColor();
     }
 
     /**

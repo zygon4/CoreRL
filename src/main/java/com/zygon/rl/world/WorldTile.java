@@ -6,27 +6,21 @@ import java.util.Map;
 import java.util.function.Function;
 
 /**
+ * TODO: convert to json templating.
  *
- * @author zygon
  */
 public enum WorldTile {
 
     FLOOR(Entities.FLOOR, '.', Color.YELLOW),
-    DIRT(Entities.DIRT, '.', new Color(109, 57, 4, 1)),
     DOOR(Entities.DOOR, ' ', (t) -> {
         Openable openable = new Openable(t);
         return openable.isClosed() ? '+' : '\'';
     }, Color.ORANGE),
-    GRASS(Entities.GRASS, '.', Color.GREEN),
-    TALL_GRASS(Entities.TALL_GRASS, '"', Color.GREEN),
     MONSTER(Entities.MONSTER, ' ', (t) -> {
         return t.hasAttribute(CommonAttributes.NPC.name()) ? 'p' : 'm';
     }, Color.CYAN),
-    PUDDLE(Entities.PUDDLE, '~', Color.BLUE),
     PLAYER(Entities.PLAYER, '@', Color.MAGENTA),
     ROCK(Entities.ROCK, ',', Color.YELLOW),
-    TREE(Entities.TREE, '4', Color.GREEN),
-    WALL(Entities.WALL, '#', Color.DARK_GRAY),
     WINDOW(Entities.WINDOW, ' ', (t) -> {
         Openable openable = new Openable(t);
         return openable.isClosed() ? '*' : '/';

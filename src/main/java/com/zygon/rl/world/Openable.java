@@ -4,6 +4,7 @@ package com.zygon.rl.world;
  *
  * @author zygon
  */
+@Deprecated
 public class Openable extends EntityWrapper {
 
     private final Entity openable;

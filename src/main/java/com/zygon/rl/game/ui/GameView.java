@@ -7,6 +7,7 @@ import com.stewsters.util.shadow.twoDimention.LitMap2d;
 import com.stewsters.util.shadow.twoDimention.ShadowCaster2d;
 import com.zygon.rl.data.Element;
 import com.zygon.rl.data.Identifable;
+import com.zygon.rl.data.Terrain;
 import com.zygon.rl.data.context.Data;
 import com.zygon.rl.game.Game;
 import com.zygon.rl.game.GameState;
@@ -192,7 +193,7 @@ final class GameView extends BaseView {
         }
     }
 
-    static Map<Location, Color> createMiniMap(World world, Location center) {
+    Map<Location, Color> createMiniMap(World world, Location center) {
 
         // round
         Location rounded = Location.create(25 * (Math.round(center.getX() / 25)),
@@ -205,10 +206,9 @@ final class GameView extends BaseView {
             for (int x = rounded.getX() - 200, realX = 0; x < rounded.getX() + 200; x += 25, realX++) {
 
                 Location location = Location.create(x, y);
-                Entity entity = world.getTerrain(location);
-                WorldTile wt = WorldTile.get(entity);
-
-                colorsByLocation.put(Location.create(realX, realY), wt.getColor());
+                Terrain terrain = world.getTerrain(location);
+                Color color = ColorUtil.get(terrain.getColor());
+                colorsByLocation.put(Location.create(realX, realY), color);
             }
         }
 
@@ -436,8 +436,8 @@ final class GameView extends BaseView {
                             gameScreen.draw(objectTile, uiScreenPosition);
                         } else {
                             // 3) Finally draw terrain if nothing is above
-                            Entity terrainEnt = game.getState().getWorld().getTerrain(loc);
-                            gameScreen.draw(toTile(terrainEnt), uiScreenPosition);
+                            Terrain terrain = game.getState().getWorld().getTerrain(loc);
+                            gameScreen.draw(toTile(terrain), uiScreenPosition);
                         }
                     }
 

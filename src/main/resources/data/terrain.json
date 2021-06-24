@@ -1,0 +1,65 @@
+[
+    {
+        "id": "t_dirt",
+        "type": "TERRAIN",
+        "name": "Dirt",
+        "description": "Dirt",
+        "symbol": ".",
+        "color": "Brown"
+    },
+    {
+        "id": "t_grass",
+        "type": "TERRAIN",
+        "name": "Grass",
+        "description": "Some grass",
+        "symbol": ".",
+        "color": "Green"
+    },
+    {
+        "id": "t_tall_grass",
+        "type": "TERRAIN",
+        "name": "Tall grass",
+        "description": "Patches of tall grass",
+        "symbol": "~",
+        "color": "Green",
+        "flags": {
+            "TERRAIN_DIFFICULTY": 0.1,
+            "VIEW_BLOCK": 0.1
+        }
+    },
+    {
+        "id": "t_puddle",
+        "type": "TERRAIN",
+        "name": "Puddle",
+        "description": "A shallow puddle of dirty water",
+        "symbol": "~",
+        "color": "Blue",
+        "flags": {
+            "TERRAIN_DIFFICULTY": 0.25
+        }
+    },
+    {
+        "id": "t_tree",
+        "type": "TERRAIN",
+        "name": "Tree",
+        "description": "A tall tree",
+        "symbol": "4",
+        "color": "Green",
+        "flags": {
+            "IMPASSABLE": "true",
+            "VIEW_BLOCK": 1.0
+        }
+    },
+    {
+        "id": "t_wall",
+        "type": "TERRAIN",
+        "name": "Wall",
+        "description": "Solid rock wall",
+        "symbol": "#",
+        "color": "Gray",
+        "flags": {
+            "IMPASSABLE": "true",
+            "VIEW_BLOCK": 1.0
+        }
+    }
+]

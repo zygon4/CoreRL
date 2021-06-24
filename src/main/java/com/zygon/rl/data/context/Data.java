@@ -2,6 +2,7 @@ package com.zygon.rl.data.context;
 
 import com.zygon.rl.data.Effect;
 import com.zygon.rl.data.Element;
+import com.zygon.rl.data.Terrain;
 import com.zygon.rl.data.field.FieldData;
 import com.zygon.rl.data.items.ArmorData;
 import com.zygon.rl.data.items.Corpse;
@@ -31,6 +32,7 @@ public class Data {
             Monster.load();
             Npc.load();
             Corpse.load();
+            Terrain.load();
         } catch (IOException io) {
             io.printStackTrace(System.err);
             System.exit(1);
@@ -66,6 +68,10 @@ public class Data {
 
         for (var v : Corpse.getAllIds()) {
             elementsById.put(v, Corpse.get(v));
+        }
+
+        for (var v : Terrain.getAllIds()) {
+            elementsById.put(v, Terrain.get(v));
         }
     }
 
