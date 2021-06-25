@@ -16,10 +16,8 @@ import com.zygon.rl.game.TargetingInputHandler;
 import com.zygon.rl.util.Audio;
 import com.zygon.rl.util.ColorUtil;
 import com.zygon.rl.world.Attribute;
-import com.zygon.rl.world.Entity;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
-import com.zygon.rl.world.WorldTile;
 import com.zygon.rl.world.character.CharacterSheet;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -290,15 +288,6 @@ final class GameView extends BaseView {
 
     private Location getPlayerLocation(Game game) {
         return game.getState().getWorld().getPlayerLocation();
-    }
-
-    @Deprecated
-    private Tile toTile(Entity entity) {
-        WorldTile wt = WorldTile.get(entity);
-        return Tile.newBuilder()
-                .withForegroundColor(colorCache.getUnchecked(wt.getColor()))
-                .withCharacter(wt.getGlyph(entity))
-                .buildCharacterTile();
     }
 
     private Tile toTile(Color color, char symbol) {
