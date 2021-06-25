@@ -26,6 +26,7 @@ TODOs:
     - Including magic items
 - Ranged combat
 - Spells
+    - Can use F1-F3 for experimental spells
 
 Can run with:
 ```
