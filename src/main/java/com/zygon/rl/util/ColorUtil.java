@@ -182,14 +182,16 @@ public final class ColorUtil {
 
     private static class ColorInfo {
 
-        public int r, g, b;
-        public String name;
+        private final int r, g, b;
+        private final String name;
+        private final Color color;
 
         public ColorInfo(String name, int r, int g, int b) {
             this.r = r;
             this.g = g;
             this.b = b;
             this.name = name;
+            this.color = new Color(this.r, this.g, this.b);
         }
 
         public int computeMSE(int pixR, int pixG, int pixB) {
@@ -214,7 +216,7 @@ public final class ColorUtil {
         }
 
         public Color getColor() {
-            return new Color(r, g, b);
+            return color;
         }
     }
 }
