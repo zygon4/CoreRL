@@ -9,7 +9,7 @@ Features:
 - Simple melee combat
 - Action command pattern for common action reuse
 - Monster spawns which have aggression and hostile status (ie will attack you)
-- Location class includes path finding, neighbor finding
+- Location utilities includes path finding, neighbor finding
 - Field generation, propagation (ie the basis for spells)
 - JSON templates so more items/monsters can be added easily
 - Example vampire game (src/main/java/com/zygon/rl/game/example/BloodRLMain.java)
