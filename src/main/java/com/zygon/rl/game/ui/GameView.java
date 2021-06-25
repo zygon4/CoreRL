@@ -1,5 +1,6 @@
 package com.zygon.rl.game.ui;
 
+import com.google.common.base.Objects;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -33,6 +34,7 @@ import org.hexworks.zircon.api.component.ComponentAlignment;
 import org.hexworks.zircon.api.component.Header;
 import org.hexworks.zircon.api.component.TextArea;
 import org.hexworks.zircon.api.component.VBox;
+import org.hexworks.zircon.api.data.CharacterTile;
 import org.hexworks.zircon.api.data.Position;
 import org.hexworks.zircon.api.data.Size;
 import org.hexworks.zircon.api.data.Tile;
@@ -76,6 +78,8 @@ final class GameView extends BaseView {
                     return GameUI.convert(key);
                 }
             });
+    // Not too many of these I hope.
+    private final Map<Integer, CharacterTile> tileCache = new HashMap<>();
 
     private final TileGrid tileGrid;
     private final FOVHelper fovHelper;
@@ -290,11 +294,23 @@ final class GameView extends BaseView {
         return game.getState().getWorld().getPlayerLocation();
     }
 
-    private Tile toTile(Color color, char symbol) {
-        return Tile.newBuilder()
+    private CharacterTile toTile(Color color, char symbol) {
+        int hashCode = Objects.hashCode(color, symbol);
+        CharacterTile cached = tileCache.get(hashCode);
+
+        if (cached != null) {
+            return cached;
+        }
+
+        CharacterTile tile = Tile.newBuilder()
                 .withForegroundColor(colorCache.getUnchecked(color))
                 .withCharacter(symbol)
                 .buildCharacterTile();
+
+        // Cache tiles
+        tileCache.put(hashCode, tile);
+
+        return tile;
     }
 
     private Tile toTile(Element element) {
