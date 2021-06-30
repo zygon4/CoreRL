@@ -6,6 +6,8 @@ import java.util.function.BiFunction;
  * This is the primary entry point for inputs. It peeks at the top of the
  * context stack and calls the handler.
  *
+ * Does this need to exist? Could this functionality live in Game?
+ *
  * @author zygon
  */
 public final class InputHandler implements BiFunction<GameState, Input, GameState> {
