@@ -20,7 +20,7 @@
         "type": "TERRAIN",
         "name": "Tall grass",
         "description": "Patches of tall grass",
-        "symbol": "~",
+        "symbol": ",",
         "color": "Green",
         "flags": {
             "TERRAIN_DIFFICULTY": 0.1,
