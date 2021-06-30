@@ -74,7 +74,6 @@ public class Terrain extends Element {
     }
 
     private Map<String, Object> flags;
-    // TODO: future add sound effects
 
     public Map<String, Object> getFlags() {
         return flags;
