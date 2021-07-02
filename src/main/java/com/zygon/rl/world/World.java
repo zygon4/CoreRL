@@ -181,7 +181,7 @@ public class World {
         } else if (terrainVal < .6) {
             if (noise > 4) {
                 return Terrain.Ids.TALL_GRASS.get();
-            } else if (noise > 2) {
+            } else if (noise > 3) {
                 return Terrain.Ids.TREE.get();
             } else {
                 return Terrain.Ids.GRASS.get();
