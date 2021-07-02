@@ -301,16 +301,22 @@ final class GameView extends BaseView {
 
     private void updateGameScreen(Game game) {
 
-        GameState.InputContext inputCtx = game.getState().getInputContext().peek();
+        GameState.InputContext inputCtx = game.getState()
+                .getInputContext().firstElement();
 
-        // Clear the renders not associated with the current context
-        componentRenderersByPrompt.forEach((p, r) -> {
-            if (p != inputCtx.getPrompt()) {
-                r.clear();
-            }
-        });
+        // This is a HACK and show that the direction handlers need better
+        // integration with the rendering, when should we clear?
+        if (inputCtx.getPrompt() != GameState.InputContextPrompt.DIRECTION) {
+            // Clear the renders not associated with the current context
+            componentRenderersByPrompt.forEach((p, r) -> {
+                if (p != inputCtx.getPrompt()) {
+                    r.clear();
+                }
+            });
+        }
 
-        GameComponentRenderer gameComponentRenderer = componentRenderersByPrompt.get(inputCtx.getPrompt());
+        GameComponentRenderer gameComponentRenderer
+                = componentRenderersByPrompt.get(inputCtx.getPrompt());
         if (gameComponentRenderer != null) {
             gameComponentRenderer.render(game.getState());
         }
