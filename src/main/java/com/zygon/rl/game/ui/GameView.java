@@ -1,19 +1,13 @@
 package com.zygon.rl.game.ui;
 
-import com.google.common.base.Objects;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.stewsters.util.shadow.twoDimention.LitMap2d;
-import com.stewsters.util.shadow.twoDimention.ShadowCaster2d;
-import com.zygon.rl.data.Element;
-import com.zygon.rl.data.Identifable;
 import com.zygon.rl.data.Terrain;
 import com.zygon.rl.data.context.Data;
 import com.zygon.rl.game.Game;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.game.Input;
-import com.zygon.rl.game.TargetingInputHandler;
 import com.zygon.rl.util.Audio;
 import com.zygon.rl.util.ColorUtil;
 import com.zygon.rl.world.Attribute;
@@ -34,7 +28,6 @@ import org.hexworks.zircon.api.component.ComponentAlignment;
 import org.hexworks.zircon.api.component.Header;
 import org.hexworks.zircon.api.component.TextArea;
 import org.hexworks.zircon.api.component.VBox;
-import org.hexworks.zircon.api.data.CharacterTile;
 import org.hexworks.zircon.api.data.Position;
 import org.hexworks.zircon.api.data.Size;
 import org.hexworks.zircon.api.data.Tile;
@@ -49,11 +42,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -66,7 +57,7 @@ final class GameView extends BaseView {
 
     private static final int SIDEBAR_SCREEN_WIDTH = 18;
     // TODO: support for different kinds of extra-sensory vision
-    private static final Tile BLANK_TILE = Tile.newBuilder()
+    private static final Tile BLACK_TILE = Tile.newBuilder()
             .withBackgroundColor(ANSITileColor.BLACK)
             .withForegroundColor(ANSITileColor.BLACK)
             .buildCharacterTile();
@@ -78,14 +69,11 @@ final class GameView extends BaseView {
                     return GameUI.convert(key);
                 }
             });
-    // Not too many of these I hope.
-    private final Map<Integer, CharacterTile> tileCache = new HashMap<>();
+
+    private final Map<GameState.InputContextPrompt, GameComponentRenderer> componentRenderersByPrompt = new HashMap<>();
 
     private final TileGrid tileGrid;
-    private final FOVHelper fovHelper;
-
     private Game game;
-    private Layer gameScreenLayer = null;
     private SideBar sideBar = null;
     private Layer miniMapLayer = null;
     private boolean initialized = false;
@@ -93,7 +81,6 @@ final class GameView extends BaseView {
     public GameView(TileGrid tileGrid, ColorTheme colorTheme, Game game) {
         super(tileGrid, colorTheme);
         this.tileGrid = tileGrid;
-        this.fovHelper = new FOVHelper(game.getState().getWorld());
         this.game = game;
     }
 
@@ -131,12 +118,23 @@ final class GameView extends BaseView {
                     .build();
             getScreen().addLayer(miniMapLayer);
 
-            gameScreenLayer = Layer.newBuilder()
+            Layer gameScreenLayer = Layer.newBuilder()
                     .withSize(gameScreen.getSize())
                     .build();
             getScreen().addLayer(gameScreenLayer);
 
-            updateGameScreen(gameScreenLayer, game);
+            componentRenderersByPrompt.put(GameState.InputContextPrompt.PRIMARY,
+                    new OuterWorldRenderer(gameScreenLayer, game, colorCache));
+
+            Layer inventoryLayer = Layer.newBuilder()
+                    .withSize(gameScreen.getSize())
+                    .build();
+            getScreen().addLayer(inventoryLayer);
+
+            componentRenderersByPrompt.put(GameState.InputContextPrompt.INVENTORY,
+                    new InventoryRenderer(inventoryLayer));
+
+            updateGameScreen(game);
             updateSideBar(sideBar, game);
             updateMiniMap(miniMapLayer, game);
 
@@ -157,7 +155,7 @@ final class GameView extends BaseView {
                                 + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - turnStart));
 
                         long updateGameScreen = System.nanoTime();
-                        updateGameScreen(gameScreenLayer, game);
+                        updateGameScreen(game);
                         logger.log(System.Logger.Level.TRACE, "game screen (ms) "
                                 + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - updateGameScreen));
 
@@ -195,7 +193,7 @@ final class GameView extends BaseView {
         }
     }
 
-    Map<Location, Color> createMiniMap(World world, Location center) {
+    private Map<Location, Color> createMiniMap(World world, Location center) {
 
         // round
         Location rounded = Location.create(25 * (Math.round(center.getX() / 25)),
@@ -238,83 +236,12 @@ final class GameView extends BaseView {
                 playerName);
     }
 
-    private static int getFoVForce(Game game) {
-        // casting is sad but it's safe
-        int hour = (int) game.getState().getWorld().getCalendar().getHourOfDay();
-        int fov = 0;
-        // Can possibly do some clever math to convert the hour so it can
-        // be used with a single switch value. Maybe if x > 12 ? 24 - x : x
-        switch (hour) {
-            case 11, 12 -> {
-                fov = 50;
-            }
-            case 10, 13 -> {
-                fov = 50;
-            }
-            case 9, 14 -> {
-                fov = 50;
-            }
-            case 8, 15 -> {
-                fov = 45;
-            }
-            case 7, 16 -> {
-                fov = 40;
-            }
-            case 6, 17 -> {
-                fov = 30;
-            }
-            case 5, 18 -> {
-                fov = 20;
-            }
-            case 4, 19 -> {
-                fov = 15;
-            }
-            case 3, 20 -> {
-                fov = 10;
-            }
-            case 2, 21 -> {
-                fov = 7;
-            }
-            case 1, 22 -> {
-                fov = 5;
-            }
-            case 0, 23 -> {
-                fov = 2;
-            }
-        }
-        // TODO: modified by character stats, status, traits
-        return fov;
-    }
-
     private CharacterSheet getPlayer(Game game) {
         return game.getState().getWorld().getPlayer();
     }
 
     private Location getPlayerLocation(Game game) {
         return game.getState().getWorld().getPlayerLocation();
-    }
-
-    private CharacterTile toTile(Color color, char symbol) {
-        int hashCode = Objects.hashCode(color, symbol);
-        CharacterTile cached = tileCache.get(hashCode);
-
-        if (cached != null) {
-            return cached;
-        }
-
-        CharacterTile tile = Tile.newBuilder()
-                .withForegroundColor(colorCache.getUnchecked(color))
-                .withCharacter(symbol)
-                .buildCharacterTile();
-
-        // Cache tiles
-        tileCache.put(hashCode, tile);
-
-        return tile;
-    }
-
-    private Tile toTile(Element element) {
-        return toTile(ColorUtil.get(element.getColor()), element.getSymbol().charAt(0));
     }
 
     private void updateSideBar(SideBar sideBar, Game game) {
@@ -370,96 +297,20 @@ final class GameView extends BaseView {
         logArea.setText(collect);
     }
 
-    private void updateGameScreen(Layer gameScreen, Game game) {
-        Location playerLocation = getPlayerLocation(game);
-        int xHalf = gameScreen.getSize().getWidth() / 2;
-        int yHalf = gameScreen.getSize().getHeight() / 2;
+    private void updateGameScreen(Game game) {
 
         GameState.InputContext inputCtx = game.getState().getInputContext().peek();
 
-        Location target = null;
-        Predicate<Location> isOnTargetPath = null;
-        if (inputCtx.getName().equals("TARGET")) {
-            // Casting is evil but shielding with a Predicate
-            TargetingInputHandler lookHandler = (TargetingInputHandler) inputCtx.getHandler();
-            target = lookHandler.getTargetLocation();
-            isOnTargetPath = (l) -> lookHandler.isOnPath(l);
-        }
-
-        // Note these are zero-based
-        float[][] lightResistances = fovHelper.generateSimpleResistances(
-                Location.create(playerLocation.getX() - xHalf, playerLocation.getY() - yHalf),
-                Location.create(playerLocation.getX() + xHalf, playerLocation.getY() + yHalf));
-        LitMap2d lightMap = new LitMap2DImpl(lightResistances);
-        ShadowCaster2d shadowCaster = new ShadowCaster2d(lightMap);
-        long fovForce = getFoVForce(game);
-
-        try {
-            shadowCaster.recalculateFOV(lightMap.getXSize() / 2, lightMap.getYSize() / 2, fovForce, .5f);
-        } catch (java.lang.ArrayIndexOutOfBoundsException aioob) {
-            throw new RuntimeException(aioob);
-        }
-        // zircon is BOTTOM-LEFT oriented
-        // starting with 1 because of the border
-        for (int y = 1; y < gameScreen.getHeight() - 1; y++) {
-            for (int x = 1; x < gameScreen.getWidth() - 1; x++) {
-                int getX = playerLocation.getX() - xHalf + x;
-                int getY = playerLocation.getY() + yHalf - y;
-                double locationLightLevelPct = 1.0;
-
-                try {
-                    if (x < lightMap.getXSize() && y < lightMap.getYSize()) {
-                        locationLightLevelPct = lightMap.getLight(x, y);
-                    }
-                } catch (java.lang.ArrayIndexOutOfBoundsException ex) {
-                    throw new RuntimeException(ex);
-                }
-
-                // TODO: simple caching needs performance testing
-                Position uiScreenPosition = Position.create(x, y);
-                Location loc = Location.create(getX, getY);
-
-                Element actor = game.getState().getWorld().get(loc);
-
-                if (locationLightLevelPct > .25) {
-
-                    // Just draw from top to bottom whatever item/actor is available
-                    // 1) Draw actor if available
-                    if (actor != null) {
-                        Tile actorTile = toTile(actor);
-                        gameScreen.draw(actorTile, uiScreenPosition);
-                    } else {
-
-                        List<Identifable> staticObjectIds = game.getState().getWorld().getAll(loc, null);
-                        Element object = !staticObjectIds.isEmpty()
-                                ? Data.get(staticObjectIds.get(0).getId()) : null;
-
-                        // 2) Next draw item if available
-                        if (object != null) {
-                            // Would be nice to use sprites eventually..
-                            Tile objectTile = toTile(object);
-                            gameScreen.draw(objectTile, uiScreenPosition);
-                        } else {
-                            // 3) Finally draw terrain if nothing is above
-                            Terrain terrain = game.getState().getWorld().getTerrain(loc);
-                            gameScreen.draw(toTile(terrain), uiScreenPosition);
-                        }
-                    }
-
-                    // Overlay path/targeting, should be a layering/transparent effect
-                    Tile targetTile = null;
-                    if (target != null && loc.equals(target)) {
-                        targetTile = toTile(Color.WHITE, 'O');
-                    } else if (isOnTargetPath != null && isOnTargetPath.test(loc)) {
-                        targetTile = toTile(Color.WHITE, '#');
-                    }
-                    if (targetTile != null) {
-                        gameScreen.draw(targetTile, uiScreenPosition);
-                    }
-                } else {
-                    gameScreen.draw(BLANK_TILE, uiScreenPosition);
-                }
+        // Clear the renders not associated with the current context
+        componentRenderersByPrompt.forEach((p, r) -> {
+            if (p != inputCtx.getPrompt()) {
+                r.clear();
             }
+        });
+
+        GameComponentRenderer gameComponentRenderer = componentRenderersByPrompt.get(inputCtx.getPrompt());
+        if (gameComponentRenderer != null) {
+            gameComponentRenderer.render(game.getState());
         }
     }
 
@@ -469,7 +320,7 @@ final class GameView extends BaseView {
         for (Location loc : miniMapLocations.keySet()) {
             Color color = miniMapLocations.get(loc);
             TileColor tileColor = colorCache.getUnchecked(color);
-            Tile tile = BLANK_TILE.createCopy().withBackgroundColor(tileColor)
+            Tile tile = BLACK_TILE.createCopy().withBackgroundColor(tileColor)
                     .withForegroundColor(ANSITileColor.BRIGHT_CYAN);
             Position offset = Position.create(loc.getX(), loc.getY());
 

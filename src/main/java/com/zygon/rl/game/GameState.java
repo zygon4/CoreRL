@@ -12,11 +12,27 @@ import java.util.Stack;
  */
 public class GameState {
 
+    // I think the real end game will be a more customized way to view.
+    // The game state tells us more specifically what should be rendered
+    // and how PLUS the inputs. This "prompt" feels like a bit of hack,
+    // or leaky.
+    // Maybe just broad names like
+    // "inventory" - show inv
+    // "primary" - game screen (map)
+    // "abilities" - show abilities
+    // "status" - show full status
     public static enum InputContextPrompt {
+        @Deprecated
         DIRECTION,
+        @Deprecated
         LIST,
+        @Deprecated
         MODAL,
-        NONE
+        @Deprecated
+        NONE,
+        // Starting the above idea here:
+        INVENTORY,
+        PRIMARY
     }
 
     // TODO: This is going to need to hold more info to teach outsiders how to
@@ -95,6 +111,7 @@ public class GameState {
             stackCopy.add(GameState.InputContext.builder()
                     .setName("DEFAULT")
                     .setHandler(new DefaultOuterInputHandler(builder.gameConfiguration))
+                    .setPrompt(InputContextPrompt.PRIMARY)
                     .build());
         }
         this.turnCount = builder.turnCount;

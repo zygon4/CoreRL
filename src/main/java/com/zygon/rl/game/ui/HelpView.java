@@ -68,7 +68,7 @@ final class HelpView extends BaseView {
                     .addHeader("x               - look around", false)
                     .addHeader("esc             - game menu", false)
                     .build());
-            getScreen().openModal(new Dialog(getScreen(), modalPanel));
+            getScreen().openModal(new Dialog(getScreen().getSize(), modalPanel));
             return UIEventResponse.processed();
         });
 

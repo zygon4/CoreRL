@@ -229,10 +229,23 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                         .map(item -> item.getName() + " " + item.getDescription())
                         .collect(Collectors.joining("\n")));
 
+                // TODO: remove and show in inv screen
                 System.out.println(eqSb.toString());
-                // TODO: use built-in modals/lists. THis is esspecially important
-                // because this style of context interaction won't cause a pause
-                // for the game so you'll get hit while using a menu. This is bad.
+                CharacterSheet player = state.getWorld().getPlayer();
+
+                // This type of "pass me in" is going to happen at least a few times..
+                InventoryInputHandler inventoryHandler = InventoryInputHandler.create(
+                        getGameConfiguration(), player.getInventory(), state.getInputContext().peek());
+
+                // Remove current context, add inventory
+                copy.removeInputContext()
+                        .addInputContext(
+                                GameState.InputContext.builder()
+                                        .setName("INVENTORY")
+                                        .setHandler(inventoryHandler)
+                                        .setPrompt(GameState.InputContextPrompt.INVENTORY)
+                                        .build());
+
             }
             case NUMPAD_5, DIGIT_5 -> {
                 // TODO: wait action
