@@ -14,8 +14,6 @@ import com.zygon.rl.world.action.GetItemAction;
 import com.zygon.rl.world.action.MeleeAttackAction;
 import com.zygon.rl.world.action.SetIdentifiableAction;
 import com.zygon.rl.world.character.CharacterSheet;
-import com.zygon.rl.world.character.Equipment;
-import com.zygon.rl.world.character.Weapon;
 import org.apache.commons.math3.util.Pair;
 import org.hexworks.zircon.api.uievent.KeyCode;
 
@@ -195,42 +193,6 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
             }
             // ability - present abilities
             case KEY_I -> {
-                CharacterSheet character = state.getWorld().getPlayer();
-                Equipment eq = character.getEquipment();
-
-                StringBuilder eqSb = new StringBuilder();
-
-                List<Weapon> weapons = eq.getWeapons();
-
-                eqSb.append("EQUIPMENT:\n");
-
-                if (weapons.size() > 0) {
-                    Weapon rWeap = weapons.get(0);
-                    if (rWeap != null) {
-                        eqSb.append("[RIGHT HAND] ").append(rWeap).append("\n");
-                    }
-                }
-
-                if (weapons.size() > 1) {
-                    Weapon lWeap = weapons.get(1);
-                    if (lWeap != null) {
-                        eqSb.append("[LEFT HAND] ").append(lWeap).append("\n");
-                    }
-                }
-
-                eqSb.append(character.getEquipment().getEquipmentBySlot().entrySet().stream()
-                        .map(slot -> slot.getValue().stream().map(armor -> slot.getKey().getName() + " - " + armor.getName() + " - " + armor.getDescription())
-                        .collect(Collectors.joining("  \n")))
-                        .collect(Collectors.joining("\n")));
-
-                eqSb.append("\nINVENTORY:\n");
-
-                eqSb.append(character.getInventory().getItems().stream()
-                        .map(item -> item.getName() + " " + item.getDescription())
-                        .collect(Collectors.joining("\n")));
-
-                // TODO: remove and show in inv screen
-                System.out.println(eqSb.toString());
                 CharacterSheet player = state.getWorld().getPlayer();
 
                 // This type of "pass me in" is going to happen at least a few times..

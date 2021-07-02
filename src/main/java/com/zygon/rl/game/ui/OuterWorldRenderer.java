@@ -1,6 +1,5 @@
 package com.zygon.rl.game.ui;
 
-import com.google.common.cache.LoadingCache;
 import com.stewsters.util.shadow.twoDimention.LitMap2d;
 import com.stewsters.util.shadow.twoDimention.ShadowCaster2d;
 import com.zygon.rl.data.Element;
@@ -12,17 +11,12 @@ import com.zygon.rl.game.GameState;
 import com.zygon.rl.game.TargetingInputHandler;
 import com.zygon.rl.util.ColorUtil;
 import com.zygon.rl.world.Location;
-import org.hexworks.zircon.api.color.ANSITileColor;
-import org.hexworks.zircon.api.color.TileColor;
-import org.hexworks.zircon.api.data.CharacterTile;
 import org.hexworks.zircon.api.data.Position;
 import org.hexworks.zircon.api.data.Tile;
 import org.hexworks.zircon.api.graphics.Layer;
 
 import java.awt.Color;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 
@@ -32,24 +26,16 @@ import java.util.function.Predicate;
  */
 public class OuterWorldRenderer implements GameComponentRenderer {
 
-    private static final Tile BLACK_TILE = Tile.newBuilder()
-            .withBackgroundColor(ANSITileColor.BLACK)
-            .withForegroundColor(ANSITileColor.BLACK)
-            .buildCharacterTile();
-
-    // Not too many of these I hope.
-    private final Map<Integer, CharacterTile> tileCache = new HashMap<>();
-
     private final Layer gameScreenLayer;
     private final FOVHelper fovHelper;
-    private final LoadingCache<Color, TileColor> colorCache;
+    private final RenderUtil renderUtil;
 
-    public OuterWorldRenderer(Layer gameScreenLayer, Game game, LoadingCache<Color, TileColor> colorCache) {
+    public OuterWorldRenderer(Layer gameScreenLayer, Game game, RenderUtil renderUtil) {
         this.gameScreenLayer = Objects.requireNonNull(gameScreenLayer);
         // Just needs world for the noise/terrain function. Would prefer something
         // less heavy.
         this.fovHelper = new FOVHelper(game.getState().getWorld());
-        this.colorCache = Objects.requireNonNull(colorCache);
+        this.renderUtil = Objects.requireNonNull(renderUtil);
     }
 
     @Override
@@ -137,15 +123,15 @@ public class OuterWorldRenderer implements GameComponentRenderer {
                     // Overlay path/targeting, should be a layering/transparent effect
                     Tile targetTile = null;
                     if (target != null && loc.equals(target)) {
-                        targetTile = toTile(Color.WHITE, 'O');
+                        targetTile = renderUtil.toTile(Color.WHITE, 'O');
                     } else if (isOnTargetPath != null && isOnTargetPath.test(loc)) {
-                        targetTile = toTile(Color.WHITE, '#');
+                        targetTile = renderUtil.toTile(Color.WHITE, '#');
                     }
                     if (targetTile != null) {
                         gameScreenLayer.draw(targetTile, uiScreenPosition);
                     }
                 } else {
-                    gameScreenLayer.draw(BLACK_TILE, uiScreenPosition);
+                    gameScreenLayer.draw(RenderUtil.BLACK_TILE, uiScreenPosition);
                 }
             }
         }
@@ -204,26 +190,6 @@ public class OuterWorldRenderer implements GameComponentRenderer {
     }
 
     private Tile toTile(Element element) {
-        return toTile(ColorUtil.get(element.getColor()), element.getSymbol().charAt(0));
-    }
-
-    private CharacterTile toTile(Color color, char symbol) {
-        //Assuming generating this hash is faster than creating a tile, GC'ing it.
-        int hashCode = com.google.common.base.Objects.hashCode(color, symbol);
-        CharacterTile cached = tileCache.get(hashCode);
-
-        if (cached != null) {
-            return cached;
-        }
-
-        CharacterTile tile = Tile.newBuilder()
-                .withForegroundColor(colorCache.getUnchecked(color))
-                .withCharacter(symbol)
-                .buildCharacterTile();
-
-        // Cache tiles
-        tileCache.put(hashCode, tile);
-
-        return tile;
+        return renderUtil.toTile(ColorUtil.get(element.getColor()), element.getSymbol().charAt(0));
     }
 }

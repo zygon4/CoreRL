@@ -123,8 +123,10 @@ final class GameView extends BaseView {
                     .build();
             getScreen().addLayer(gameScreenLayer);
 
+            RenderUtil renderUtil = new RenderUtil(colorCache);
+
             componentRenderersByPrompt.put(GameState.InputContextPrompt.PRIMARY,
-                    new OuterWorldRenderer(gameScreenLayer, game, colorCache));
+                    new OuterWorldRenderer(gameScreenLayer, game, renderUtil));
 
             Layer inventoryLayer = Layer.newBuilder()
                     .withSize(gameScreen.getSize())
@@ -132,7 +134,7 @@ final class GameView extends BaseView {
             getScreen().addLayer(inventoryLayer);
 
             componentRenderersByPrompt.put(GameState.InputContextPrompt.INVENTORY,
-                    new InventoryRenderer(inventoryLayer));
+                    new InventoryRenderer(inventoryLayer, renderUtil));
 
             updateGameScreen(game);
             updateSideBar(sideBar, game);
