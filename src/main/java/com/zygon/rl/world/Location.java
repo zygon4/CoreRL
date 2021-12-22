@@ -6,6 +6,7 @@ import com.stewsters.util.pathing.twoDimention.pathfinder.AStarPathFinder2d;
 import com.stewsters.util.pathing.twoDimention.shared.BoundingBox2d;
 import org.apache.commons.math3.util.Pair;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -68,6 +69,17 @@ public class Location {
         total += Math.pow(this.z - o.z, 2);
 
         return Math.sqrt(total);
+    }
+
+    /**
+     * Returns a straight line to the target without any notion of traversal or
+     * path finding.
+     *
+     * @param to
+     * @return
+     */
+    public List<Location> getLine(final Location to) {
+        return getSuperCoverLine(this, to);
     }
 
     public List<Location> getPath(final Location to, Function<Location, Boolean> canTraverse) {
@@ -245,6 +257,38 @@ public class Location {
 
     private static String getDisplay(int x, int y, int z) {
         return "[" + x + "," + y + "," + z + "]";
+    }
+
+    // This is a line, not a search algorithm, suitable for straight line targetting.
+    // From https://www.redblobgames.com/grids/line-drawing.html
+    private List<Location> getSuperCoverLine(Location p0, Location p1) {
+        double dx = p1.getX() - p0.getX(), dy = p1.getY() - p0.getY();
+        double nx = Math.abs(dx), ny = Math.abs(dy);
+        int sign_x = dx > 0 ? 1 : -1, sign_y = dy > 0 ? 1 : -1;
+
+        Location p = Location.create(p0.getX(), p0.getY());
+        List<Location> points = new ArrayList<>();
+        points.add(Location.create(p.getX(), p.getY()));
+
+        for (double ix = 0, iy = 0; ix < nx || iy < ny;) {
+            double decision = (1 + 2 * ix) * ny - (1 + 2 * iy) * nx;
+            if (decision == 0) {
+                // next step is diagonal
+                p = Location.create(p.getX() + sign_x, p.getY() + sign_y);
+                ix++;
+                iy++;
+            } else if (decision < 0) {
+                // next step is horizontal
+                p = Location.create(p.getX() + sign_x, p.getY());
+                ix++;
+            } else {
+                // next step is vertical
+                p = Location.create(p.getX(), p.getY() + sign_y);
+                iy++;
+            }
+            points.add(Location.create(p.getX(), p.getY()));
+        }
+        return points;
     }
 
     // To project against the box size and become a value between 0-49

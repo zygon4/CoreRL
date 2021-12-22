@@ -34,7 +34,7 @@ public class TargetingInputHandler extends DirectionInputHandler {
                 ? targetLocation : getCentralLocation();
 
         if (!this.targetLocation.equals(getCentralLocation())) {
-            targetPath.addAll(getCentralLocation().getPath(this.targetLocation).stream()
+            targetPath.addAll(getCentralLocation().getLine(this.targetLocation).stream()
                     .collect(Collectors.toSet()));
         }
 
