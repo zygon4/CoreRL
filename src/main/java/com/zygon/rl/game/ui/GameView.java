@@ -16,7 +16,6 @@ import com.zygon.rl.world.World;
 import com.zygon.rl.world.character.CharacterSheet;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import org.apache.commons.text.WordUtils;
 import org.hexworks.zircon.api.Components;
 import org.hexworks.zircon.api.Functions;
 import org.hexworks.zircon.api.behavior.TextOverride;
@@ -228,7 +227,7 @@ final class GameView extends BaseView {
                 .withSize(SIDEBAR_SCREEN_WIDTH - 2, 5).build());
         // TODO: full screen log area (view?) to see/search all
         componentsByName.put("log", Components.textArea()
-                .withSize(SIDEBAR_SCREEN_WIDTH - 2, 20)
+                .withSize(SIDEBAR_SCREEN_WIDTH - 2, 25)
                 .build());
 
         String playerName = getPlayer(game).getName();
@@ -291,9 +290,8 @@ final class GameView extends BaseView {
         // TODO: log area is SLOW so use text area
         TextArea logArea = (TextArea) componentsByName.get("log");
 
-        // TODO: doesn't wrap, need to insert newlines?
+        // Doesn't wrap, need to insert newlines!
         String collect = game.getState().getLog().getRecent(10).stream()
-                .map(log -> WordUtils.wrap(log, SIDEBAR_SCREEN_WIDTH - 2, null, true))
                 .collect(Collectors.joining("\n"));
 
         logArea.setText(collect);
