@@ -35,8 +35,8 @@ public class ExamineAction extends Action {
         if (allElements.isEmpty()) {
             examineLog = "There is nothing to examine.";
         } else {
-            examineLog = allElements.stream()
-                    .map(e -> e.getName() + ") " + e.getDescription())
+            examineLog = "You see:\n" + allElements.stream()
+                    .map(e -> " - " + e.getName())
                     .collect(Collectors.joining("\n"));
         }
 
