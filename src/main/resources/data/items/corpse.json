@@ -4,8 +4,8 @@
         "type": "CORPSE",
         "symbol": "x",
         "color": "Crimson",
-        "name": "Corpse of ",
-        "description": "A corpse",
+        "name": "Corpse",
+        "description": "A dead thing",
         "weight": 12
     }
 ]
