@@ -30,6 +30,8 @@ dependencies {
     implementation("org.hexworks.zircon:zircon.jvm.libgdx:2020.2.0-RELEASE")
 
     // Use JUnit test framework
+    // For SOME reason it's required to be on the regular compile classpath, not sure why
+    implementation("junit:junit:4.13")
     testImplementation("junit:junit:4.13")
 }
 
