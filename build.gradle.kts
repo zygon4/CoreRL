@@ -25,9 +25,9 @@ dependencies {
 
     implementation("commons-io:commons-io:2.8.0")
 
-    implementation("org.hexworks.zircon:zircon.core-jvm:2020.2.0-RELEASE")
-    implementation("org.hexworks.zircon:zircon.jvm.swing:2020.2.0-RELEASE")
-    implementation("org.hexworks.zircon:zircon.jvm.libgdx:2020.2.0-RELEASE")
+    implementation("org.hexworks.zircon:zircon.core-jvm:2021.1.0-RELEASE")
+    implementation("org.hexworks.zircon:zircon.jvm.swing:2021.1.0-RELEASE")
+    implementation("org.hexworks.zircon:zircon.jvm.libgdx:2021.1.0-RELEASE")
 
     // Use JUnit test framework
     // For SOME reason it's required to be on the regular compile classpath, not sure why
