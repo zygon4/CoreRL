@@ -12,6 +12,7 @@ import com.zygon.rl.world.action.DropItemAction;
 import com.zygon.rl.world.action.ExamineAction;
 import com.zygon.rl.world.action.GetItemAction;
 import com.zygon.rl.world.action.MeleeAttackAction;
+import com.zygon.rl.world.action.MoveAction;
 import com.zygon.rl.world.action.SetIdentifiableAction;
 import com.zygon.rl.world.character.CharacterSheet;
 import org.apache.commons.math3.util.Pair;
@@ -224,7 +225,10 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
 
                 Location destination = getRelativeLocation(playerLocation, input);
                 if (state.getWorld().canMove(destination)) {
-                    state.getWorld().move(player, playerLocation, destination);
+                    MoveAction moveAction = new MoveAction(player.getId(), playerLocation, destination);
+                    if (moveAction.canExecute(state)) {
+                        moveAction.execute(state);
+                    }
                 } else {
                     // TODO: bump to interact
                     CharacterSheet interactable = state.getWorld().get(destination);
