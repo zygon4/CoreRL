@@ -1,0 +1,26 @@
+[
+    {
+        "id": "t_door_closed",
+        "type": "DOOR",
+        "name": "Door",
+        "description": "Solid wood door closed shut",
+        "symbol": "+",
+        "color": "Brown",
+        "flags": {
+            "IMPASSABLE": true,
+            "CLOSED": true,
+            "VIEW_BLOCK": 1.0
+        }
+    },
+    {
+        "id": "t_door_open",
+        "type": "DOOR",
+        "name": "Door",
+        "description": "Open door",
+        "symbol": "/",
+        "color": "Brown",
+        "flags": {
+            "VIEW_BLOCK": 0.1
+        }
+    }
+]

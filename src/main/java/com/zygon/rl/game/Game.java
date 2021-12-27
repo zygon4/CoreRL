@@ -66,7 +66,7 @@ public final class Game {
                             + newState.getTurnCount() + " turns in the world of "
                             + getConfiguration().getGameName();
 
-                    // TODO: print nicely to screen
+                    // TODO: print nicely to screen, go to main menu
                     System.out.println(deathMessage);
                     System.exit(0);
                 }

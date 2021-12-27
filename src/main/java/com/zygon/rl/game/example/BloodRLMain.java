@@ -1,5 +1,5 @@
 /*
- * 
+ *
  */
 package com.zygon.rl.game.example;
 
@@ -24,7 +24,6 @@ import com.zygon.rl.world.character.Armor;
 import com.zygon.rl.world.character.CharacterSheet;
 import com.zygon.rl.world.character.Stats;
 import com.zygon.rl.world.character.Status;
-import com.zygon.rl.world.character.StatusEffect;
 import com.zygon.rl.world.character.Weapon;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -35,6 +34,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
@@ -149,6 +149,7 @@ public class BloodRLMain {
 
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
             e.printStackTrace(System.err);
+            System.exit(1);
         });
 
         String strTmp = System.getProperty("java.io.tmpdir");
@@ -181,13 +182,15 @@ public class BloodRLMain {
         abilities.add(drainBlood);
         abilities.add(summonFamiliar);
 
-        Effect effect = Effect.get("effect_terror");
-
-        Element eleTemplate = new Element("player", "player", "@", "PaleVioletRed", "Alucard", "He's cool");
+        // Not using right now
+//        Effect effect = Effect.get("effect_terror");
+//        StatusEffect statusEffect = new StatusEffect(effect);
+//
+        Element eleTemplate = new Element("player", "player", "@", "PaleVioletRed", "Alucard", "He's cool but moody", Map.of());
         CharacterSheet pc = new CharacterSheet(
-                new Creature(eleTemplate, Species.MAMMAL.name(), 100, 120, 100, Set.of()),
+                new Creature(eleTemplate, Species.MAMMAL.name(), 100, 120, 100),
                 new Stats(16, 16, 14, 12, 12, 16),
-                new Status(19, 100, Set.of(new StatusEffect(effect))),
+                new Status(19, 100, Set.of()),
                 null,
                 null,
                 abilities,

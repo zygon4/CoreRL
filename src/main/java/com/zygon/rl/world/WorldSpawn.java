@@ -6,7 +6,11 @@ package com.zygon.rl.world;
  */
 public interface WorldSpawn {
 
-    default int getFrequency() {
+    default int getLivingSpawnFrequency() {
         return 50;
+    }
+
+    default int getCityBuildingDistance() {
+        return 20;
     }
 }

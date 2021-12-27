@@ -20,11 +20,13 @@ import java.util.stream.Collectors;
  */
 public class Terrain extends Element {
 
+    // A lot of these should be items
     public static enum Ids {
 
         DIRT("t_dirt"),
         GRASS("t_grass"),
         TALL_GRASS("t_tall_grass"),
+        DEEP_WATER("t_deep_water"),
         PUDDLE("t_puddle"),
         TREE("t_tree"),
         WALL("t_wall");
@@ -71,19 +73,5 @@ public class Terrain extends Element {
 
     public static Set<String> getAllIds() {
         return BY_ID.keySet();
-    }
-
-    private Map<String, Object> flags;
-
-    public Map<String, Object> getFlags() {
-        return flags;
-    }
-
-    public <T> T getFlag(String name) {
-        if (flags == null || flags.isEmpty()) {
-            return null;
-        }
-        Object flag = flags.get(name);
-        return flag != null ? (T) flags.get(name) : null;
     }
 }

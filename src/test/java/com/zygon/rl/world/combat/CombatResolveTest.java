@@ -14,6 +14,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.awt.Color;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -33,9 +34,9 @@ public class CombatResolveTest {
         Melee dagger = Melee.get("dagger");
         Weapon weapon = new Weapon(dagger, 20, 2, 0);
 
-        Element eleATemplate = new Element("player", "player", "z", Color.PINK.toString(), "attacker", "");
+        Element eleATemplate = new Element("player", "player", "z", Color.PINK.toString(), "attacker", "", Map.of());
         CharacterSheet attacker = new CharacterSheet(
-                new Creature(eleATemplate, Species.MAMMAL.name(), 100, 120, 100, Set.of()),
+                new Creature(eleATemplate, Species.MAMMAL.name(), 100, 120, 100),
                 new Stats(10, 10, 10, 10, 10, 10),
                 new Status(20, 10, Set.of()),
                 null,
@@ -44,9 +45,9 @@ public class CombatResolveTest {
 
         attacker = attacker.add(weapon).wield(weapon);
 
-        Element eleDTemplate = new Element("player", "player", "z", Color.PINK.toString(), "defender", "");
+        Element eleDTemplate = new Element("player", "player", "z", Color.PINK.toString(), "defender", "", Map.of());
         CharacterSheet defender = new CharacterSheet(
-                new Creature(eleDTemplate, Species.MAMMAL.name(), 100, 120, 100, Set.of()),
+                new Creature(eleDTemplate, Species.MAMMAL.name(), 100, 120, 100),
                 new Stats(10, 10, 10, 10, 10, 10),
                 new Status(20, 10, Set.of()),
                 null,

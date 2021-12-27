@@ -3,8 +3,10 @@ package com.zygon.rl.data.context;
 import com.zygon.rl.data.Effect;
 import com.zygon.rl.data.Element;
 import com.zygon.rl.data.Terrain;
+import com.zygon.rl.data.buildings.BuildingData;
 import com.zygon.rl.data.field.FieldData;
 import com.zygon.rl.data.items.ArmorData;
+import com.zygon.rl.data.items.Building;
 import com.zygon.rl.data.items.Corpse;
 import com.zygon.rl.data.items.Melee;
 import com.zygon.rl.data.monster.Monster;
@@ -26,6 +28,8 @@ public class Data {
     static {
         try {
             ArmorData.load();
+            Building.load(); // building items
+            BuildingData.load(); // building templates
             Effect.load();
             FieldData.load();
             Melee.load();
@@ -44,6 +48,14 @@ public class Data {
         // get key -> val vs. just gimme the map directly?
         for (var v : ArmorData.getAllIds()) {
             elementsById.put(v, ArmorData.get(v));
+        }
+
+        for (var v : Building.getAllIds()) {
+            elementsById.put(v, Building.get(v));
+        }
+
+        for (var v : BuildingData.getAllIds()) {
+            elementsById.put(v, BuildingData.get(v));
         }
 
         for (var v : Effect.getAllIds()) {

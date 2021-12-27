@@ -1,8 +1,11 @@
 package com.zygon.rl.game;
 
 import com.zygon.rl.data.Element;
+import com.zygon.rl.data.Identifable;
 import com.zygon.rl.data.ItemClass;
+import com.zygon.rl.data.context.Data;
 import com.zygon.rl.data.field.FieldData;
+import com.zygon.rl.world.CommonAttributes;
 import com.zygon.rl.world.Field;
 import com.zygon.rl.world.Item;
 import com.zygon.rl.world.Location;
@@ -13,6 +16,7 @@ import com.zygon.rl.world.action.ExamineAction;
 import com.zygon.rl.world.action.GetItemAction;
 import com.zygon.rl.world.action.MeleeAttackAction;
 import com.zygon.rl.world.action.MoveAction;
+import com.zygon.rl.world.action.OpenDoorAction;
 import com.zygon.rl.world.action.SetIdentifiableAction;
 import com.zygon.rl.world.character.CharacterSheet;
 import org.apache.commons.math3.util.Pair;
@@ -208,7 +212,6 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                                         .setHandler(inventoryHandler)
                                         .setPrompt(GameState.InputContextPrompt.INVENTORY)
                                         .build());
-
             }
             case NUMPAD_5, DIGIT_5 -> {
                 // TODO: wait action
@@ -230,7 +233,8 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                         moveAction.execute(state);
                     }
                 } else {
-                    // TODO: bump to interact
+                    // Bump to interact
+                    // First check for monsters
                     CharacterSheet interactable = state.getWorld().get(destination);
 
                     // TODO: hostile status
@@ -244,8 +248,25 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                         }
 
                         // TODO: resolve damages, kill NPCs or player
+                    } else {
+                        // Next check on items in the way (ie doors)
+                        GameState gs = copy.build();
+                        List<Identifable> items = gs.getWorld().getAll(destination, null);
+
+                        for (Identifable item : items) {
+                            Element element = Data.get(item.getId());
+
+                            Boolean closed = element.getFlag(CommonAttributes.CLOSED.name());
+                            if (closed != null && closed.booleanValue()) {
+                                Action open = new OpenDoorAction(destination);
+                                if (open.canExecute(gs)) {
+                                    copy = open.execute(gs).copy();
+                                    // Only open one thing..
+                                    break;
+                                }
+                            }
+                        }
                     }
-                    // else an item?
                 }
 
                 // Same movement cost everywhere for now..

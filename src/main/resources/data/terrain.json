@@ -20,11 +20,22 @@
         "type": "TERRAIN",
         "name": "Tall grass",
         "description": "Patches of tall grass",
-        "symbol": ",",
+        "symbol": "\"",
         "color": "Green",
         "flags": {
             "TERRAIN_DIFFICULTY": 0.1,
-            "VIEW_BLOCK": 0.1
+            "VIEW_BLOCK": 0.20
+        }
+    },
+    {
+        "id": "t_deep_water",
+        "type": "TERRAIN",
+        "name": "Deep water",
+        "description": "Deep water",
+        "symbol": "#",
+        "color": "Blue",
+        "flags": {
+            "TERRAIN_DIFFICULTY": 1.0
         }
     },
     {
@@ -46,7 +57,7 @@
         "symbol": "4",
         "color": "Green",
         "flags": {
-            "IMPASSABLE": "true",
+            "IMPASSABLE": true,
             "VIEW_BLOCK": 1.0
         }
     },
@@ -58,8 +69,20 @@
         "symbol": "#",
         "color": "Gray",
         "flags": {
-            "IMPASSABLE": "true",
+            "IMPASSABLE": true,
             "VIEW_BLOCK": 1.0
+        }
+    },
+    {
+        "id": "t_window",
+        "type": "TERRAIN",
+        "name": "Window",
+        "description": "Open window",
+        "symbol": "o",
+        "color": "Yellow",
+        "flags": {
+            "IMPASSABLE": false,
+            "VIEW_BLOCK": 0.5
         }
     }
 ]

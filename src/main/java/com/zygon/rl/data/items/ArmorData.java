@@ -31,7 +31,7 @@ public class ArmorData extends ItemClass {
     private static final String ARMOR_LEGS_PATH = "/data/items/armor_legs.json";
     private static final String ARMOR_FEET_PATH = "/data/items/armor_feet.json";
 
-    public static void load(String path) throws FileNotFoundException, IOException {
+    private static void load(String path) throws FileNotFoundException, IOException {
         try ( Reader jsonReader = new BufferedReader(new InputStreamReader(
                 ArmorData.class.getResourceAsStream(path)))) {
             List<ArmorData> items = StringUtil.JSON.fromJson(jsonReader, TYPE);

@@ -210,19 +210,34 @@ public class Location {
     public static Location create(int x, int y, int z) {
         String hash = getDisplay(x, y, z);
         if (KNOWN_LOCATIONS.containsKey(hash)) {
-            Location loc = KNOWN_LOCATIONS.get(hash);
+            synchronized (KNOWN_LOCATIONS) {
+                // double-check
+                Location loc = KNOWN_LOCATIONS.get(hash);
 
-            if (loc.getX() != x || loc.getY() != y) {
-                // hash collision
-                throw new IllegalStateException(loc.toString());
+                if (loc == null) {
+                    loc = store(x, y, z, hash);
+                }
+
+                if (loc == null) {
+                    throw new IllegalStateException("loc is null? " + hash + ". contains?" + KNOWN_LOCATIONS.containsKey(hash) + "?");
+                }
+
+                if (loc.getX() != x || loc.getY() != y) {
+                    // hash collision
+                    throw new IllegalStateException(loc.toString());
+                }
+
+                return loc;
             }
-
-            return loc;
         } else {
-            Location location = new Location(x, y, z, hash);
-            KNOWN_LOCATIONS.put(hash, location);
-            return location;
+            return store(x, y, z, hash);
         }
+    }
+
+    private static Location store(int x, int y, int z, String hash) {
+        Location location = new Location(x, y, z, hash);
+        KNOWN_LOCATIONS.put(hash, location);
+        return location;
     }
 
     public static Location create(int x, int y) {
