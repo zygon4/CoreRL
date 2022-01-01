@@ -6,6 +6,7 @@
         "color": "Crimson",
         "name": "Corpse",
         "description": "A dead thing",
-        "weight": 12
+        "weight": 12,
+        "weight": 0
     }
 ]

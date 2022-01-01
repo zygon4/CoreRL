@@ -1,7 +1,7 @@
 package com.zygon.rl.data.field;
 
 import com.google.gson.reflect.TypeToken;
-import com.zygon.rl.data.Element;
+import com.zygon.rl.data.WorldElement;
 import com.zygon.rl.util.StringUtil;
 
 import java.io.BufferedReader;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 /**
  *
  */
-public class FieldData extends Element {
+public class FieldData extends WorldElement {
 
     private static final String TYPE_NAME = "FIELD";
 
@@ -52,13 +52,7 @@ public class FieldData extends Element {
         return BY_ID.keySet();
     }
 
-    private List<String> slots;
-
-    public List<String> getSlots() {
-        return slots;
-    }
-
-    public static boolean isFieldData(Element element) {
+    public static boolean isFieldData(WorldElement element) {
         return element.getType().equals(TYPE_NAME);
     }
 

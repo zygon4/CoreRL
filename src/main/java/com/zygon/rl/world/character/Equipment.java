@@ -1,5 +1,7 @@
 package com.zygon.rl.world.character;
 
+import com.zygon.rl.data.items.ArmorData;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -123,9 +125,10 @@ public class Equipment {
         return null;
     }
 
-    // TODO: move
     private Map<Slot, Long> getRequiredSlotCounts(Armor armor) {
-        return armor.getTemplate().getSlots().stream()
+        ArmorData template = armor.getTemplate();
+
+        return template.getSlots().stream()
                 .map(Slot::valueOf)
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
     }

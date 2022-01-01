@@ -2,8 +2,8 @@ package com.zygon.rl.world.character;
 
 import com.zygon.rl.data.Creature;
 import com.zygon.rl.data.Effect;
-import com.zygon.rl.data.Element;
 import com.zygon.rl.world.Item;
+import com.zygon.rl.world.Tangible;
 
 import java.util.Collections;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.Set;
  *
  * @author zygon
  */
-public final class CharacterSheet extends Element {
+public final class CharacterSheet extends Tangible {
 
     // This should come from the race of character
     private static final Equipment STANDARD_EQ = Equipment.create(
@@ -30,7 +30,7 @@ public final class CharacterSheet extends Element {
                     Slot.LEG, 2,
                     Slot.FOOT, 2));
 
-    private final Creature template;
+    private final String name;
     private final Stats stats;
     private final Status status;
     private final Equipment equipment;
@@ -38,21 +38,17 @@ public final class CharacterSheet extends Element {
     private final Set<Ability> abilities;
     private final Set<Spell> spells;
 
-    public CharacterSheet(Creature template, Stats stats, Status status,
+    public CharacterSheet(Creature template, String name, Stats stats, Status status,
             Equipment equipment, Inventory inventory, Set<Ability> abilities, Set<Spell> spells) {
         super(template);
 
-        this.template = template;
+        this.name = name;
         this.stats = stats;
         this.status = status;
         this.equipment = equipment != null ? equipment : STANDARD_EQ;
         this.inventory = inventory != null ? inventory : new Inventory();
         this.abilities = Collections.unmodifiableSet(abilities);
         this.spells = Collections.unmodifiableSet(spells);
-    }
-
-    public <T extends Element> T getElement() {
-        return (T) template;
     }
 
     public Equipment getEquipment() {
@@ -65,7 +61,8 @@ public final class CharacterSheet extends Element {
 
     // TODO: Calculate final from species/traits/status/eq
     public int getSpeed() {
-        return template.getSpeed();
+        Creature creature = (Creature) getTemplate();
+        return creature.getSpeed();
     }
 
     public Stats getStats() {
@@ -161,7 +158,7 @@ public final class CharacterSheet extends Element {
                 newEq = equipment.wear(armor);
             }
 
-            return new CharacterSheet(template, stats, status,
+            return new CharacterSheet(getTemplate(), name, stats, status,
                     newEq, inventory.remove(item), abilities, spells);
 
         }
@@ -170,7 +167,7 @@ public final class CharacterSheet extends Element {
     }
 
     public CharacterSheet add(Item item) {
-        CharacterSheet copy = new CharacterSheet(template, stats, status,
+        CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
                 equipment, inventory.add(item), abilities, spells);
 
         return copy;
@@ -178,7 +175,7 @@ public final class CharacterSheet extends Element {
 
     public CharacterSheet remove(Item item) {
         // TODO: drop equipped/wielded
-        CharacterSheet copy = new CharacterSheet(template, stats, status,
+        CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
                 equipment, inventory.remove(item), abilities, spells);
 
         return copy;
@@ -186,21 +183,21 @@ public final class CharacterSheet extends Element {
 
     // hopefully not necessary, use the helper functions
     public CharacterSheet set(Equipment equipment) {
-        CharacterSheet copy = new CharacterSheet(template, stats, status,
+        CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
                 equipment, inventory, abilities, spells);
 
         return copy;
     }
 
     public CharacterSheet set(Status status) {
-        CharacterSheet copy = new CharacterSheet(template, stats, status,
+        CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
                 equipment, inventory, abilities, spells);
 
         return copy;
     }
 
     public CharacterSheet set(Set<Ability> abilities) {
-        CharacterSheet copy = new CharacterSheet(template, stats, status,
+        CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
                 equipment, inventory, abilities, spells);
 
         return copy;
@@ -218,7 +215,7 @@ public final class CharacterSheet extends Element {
                 return null;
             }
 
-            return new CharacterSheet(template, stats, status,
+            return new CharacterSheet(getTemplate(), name, stats, status,
                     newEq, inventory.remove(item), abilities, spells);
 
         }

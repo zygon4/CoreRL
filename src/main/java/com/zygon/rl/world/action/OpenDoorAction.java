@@ -1,11 +1,12 @@
 package com.zygon.rl.world.action;
 
-import com.zygon.rl.data.Element;
-import com.zygon.rl.data.Identifable;
+import com.zygon.rl.data.ItemClass;
+import com.zygon.rl.data.WorldElement;
 import com.zygon.rl.data.context.Data;
 import com.zygon.rl.data.items.Building;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.world.CommonAttributes;
+import com.zygon.rl.world.Item;
 import com.zygon.rl.world.Location;
 
 import java.util.List;
@@ -27,8 +28,8 @@ public class OpenDoorAction extends Action {
     @Override
     public boolean canExecute(GameState state) {
 
-        Identifable closedDoor = getDoor(state);
-        Element element = Data.get(closedDoor.getId());
+        Item closedDoor = getDoor(state);
+        WorldElement element = Data.get(closedDoor.getId());
 
         Boolean closed = element.getFlag(CommonAttributes.CLOSED.name());
         if (closed != null && closed.booleanValue()) {
@@ -50,18 +51,18 @@ public class OpenDoorAction extends Action {
     public GameState execute(GameState state) {
 
         if (canExecute(state)) {
-            Identifable closedDoor = getDoor(state);
+            Item closedDoor = getDoor(state);
 
             Action removeItem = new RemoveItemAction(closedDoor, location);
             state = removeItem.execute(state);
 
             // TODO: the closed door should probably link to its open variety.
-            Identifable openDoor = Data.get("t_door_open");
+            ItemClass openDoor = Data.get("t_door_open");
 
-            Action setItem = new SetItemAction(openDoor, location);
+            Action setItem = new SetItemAction(new Item(openDoor), location);
             state = setItem.execute(state);
 
-            state.copy().addLog("Door opened!");
+            state.copy().addLog("You open the door.");
 
             return state;
         }
@@ -69,8 +70,9 @@ public class OpenDoorAction extends Action {
         return state;
     }
 
-    private Identifable getDoor(GameState state) {
-        List<Identifable> doors = state.getWorld().getAll(location, Building.TypeNames.DOOR.name());
+    private Item getDoor(GameState state) {
+        // Lousy generics.. wish this would return a List<Item>
+        List<Item> doors = state.getWorld().getAll(location, Building.TypeNames.DOOR.name());
 
         if (doors.isEmpty()) {
             return null;

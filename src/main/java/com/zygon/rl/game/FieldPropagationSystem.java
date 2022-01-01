@@ -4,7 +4,7 @@ import com.zygon.rl.data.field.FieldData;
 import com.zygon.rl.world.Field;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
-import com.zygon.rl.world.action.SetIdentifiableAction;
+import com.zygon.rl.world.action.SetTangibleAction;
 
 import java.util.List;
 import java.util.Map;
@@ -55,7 +55,7 @@ import java.util.stream.Collectors;
                 logger.log(System.Logger.Level.TRACE, "FIELD) " + fd.getId()
                         + " to " + propLoc + " " + propField.getStrength());
 
-                SetIdentifiableAction set = new SetIdentifiableAction(propLoc, propField);
+                SetTangibleAction set = new SetTangibleAction(propLoc, propField);
                 if (set.canExecute(state)) {
                     set.execute(state);
                 }

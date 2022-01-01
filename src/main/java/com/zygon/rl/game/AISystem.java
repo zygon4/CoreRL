@@ -1,8 +1,8 @@
 package com.zygon.rl.game;
 
+import com.zygon.rl.data.Creature;
 import com.zygon.rl.data.Effect;
 import com.zygon.rl.data.field.FieldData;
-import com.zygon.rl.data.monster.Monster;
 import com.zygon.rl.data.monster.Species;
 import com.zygon.rl.world.CommonAttributes;
 import com.zygon.rl.world.Field;
@@ -113,8 +113,8 @@ final class AISystem extends GameSystem {
         }
 
         if (character.getType().equals(CommonAttributes.MONSTER.name())) {
-            Monster monTemplate = character.getElement();
-            Species species = Species.valueOf(monTemplate.getSpecies());
+            Creature creatureTemplate = character.getTemplate();
+            Species species = Species.valueOf(creatureTemplate.getSpecies());
 
             // The actual behaviors should be different: e.g. "flock" vs "hunt"
             // with different flee/fight caracteristics.
@@ -128,7 +128,7 @@ final class AISystem extends GameSystem {
                                 c, player, world.getPlayerLocation());
                     } else {
                         // If within aggression range follow
-                        if (characterLocation.getNeighbors(monTemplate.getAggression())
+                        if (characterLocation.getNeighbors(creatureTemplate.getAggression())
                                 .contains(world.getPlayerLocation())) {
                             Location playerLocation = world.getPlayerLocation();
                             // player location can be null if dead

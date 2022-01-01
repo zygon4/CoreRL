@@ -1,8 +1,8 @@
 package com.zygon.rl.world.action;
 
-import com.zygon.rl.data.Identifable;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.world.Location;
+import com.zygon.rl.world.Tangible;
 
 /**
  * So for a spell.. set the fields which are not static items, not characters,
@@ -13,16 +13,16 @@ import com.zygon.rl.world.Location;
  *
  * @author zygon
  */
-public class SetIdentifiableAction extends Action {
+public class SetTangibleAction extends Action {
 
     private final Location location;
-    private final Identifable identifable;
+    private final Tangible identifable;
 
     // This is intended to be a actor-only summon, but summoning random items
     // is pretty valid as well. This will need enhancement.
-    public SetIdentifiableAction(Location location, Identifable identifable) {
+    public SetTangibleAction(Location location, Tangible tangible) {
         this.location = location;
-        this.identifable = identifable;
+        this.identifable = tangible;
     }
 
     @Override

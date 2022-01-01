@@ -32,7 +32,7 @@ public class DropItemAction extends Action {
             World world = state.getWorld();
             world.add(player.remove(item), world.getPlayerLocation());
 
-            world.add(item.getTemplate(), world.getPlayerLocation());
+            world.add(item, world.getPlayerLocation());
             return state.log("Dropped " + item.getName());
         }
 

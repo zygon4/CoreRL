@@ -1,7 +1,7 @@
 package com.zygon.rl.world.combat;
 
 import com.zygon.rl.data.Creature;
-import com.zygon.rl.data.Element;
+import com.zygon.rl.data.WorldElement;
 import com.zygon.rl.data.context.Data;
 import com.zygon.rl.data.items.Melee;
 import com.zygon.rl.data.monster.Species;
@@ -34,9 +34,10 @@ public class CombatResolveTest {
         Melee dagger = Melee.get("dagger");
         Weapon weapon = new Weapon(dagger, 20, 2, 0);
 
-        Element eleATemplate = new Element("player", "player", "z", Color.PINK.toString(), "attacker", "", Map.of());
+        WorldElement eleATemplate = new WorldElement("player", "player", "z", Color.PINK.toString(), "attacker", "", Map.of(), 150);
         CharacterSheet attacker = new CharacterSheet(
                 new Creature(eleATemplate, Species.MAMMAL.name(), 100, 120, 100),
+                "attacker",
                 new Stats(10, 10, 10, 10, 10, 10),
                 new Status(20, 10, Set.of()),
                 null,
@@ -45,9 +46,10 @@ public class CombatResolveTest {
 
         attacker = attacker.add(weapon).wield(weapon);
 
-        Element eleDTemplate = new Element("player", "player", "z", Color.PINK.toString(), "defender", "", Map.of());
+        WorldElement eleDTemplate = new WorldElement("player", "player", "z", Color.PINK.toString(), "defender", "", Map.of(), 150);
         CharacterSheet defender = new CharacterSheet(
                 new Creature(eleDTemplate, Species.MAMMAL.name(), 100, 120, 100),
+                "defender",
                 new Stats(10, 10, 10, 10, 10, 10),
                 new Status(20, 10, Set.of()),
                 null,

@@ -3,7 +3,7 @@ package com.zygon.rl.data;
 /**
  *
  */
-public class Creature extends Element {
+public class Creature extends WorldElement {
 
     private String species;
     private int aggression;
@@ -13,7 +13,7 @@ public class Creature extends Element {
     public Creature() {
     }
 
-    public Creature(Element template, String species, int aggression, int hitPoints, int speed) {
+    public Creature(WorldElement template, String species, int aggression, int hitPoints, int speed) {
         super(template);
         this.species = species;
         this.aggression = aggression;

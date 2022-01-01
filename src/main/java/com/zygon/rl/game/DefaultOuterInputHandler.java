@@ -1,23 +1,25 @@
 package com.zygon.rl.game;
 
-import com.zygon.rl.data.Element;
 import com.zygon.rl.data.Identifable;
-import com.zygon.rl.data.ItemClass;
+import com.zygon.rl.data.WorldElement;
 import com.zygon.rl.data.context.Data;
 import com.zygon.rl.data.field.FieldData;
+import com.zygon.rl.data.items.Building;
 import com.zygon.rl.world.CommonAttributes;
 import com.zygon.rl.world.Field;
 import com.zygon.rl.world.Item;
 import com.zygon.rl.world.Location;
+import com.zygon.rl.world.Tangible;
 import com.zygon.rl.world.World;
 import com.zygon.rl.world.action.Action;
+import com.zygon.rl.world.action.CloseDoorAction;
 import com.zygon.rl.world.action.DropItemAction;
 import com.zygon.rl.world.action.ExamineAction;
 import com.zygon.rl.world.action.GetItemAction;
 import com.zygon.rl.world.action.MeleeAttackAction;
 import com.zygon.rl.world.action.MoveAction;
 import com.zygon.rl.world.action.OpenDoorAction;
-import com.zygon.rl.world.action.SetIdentifiableAction;
+import com.zygon.rl.world.action.SetTangibleAction;
 import com.zygon.rl.world.character.CharacterSheet;
 import org.apache.commons.math3.util.Pair;
 import org.hexworks.zircon.api.uievent.KeyCode;
@@ -52,6 +54,8 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
         defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_A.getCode()));
         // 'e' for examine adjacent
         defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_E.getCode()));
+        // 'c' for close adjacent
+        defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_C.getCode()));
         // 'd' for get
         defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_D.getCode()));
         // 'i' for inventory
@@ -82,6 +86,60 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
         GameState.Builder copy = state.copy();
         KeyCode inputKeyCode = convert(input);
         switch (inputKeyCode) {
+            case KEY_C -> {
+                Map<Location, List<WorldElement>> neighborsWithSomethingOpen
+                        = state.getWorld().getPlayerLocation().getNeighbors(true).stream()
+                                .map(loc -> {
+                                    // TODO: check for doors
+                                    List<WorldElement> elements = state.getWorld().getAll(loc, Building.TypeNames.DOOR.name()).stream()
+                                            .map(id -> {
+                                                // I think having to use this syntax is a language
+                                                // difficiency wrt generics.
+                                                WorldElement el = Data.get(id.getId());
+                                                return el;
+                                            })
+                                            .collect(Collectors.toList());
+
+                                    if (elements.isEmpty()) {
+                                        return null;
+                                    } else {
+                                        return Pair.create(loc, elements);
+                                    }
+                                })
+                                .filter(Objects::nonNull)
+                                .collect(Collectors.toMap(k -> k.getFirst(), v -> v.getSecond()));
+
+                if (neighborsWithSomethingOpen.isEmpty()) {
+                    copy.addLog("There is nothing to close.");
+                } else {
+                    if (neighborsWithSomethingOpen.size() == 1) {
+                        Location loc = neighborsWithSomethingOpen.keySet().iterator().next();
+
+                        // TODO Don't want an action here.. want to tell the
+                        // screen to print the items at the location!!!
+                        Action closeAction = new CloseDoorAction(loc);
+                        if (closeAction.canExecute(state)) {
+                            copy = closeAction.execute(state).copy();
+                        } else {
+                            // This should be very rare.. maybe a body in the way?
+                            copy.addLog("Cannot close door");
+                        }
+                    } else {
+                        // prompt for direction
+                        // Note: This is the same "TODO" as elsewhere in this class
+                        // TODO Don't want an action here.. want to tell the
+                        // screen to print the items at the location!!!
+                        copy.addInputContext(GameState.InputContext.builder()
+                                .setName("CLOSE")
+                                .setHandler(new ActionDirectionInputHandler(
+                                        getGameConfiguration(),
+                                        l -> new CloseDoorAction(l),
+                                        state.getWorld().getPlayerLocation()))
+                                .setPrompt(GameState.InputContextPrompt.DIRECTION)
+                                .build()).build();
+                    }
+                }
+            }
             case KEY_D -> {
                 // This is pretty clunky, eh?
                 List<Item> items = state.getWorld().getPlayer().getInventory().getItems();
@@ -104,10 +162,10 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                 }
             }
             case KEY_E -> {
-                Map<Location, List<Element>> neighborsWithSomething
+                Map<Location, List<Identifable>> neighborsWithSomething
                         = state.getWorld().getPlayerLocation().getNeighbors(true).stream()
                                 .map(loc -> {
-                                    List<Element> elements = state.getWorld().getAllElements(loc).stream()
+                                    List<Identifable> elements = state.getWorld().getAllElements(loc).stream()
                                             .filter(el -> !el.getId().equals("player"))
                                             .collect(Collectors.toList());
 
@@ -158,11 +216,12 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
             case KEY_G -> {
                 // This is pretty clunky, eh?
                 List<Item> items = state.getWorld()
-                        .getAllElements(state.getWorld().getPlayerLocation()).stream()
+                        .getAll(state.getWorld().getPlayerLocation(), null).stream()
+                        .filter(t -> state.getWorld().canGet(t.getTemplate()))
                         .filter(el -> {
-                            return ItemClass.class.isAssignableFrom(el.getClass());
+                            return Item.class.isAssignableFrom(el.getClass());
                         })
-                        .map(el -> new Item((ItemClass) el))
+                        .map(el -> (Item) el)
                         .collect(Collectors.toList());
 
                 if (items.isEmpty()) {
@@ -251,10 +310,10 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                     } else {
                         // Next check on items in the way (ie doors)
                         GameState gs = copy.build();
-                        List<Identifable> items = gs.getWorld().getAll(destination, null);
+                        List<Tangible> items = gs.getWorld().getAll(destination, null);
 
                         for (Identifable item : items) {
-                            Element element = Data.get(item.getId());
+                            WorldElement element = Data.get(item.getId());
 
                             Boolean closed = element.getFlag(CommonAttributes.CLOSED.name());
                             if (closed != null && closed.booleanValue()) {
@@ -281,7 +340,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                         state.getWorld().getPlayerLocation(), 50);
 
                 Set<Action> n = state.getWorld().getPlayerLocation().getNeighbors(4).stream()
-                        .map(l -> new SetIdentifiableAction(l, field))
+                        .map(l -> new SetTangibleAction(l, field))
                         .collect(Collectors.toSet());
 
                 GameState newState = state;
@@ -301,7 +360,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                         state.getWorld().getPlayerLocation(), 20);
 
                 Set<Action> n = state.getWorld().getPlayerLocation().getNeighbors(1).stream()
-                        .map(l -> new SetIdentifiableAction(l, field))
+                        .map(l -> new SetTangibleAction(l, field))
                         .collect(Collectors.toSet());
 
                 GameState newState = state;
@@ -319,7 +378,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                         state.getWorld().getPlayerLocation(), 80);
 
                 Location playerLocation = state.getWorld().getPlayerLocation();
-                Function<Location, Action> getFieldSetFn = (l) -> new SetIdentifiableAction(l, field);
+                Function<Location, Action> getFieldSetFn = (l) -> new SetTangibleAction(l, field);
                 Map<Input, Function<Location, Action>> examine = Map.of(
                         Input.valueOf(KeyCode.ENTER.getCode()),
                         getFieldSetFn,

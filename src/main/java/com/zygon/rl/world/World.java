@@ -1,8 +1,8 @@
 package com.zygon.rl.world;
 
-import com.zygon.rl.data.Element;
 import com.zygon.rl.data.Identifable;
 import com.zygon.rl.data.Terrain;
+import com.zygon.rl.data.WorldElement;
 import com.zygon.rl.data.buildings.Building;
 import com.zygon.rl.data.buildings.BuildingData;
 import com.zygon.rl.data.buildings.Layout;
@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -33,13 +34,13 @@ public class World {
     private final Calendar calendar;
     // These were originally plain static objects, but now they take on some
     // runtime characteristics. E.g. fields have a half-life
-    private final GenericEntityManager<Identifable> staticObjects;
-    private final ElementEntityManager<CharacterSheet> actors;
+    private final GenericEntityManager<Tangible> staticObjects;
+    private final GenericEntityManager<CharacterSheet> actors;
     // got lazy, partially immutable
     private Location playerLocation;
 
-    public World(Calendar calendar, GenericEntityManager<Identifable> staticObjects,
-            ElementEntityManager<CharacterSheet> actors, Location playerLocation) {
+    public World(Calendar calendar, GenericEntityManager<Tangible> staticObjects,
+            GenericEntityManager<CharacterSheet> actors, Location playerLocation) {
         this.calendar = calendar;
         this.staticObjects = staticObjects;
         this.actors = actors;
@@ -47,7 +48,7 @@ public class World {
     }
 
     public World(Calendar calendar) {
-        this(calendar, new GenericEntityManager<>(), new ElementEntityManager<>(), null);
+        this(calendar, new GenericEntityManager<>(), new GenericEntityManager<>(), null);
     }
 
     // this is fresh world only
@@ -55,8 +56,8 @@ public class World {
         this(new Calendar(20).addTime(TimeUnit.DAYS.toSeconds(1000)));
     }
 
-    public void add(Identifable id, Location location) {
-        staticObjects.add(id, location);
+    public void add(Tangible thing, Location location) {
+        staticObjects.add(thing, location);
     }
 
     public void add(CharacterSheet character, Location location) {
@@ -65,6 +66,10 @@ public class World {
         if (character.getId().equals("player")) {
             playerLocation = location;
         }
+    }
+
+    public boolean canGet(Identifable identifiable) {
+        return !Data.get(identifiable.getId()).getType().equals(com.zygon.rl.data.items.Building.TypeNames.DOOR.name());
     }
 
     public boolean canMove(Location destination) {
@@ -81,14 +86,14 @@ public class World {
 
         Boolean impassable = getAllElements(destination).stream()
                 .map(element -> {
-
+                    WorldElement ele = Data.get(element.getId());
                     // This is a hack, need a better way to aggregate this kind of check
                     // or more things need "impassable" flag or a way to inherit some flags by default e.g. NPCs are impassable
-                    if (element.getType().equals("NPC")) {
+                    if (ele.getType().equals("NPC")) {
                         return Boolean.TRUE;
                     }
 
-                    Boolean impass = element.getFlag(CommonAttributes.IMPASSABLE.name());
+                    Boolean impass = ele.getFlag(CommonAttributes.IMPASSABLE.name());
                     return impass;
                 })
                 .filter(Objects::nonNull)
@@ -100,13 +105,13 @@ public class World {
 
         // Assumption is you cannot pass an "actor" of any kind
         // This needs to be reconciled with the check above
-        List<CharacterSheet> get = actors.getByType(destination, null);
+        List<CharacterSheet> get = actors.get(destination, (t) -> true);
         return get == null || get.isEmpty();
     }
 
     public Map<Location, CharacterSheet> getAll(Location center, String type,
             int radius, boolean includeCenter) {
-        Map<Location, List<CharacterSheet>> allByType = actors.getAllByType(center, type, radius, includeCenter);
+        Map<Location, List<CharacterSheet>> allByType = actors.get(center, (t) -> true, radius, includeCenter);
 
         // Should only be 1 character in a single space
         return allByType.entrySet().stream()
@@ -122,15 +127,17 @@ public class World {
         return actors.get(location);
     }
 
-    public List<Element> getAllElements(Location location) {
-        List<Element> elements = new ArrayList<>();
+    // TODO: there is an issue here.. i don't want the static templates back,
+    // i need the real "instantiated" world objects
+    public List<Identifable> getAllElements(Location location) {
+        List<Identifable> elements = new ArrayList<>();
 
-        List<Element> staticItems = staticObjects.get(location).stream()
+        List<WorldElement> staticItems = staticObjects.get(location).stream()
                 .map(Identifable::getId)
                 .map(id -> {
                     // I think having to use this syntax is a language
                     // difficiency wrt generics.
-                    Element el = Data.get(id);
+                    WorldElement el = Data.get(id);
                     return el;
                 })
                 .collect(Collectors.toList());
@@ -152,16 +159,22 @@ public class World {
     }
 
     public CharacterSheet get(Location location) {
-        return actors.getElement(location);
+        List<CharacterSheet> characters = actors.get(location);
+        if (characters.size() > 1) {
+            throw new IllegalStateException("Too many characters");
+        }
+
+        List<CharacterSheet> get = actors.get(location);
+
+        return get != null && !get.isEmpty() ? get.get(0) : null;
     }
 
-    public List<Identifable> getAll(Location location, String type) {
-        // Need to fetch the data out of the templates to check the type
-        List<Identifable> identifiables = staticObjects.get(location);
+    public <T extends Tangible> List<T> getAll(Location location, String type) {
+        List<T> things = (List<T>) staticObjects.get(location);
 
-        return identifiables != null
-                ? identifiables.stream()
-                        .filter(id -> type == null || Data.get(id.getId()).getType().equals(type))
+        return things != null
+                ? things.stream()
+                        .filter(id -> type == null || id.getType().equals(type))
                         .collect(Collectors.toList())
                 : List.of();
     }
@@ -182,6 +195,22 @@ public class World {
 
     public CharacterSheet getPlayer() {
         return get(getPlayerLocation());
+    }
+
+    public int getTotalWeight(Location location, Predicate<Tangible> filter) {
+        int total = 0;
+
+        total = getAll(location).stream()
+                .filter(filter)
+                .map(CharacterSheet::getWeight)
+                .reduce(total, Integer::sum);
+
+        total = getAll(location, null).stream()
+                .filter(filter)
+                .map(Tangible::getWeight)
+                .reduce(total, Integer::sum);
+
+        return total;
     }
 
     // Only used in a single thread
@@ -322,8 +351,8 @@ public class World {
         }
     }
 
-    public void remove(Identifable id, Location from) {
-        staticObjects.delete(id, from);
+    public void remove(Tangible thing, Location from) {
+        staticObjects.delete(thing, from);
     }
 
     public void remove(CharacterSheet character, Location from) {

@@ -130,8 +130,6 @@ public class SpawnSystem extends GameSystem {
                 if (itemId != null) {
                     Location spawnLocation = Location.create(mapX, mapY);
                     ItemClass item = Data.get(itemId);
-
-                    // TODO: not sure about wrapping this is a new Item() ???
                     spawnActions.add(new SetItemAction(new Item(item), spawnLocation));
                 }
             }

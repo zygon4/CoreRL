@@ -1,6 +1,6 @@
 package com.zygon.rl.world.character;
 
-import com.zygon.rl.data.Element;
+import com.zygon.rl.data.WorldElement;
 import com.zygon.rl.data.Identifable;
 
 /**
@@ -9,9 +9,9 @@ import com.zygon.rl.data.Identifable;
  */
 public class Spell implements Identifable {
 
-    private final Element template;
+    private final WorldElement template;
 
-    public Spell(Element template) {
+    public Spell(WorldElement template) {
         this.template = template;
     }
 

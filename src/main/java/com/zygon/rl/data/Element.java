@@ -74,6 +74,11 @@ public class Element implements Identifable {
         return flag != null ? (T) flags.get(name) : null;
     }
 
+    // Kind of a weak way to implement this check.
+    public boolean isWorldElement() {
+        return false;
+    }
+
     public final void setId(String id) {
         this.id = id;
     }

@@ -1,6 +1,5 @@
 package com.zygon.rl.world;
 
-import com.zygon.rl.data.Identifable;
 import com.zygon.rl.data.field.FieldData;
 
 import java.util.HashMap;
@@ -20,7 +19,7 @@ import java.util.Set;
  *
  * @author zygon
  */
-public class Field implements Identifable {
+public class Field extends Tangible {
 
     public static enum PropagationDirection {
         EMIT,
@@ -41,7 +40,6 @@ public class Field implements Identifable {
         // maybe a different scale like: weak, medium, strong?
     }
 
-    private final FieldData template;
     private final PropagationDirection direction;
     private final PropagationStyle style;
     private final PropagationPotency potency;
@@ -50,7 +48,7 @@ public class Field implements Identifable {
 
     public Field(FieldData template, PropagationDirection direction, PropagationStyle style,
             PropagationPotency potency, Location origin, int strength) {
-        this.template = template;
+        super(template);
         this.direction = direction;
         this.style = style;
         this.potency = potency;
@@ -61,15 +59,6 @@ public class Field implements Identifable {
     public Field(FieldData template, PropagationDirection direction, PropagationStyle style,
             PropagationPotency potency, Location origin) {
         this(template, direction, style, potency, origin, 100);
-    }
-
-    @Override
-    public String getId() {
-        return template.getId();
-    }
-
-    public FieldData getTemplate() {
-        return template;
     }
 
     public int getStrength() {
@@ -103,7 +92,7 @@ public class Field implements Identifable {
             int str = (int) (strength * strOffset);
 
             // Self field propagation
-            fieldsByLocation.put(currentLocation, new Field(template, direction,
+            fieldsByLocation.put(currentLocation, new Field(getTemplate(), direction,
                     style, potency, origin, str));
 
             // Nearby field propagation
@@ -111,14 +100,14 @@ public class Field implements Identifable {
                 case EMIT -> {
                     Set<Location> targets = getTargets(origin, currentLocation);
                     for (Location target : targets) {
-                        fieldsByLocation.put(target, new Field(template, direction,
+                        fieldsByLocation.put(target, new Field(getTemplate(), direction,
                                 style, potency, origin, str));
                     }
                 }
                 case TARGET -> {
                     if (style == PropagationStyle.STRAIGHT) {
                         Location target = getTarget(origin, currentLocation);
-                        fieldsByLocation.put(target, new Field(template, direction,
+                        fieldsByLocation.put(target, new Field(getTemplate(), direction,
                                 style, potency, origin, str));
                     }
                 }

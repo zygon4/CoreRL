@@ -1,5 +1,6 @@
 package com.zygon.rl.world.action;
 
+import com.stewsters.util.name.FantasyNameGen;
 import com.zygon.rl.data.Creature;
 import com.zygon.rl.data.Effect;
 import com.zygon.rl.data.context.Data;
@@ -93,6 +94,7 @@ public class SummonAction extends Action {
                 .collect(Collectors.toSet());
 
         return new CharacterSheet(actor,
+                FantasyNameGen.generate(),
                 new Stats(stats, stats, stats, stats, stats, stats),
                 new Status(stats, actor.getHitPoints(), statusEffects),
                 null, null, Set.of(), Set.of());

@@ -10,7 +10,8 @@
             "IMPASSABLE": true,
             "CLOSED": true,
             "VIEW_BLOCK": 1.0
-        }
+        },
+        "weight": 45
     },
     {
         "id": "t_door_open",
@@ -21,6 +22,7 @@
         "color": "Brown",
         "flags": {
             "VIEW_BLOCK": 0.1
-        }
+        },
+        "weight": 45
     }
 ]

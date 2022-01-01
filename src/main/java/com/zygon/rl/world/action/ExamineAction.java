@@ -1,8 +1,10 @@
 package com.zygon.rl.world.action;
 
-import com.zygon.rl.data.Element;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.world.Location;
+import com.zygon.rl.world.Tangible;
+import com.zygon.rl.world.World;
+import com.zygon.rl.world.character.CharacterSheet;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,10 +17,10 @@ import java.util.stream.Collectors;
  */
 public class ExamineAction extends Action {
 
-    private final Location examine;
+    private final Location location;
 
-    public ExamineAction(Location examine) {
-        this.examine = examine;
+    public ExamineAction(Location location) {
+        this.location = location;
     }
 
     @Override
@@ -29,15 +31,25 @@ public class ExamineAction extends Action {
     @Override
     public GameState execute(GameState state) {
 
-        List<Element> allElements = state.getWorld().getAllElements(examine);
+        World world = state.getWorld();
+        List<CharacterSheet> characters = world.getAll(location);
 
         String examineLog = null;
-        if (allElements.isEmpty()) {
-            examineLog = "There is nothing to examine.";
-        } else {
-            examineLog = "You see:\n" + allElements.stream()
+
+        if (!characters.isEmpty()) {
+            examineLog = "You see:\n" + characters.stream()
                     .map(e -> " - " + e.getName())
                     .collect(Collectors.joining("\n"));
+        } else {
+            List<Tangible> things = world.getAll(location, null);
+
+            if (!things.isEmpty()) {
+                examineLog = "You see:\n" + things.stream()
+                        .map(e -> " - " + e.getName())
+                        .collect(Collectors.joining("\n"));
+            } else {
+                examineLog = "There is nothing to examine.";
+            }
         }
 
         return state.log(examineLog);

@@ -1,11 +1,11 @@
 package com.zygon.rl.world.action;
 
 import com.zygon.rl.data.Effect;
-import com.zygon.rl.data.Identifable;
-import com.zygon.rl.data.items.Corpse;
 import com.zygon.rl.game.GameConfiguration;
 import com.zygon.rl.game.GameState;
+import com.zygon.rl.world.CorpseItem;
 import com.zygon.rl.world.DamageResolution;
+import com.zygon.rl.world.Item;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
 import com.zygon.rl.world.character.CharacterSheet;
@@ -69,7 +69,8 @@ public abstract class DamageAction extends Action {
 
             state = state.log(updatedDefender.getName() + " died!");
             state.getWorld().remove(updatedDefender, defenderLocation);
-            state.getWorld().add(getCorpseId(damaged), defenderLocation);
+            Item corpse = CorpseItem.create(damaged);
+            state.getWorld().add(corpse, defenderLocation);
         }
 
         return state;
@@ -96,12 +97,5 @@ public abstract class DamageAction extends Action {
                         updateToHostile(world, hostileCharacter, n);
                     }
                 });
-    }
-
-    // Incredibly simple "corpse" for anything
-    // TODO: future use more info from the character info to get an appropriate corpse
-    // can use rng if desired for weight, etc.
-    private static Identifable getCorpseId(CharacterSheet character) {
-        return Corpse.get("corpse");
     }
 }

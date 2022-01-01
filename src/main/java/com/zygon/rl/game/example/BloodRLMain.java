@@ -5,7 +5,8 @@ package com.zygon.rl.game.example;
 
 import com.zygon.rl.data.Creature;
 import com.zygon.rl.data.Effect;
-import com.zygon.rl.data.Element;
+import com.zygon.rl.data.Identifable;
+import com.zygon.rl.data.WorldElement;
 import com.zygon.rl.data.context.Data;
 import com.zygon.rl.data.items.ArmorData;
 import com.zygon.rl.data.items.Corpse;
@@ -16,6 +17,7 @@ import com.zygon.rl.game.GameConfiguration;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.game.ui.GameUI;
 import com.zygon.rl.world.Calendar;
+import com.zygon.rl.world.CorpseItem;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
 import com.zygon.rl.world.action.SummonAction;
@@ -63,7 +65,7 @@ public class BloodRLMain {
         }
 
         @Override
-        public GameState use(GameState state, Optional<Element> empty,
+        public GameState use(GameState state, Optional<Identifable> empty,
                 Optional<Location> victimLocation) {
 
             GameState.Builder copy = state.copy();
@@ -114,7 +116,7 @@ public class BloodRLMain {
         }
 
         @Override
-        public GameState use(GameState state, Optional<Element> empty,
+        public GameState use(GameState state, Optional<Identifable> empty,
                 Optional<Location> expectEmpty) {
 
             String id = random.nextBoolean() ? "mon_simple_bat" : "mon_wolf";
@@ -186,9 +188,10 @@ public class BloodRLMain {
 //        Effect effect = Effect.get("effect_terror");
 //        StatusEffect statusEffect = new StatusEffect(effect);
 //
-        Element eleTemplate = new Element("player", "player", "@", "PaleVioletRed", "Alucard", "He's cool but moody", Map.of());
+        WorldElement eleTemplate = new WorldElement("player", "player", "@", "PaleVioletRed", "Alucard", "He's cool but moody", Map.of(), 150);
         CharacterSheet pc = new CharacterSheet(
                 new Creature(eleTemplate, Species.MAMMAL.name(), 100, 120, 100),
+                "Alucard",
                 new Stats(16, 16, 14, 12, 12, 16),
                 new Status(19, 100, Set.of()),
                 null,
@@ -249,9 +252,9 @@ public class BloodRLMain {
 //                world.add(npcSheet, rand);
 //            }
 //        }
-        world.add(dagger, Location.create(0, 0));
-        world.add(dagger, Location.create(0, -1));
-        world.add(Corpse.get("corpse"), Location.create(0, 1));
+        world.add(new Weapon(dagger, 18, 4, 0), Location.create(0, 0));
+        world.add(new Weapon(dagger, 18, 4, 0), Location.create(0, -1));
+        world.add(new CorpseItem(Corpse.get("corpse"), 50), Location.create(0, 1));
 
         GameState initialState = GameState.builder(config)
                 .setWorld(world)

@@ -20,18 +20,19 @@ public class GetItemAction extends Action {
 
     @Override
     public boolean canExecute(GameState state) {
-        CharacterSheet player = state.getWorld().getPlayer();
+        World world = state.getWorld();
+        CharacterSheet player = world.getPlayer();
 
-        return canExecute(player);
+        return world.canGet(item.getTemplate()) && canExecute(player);
     }
 
     @Override
     public GameState execute(GameState state) {
         CharacterSheet player = state.getWorld().getPlayer();
+        World world = state.getWorld();
 
         if (canExecute(player)) {
-            World world = state.getWorld();
-            world.remove(item.getTemplate(), world.getPlayerLocation());
+            world.remove(item, world.getPlayerLocation());
             world.add(player.add(item), world.getPlayerLocation());
             return state.log("Picked up " + item.getName());
         }

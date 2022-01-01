@@ -10,7 +10,8 @@
         "aggression": 2,
         "hitPoints": 5,
         "speed": 140,
-        "flags": { "FLIES": true }
+        "flags": { "FLIES": true },
+        "weight": 1
     },
     {
         "id": "mon_giant_frog",
@@ -24,6 +25,8 @@
         "hitPoints": 25,
         "speed": 80,
         "flags": {}
+        ,
+        "weight": 30
     },
     {
         "id": "mon_wolf",
@@ -36,7 +39,9 @@
         "aggression": 16,
         "hitPoints": 40,
         "speed": 100,
-        "flags": {}
+        "flags": {},
+        "weight": 75
+        
     },
     {
         "id": "mon_rat",
@@ -49,7 +54,8 @@
         "aggression": 1,
         "hitPoints": 8,
         "speed": 40,
-        "flags": {}
+        "flags": {},
+        "weight": 2
     },
     {
         "id": "mon_bear",
@@ -62,7 +68,8 @@
         "aggression": 5,
         "hitPoints": 100,
         "speed": 90,
-        "flags": {}
+        "flags": {},
+        "weight": 285
     },
     {
         "id": "mon_deer",
@@ -75,7 +82,8 @@
         "aggression": 1,
         "hitPoints": 30,
         "speed": 120,
-        "flags": {}
+        "flags": {},
+        "weight": 105
     },
     {
         "id": "mon_opossum",
@@ -88,6 +96,7 @@
         "aggression": 1,
         "hitPoints": 10,
         "speed": 80,
-        "flags": {}
+        "flags": {},
+        "weight": 12
     }
 ]

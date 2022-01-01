@@ -4,11 +4,6 @@ package com.zygon.rl.data;
  * How does "FooClass" work out?
  *
  */
-public class ItemClass extends Element {
+public class ItemClass extends WorldElement {
 
-    private int weight;
-
-    public int getWeight() {
-        return weight;
-    }
 }

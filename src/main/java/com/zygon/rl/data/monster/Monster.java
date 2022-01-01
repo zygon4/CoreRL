@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
  */
 public class Monster extends Creature {
 
+    public static final String MONSTER_TYPE = "MONSTER";
+
     private static final Map<String, Monster> NPC_BY_ID = new HashMap<>();
 
     private static final Type TYPE = new TypeToken<List<Monster>>() {

@@ -5,7 +5,8 @@
         "symbol": "~",
         "color": "YellowGreen",
         "name": "poison gas",
-        "description": "Poison gas"
+        "description": "Poison gas",
+        "weight": 0
     },
     {
         "id": "fd_web",
@@ -13,7 +14,8 @@
         "symbol": "#",
         "color": "Gray",
         "name": "cobb webs",
-        "description": "sticky cobb webs"
+        "description": "sticky cobb webs",
+        "weight": 1
     },
     {
         "id": "fd_electricity",
@@ -21,6 +23,7 @@
         "symbol": "V",
         "color": "Silver",
         "name": "electricity",
-        "description": "Electricity"
+        "description": "Electricity",
+        "weight": 0
     }
 ]

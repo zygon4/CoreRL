@@ -1,6 +1,7 @@
 package com.zygon.rl.game;
 
-import com.zygon.rl.data.Element;
+import com.zygon.rl.data.Identifable;
+import com.zygon.rl.world.Tangible;
 import com.zygon.rl.world.character.Ability;
 
 import java.util.ArrayList;
@@ -17,10 +18,10 @@ import java.util.Set;
 public class AbilityTargetInputHandler extends BaseInputHandler {
 
     private final Ability ability;
-    private final Map<Input, Element> targetsByInput;
+    private final Map<Input, Tangible> targetsByInput;
 
     private AbilityTargetInputHandler(GameConfiguration gameConfiguration,
-            Ability ability, Map<Input, Element> targetsByInput) {
+            Ability ability, Map<Input, Tangible> targetsByInput) {
         super(gameConfiguration, targetsByInput.keySet());
 
         this.ability = ability;
@@ -28,10 +29,10 @@ public class AbilityTargetInputHandler extends BaseInputHandler {
     }
 
     public static final AbilityTargetInputHandler create(GameConfiguration gameConfiguration,
-            Ability ability, Set<Element> targets) {
+            Ability ability, Set<Tangible> targets) {
 
         // TODO: use location-based inputs vs alphabet
-        Map<Input, Element> targetsByInput = createAlphaInputs(new ArrayList<>(targets));
+        Map<Input, Tangible> targetsByInput = createAlphaInputs(new ArrayList<>(targets));
         return new AbilityTargetInputHandler(gameConfiguration, ability, targetsByInput);
     }
 
@@ -39,7 +40,7 @@ public class AbilityTargetInputHandler extends BaseInputHandler {
     public GameState apply(GameState state, Input input) {
 
         GameState newState = state;
-        Element target = targetsByInput.get(input);
+        Identifable target = targetsByInput.get(input);
 
         if (target != null) {
             newState = ability.use(state, Optional.of(target), Optional.empty());
@@ -57,7 +58,7 @@ public class AbilityTargetInputHandler extends BaseInputHandler {
 
     @Override
     public String getDisplayText(Input input) {
-        Element entity = targetsByInput.get(input);
+        Tangible entity = targetsByInput.get(input);
         return entity.getName();
     }
 

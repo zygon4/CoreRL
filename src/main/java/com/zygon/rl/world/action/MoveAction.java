@@ -1,6 +1,5 @@
 package com.zygon.rl.world.action;
 
-import com.zygon.rl.data.Element;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
@@ -34,7 +33,7 @@ public class MoveAction extends Action {
         // next location
         World world = state.getWorld();
         List<CharacterSheet> all = world.getAll(from);
-        Element fromElements = all != null ? world.getAll(from).stream()
+        CharacterSheet fromElements = all != null ? world.getAll(from).stream()
                 .filter(element -> element.getId().equals(id))
                 .findAny().orElse(null) : null;
         return fromElements != null && world.canMove(to);

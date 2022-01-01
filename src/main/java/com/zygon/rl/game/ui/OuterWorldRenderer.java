@@ -2,15 +2,16 @@ package com.zygon.rl.game.ui;
 
 import com.stewsters.util.shadow.twoDimention.LitMap2d;
 import com.stewsters.util.shadow.twoDimention.ShadowCaster2d;
-import com.zygon.rl.data.Element;
-import com.zygon.rl.data.Identifable;
 import com.zygon.rl.data.Terrain;
+import com.zygon.rl.data.WorldElement;
 import com.zygon.rl.data.context.Data;
 import com.zygon.rl.game.Game;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.game.TargetingInputHandler;
 import com.zygon.rl.util.ColorUtil;
 import com.zygon.rl.world.Location;
+import com.zygon.rl.world.Tangible;
+import com.zygon.rl.world.character.CharacterSheet;
 import org.hexworks.zircon.api.data.Position;
 import org.hexworks.zircon.api.data.Tile;
 import org.hexworks.zircon.api.graphics.Layer;
@@ -93,19 +94,19 @@ public class OuterWorldRenderer implements GameComponentRenderer {
                 Position uiScreenPosition = Position.create(x, y);
                 Location loc = Location.create(getX, getY);
 
-                Element actor = gameState.getWorld().get(loc);
+                CharacterSheet actor = gameState.getWorld().get(loc);
 
                 if (locationLightLevelPct > .25) {
 
                     // Just draw from top to bottom whatever item/actor is available
                     // 1) Draw actor if available
                     if (actor != null) {
-                        Tile actorTile = toTile(actor);
+                        Tile actorTile = toTile(actor.getTemplate());
                         gameScreenLayer.draw(actorTile, uiScreenPosition);
                     } else {
 
-                        List<Identifable> staticObjectIds = gameState.getWorld().getAll(loc, null);
-                        Element object = !staticObjectIds.isEmpty()
+                        List<Tangible> staticObjectIds = gameState.getWorld().getAll(loc, null);
+                        WorldElement object = !staticObjectIds.isEmpty()
                                 ? Data.get(staticObjectIds.get(0).getId()) : null;
 
                         // 2) Next draw item if available
@@ -189,7 +190,7 @@ public class OuterWorldRenderer implements GameComponentRenderer {
         return gameState.getWorld().getPlayerLocation();
     }
 
-    private Tile toTile(Element element) {
+    private Tile toTile(WorldElement element) {
         return renderUtil.toTile(ColorUtil.get(element.getColor()), element.getSymbol().charAt(0));
     }
 }

@@ -1,6 +1,6 @@
 package com.zygon.rl.world;
 
-import com.zygon.rl.data.Element;
+import com.zygon.rl.data.WorldElement;
 
 import java.util.List;
 import java.util.Map;
@@ -10,7 +10,7 @@ import java.util.Map;
  * @author zygon
  * @param <T>
  */
-public class ElementEntityManager<T extends Element> extends GenericEntityManager<T> {
+public class ElementEntityManager<T extends WorldElement> extends GenericEntityManager<T> {
 
     public T getElement(Location location) {
         List<T> elements = get(location);

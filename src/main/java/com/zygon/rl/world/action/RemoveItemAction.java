@@ -2,6 +2,7 @@ package com.zygon.rl.world.action;
 
 import com.zygon.rl.data.Identifable;
 import com.zygon.rl.game.GameState;
+import com.zygon.rl.world.Item;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
 
@@ -12,18 +13,18 @@ import com.zygon.rl.world.World;
  */
 public class RemoveItemAction extends Action {
 
-    private final Identifable identifable;
+    private final Item item;
     private final Location location;
 
-    public RemoveItemAction(Identifable item, Location location) {
-        this.identifable = item;
+    public RemoveItemAction(Item item, Location location) {
+        this.item = item;
         this.location = location;
     }
 
     @Override
     public boolean canExecute(GameState state) {
         Identifable ident = state.getWorld().getAll(location, null).stream()
-                .filter(id -> id.getId().equals(identifable.getId()))
+                .filter(id -> id.getId().equals(item.getId()))
                 .findAny().orElse(null);
 
         return ident != null;
@@ -33,7 +34,7 @@ public class RemoveItemAction extends Action {
     public GameState execute(GameState state) {
         World world = state.getWorld();
 
-        world.remove(identifable, location);
+        world.remove(item, location);
 
         return state;
     }

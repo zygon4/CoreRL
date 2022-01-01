@@ -1,7 +1,7 @@
 package com.zygon.rl.world.action;
 
-import com.zygon.rl.data.Identifable;
 import com.zygon.rl.game.GameState;
+import com.zygon.rl.world.Item;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
 
@@ -12,11 +12,11 @@ import com.zygon.rl.world.World;
  */
 public class SetItemAction extends Action {
 
-    private final Identifable identifable;
+    private final Item identifable;
     private final Location location;
 
-    public SetItemAction(Identifable identifable, Location location) {
-        this.identifable = identifable;
+    public SetItemAction(Item item, Location location) {
+        this.identifable = item;
         this.location = location;
     }
 

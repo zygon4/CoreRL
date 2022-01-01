@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 /**
  *
  */
-public class Terrain extends Element {
+public class Terrain extends WorldElement {
 
     // A lot of these should be items
     public static enum Ids {

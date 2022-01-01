@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  *
  * @author zygon
  */
-public final class Effect extends Element {
+public final class Effect extends WorldElement {
 
     public static class StatMod {
 

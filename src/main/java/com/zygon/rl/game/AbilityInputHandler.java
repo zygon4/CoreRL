@@ -1,6 +1,6 @@
 package com.zygon.rl.game;
 
-import com.zygon.rl.data.Element;
+import com.zygon.rl.world.Tangible;
 import com.zygon.rl.world.character.Ability;
 
 import java.util.ArrayList;
@@ -50,7 +50,7 @@ final class AbilityInputHandler extends BaseInputHandler {
                 // need to find all legal targets,
                 // should this code be preparing them? or asking for them
                 // from the game impl?
-                Set<Element> livingAdjacents = state.getWorld().getPlayerLocation().getNeighbors().stream()
+                Set<Tangible> livingAdjacents = state.getWorld().getPlayerLocation().getNeighbors().stream()
                         .map(loc -> state.getWorld().get(loc))
                         .filter(Objects::nonNull)
                         .collect(Collectors.toSet());

@@ -10,6 +10,7 @@
         "aggression": 5,
         "hitPoints": 50,
         "speed": 60,
-        "flags": []
+        "flags": [],
+        "weight": 150
     }
 ]
