@@ -24,8 +24,7 @@
         "aggression": 4,
         "hitPoints": 25,
         "speed": 80,
-        "flags": {}
-        ,
+        "flags": {},
         "weight": 30
     },
     {
