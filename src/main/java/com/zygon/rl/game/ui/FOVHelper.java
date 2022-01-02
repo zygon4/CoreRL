@@ -1,9 +1,13 @@
 package com.zygon.rl.game.ui;
 
+import com.zygon.rl.data.Identifable;
 import com.zygon.rl.data.Terrain;
+import com.zygon.rl.data.WorldElement;
 import com.zygon.rl.world.CommonAttributes;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
+
+import java.util.List;
 
 /**
  *
@@ -23,6 +27,9 @@ class FOVHelper {
         for (int y = minValues.getY(); y < maxValues.getY(); y++) {
             for (int x = minValues.getX(); x < maxValues.getX(); x++) {
                 Terrain terrain = world.getTerrain(Location.create(x, y));
+                List<Identifable> allElements = world.getAllElements(Location.create(x, y));
+
+                // TODO:
                 double viewBlocking = getMaxViewBlock(terrain);
                 try {
                     portion[x - minValues.getX()][y - minValues.getY()] = (float) viewBlocking;
@@ -34,7 +41,7 @@ class FOVHelper {
         return portion;
     }
 
-    public static double getMaxViewBlock(Terrain entity) {
+    public static double getMaxViewBlock(WorldElement entity) {
         Double viewBlocker = entity.getFlag(VIEW_BLOCK_NAME);
         return viewBlocker != null ? viewBlocker : 0.0;
     }

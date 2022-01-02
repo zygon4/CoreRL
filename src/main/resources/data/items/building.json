@@ -24,5 +24,44 @@
             "VIEW_BLOCK": 0.1
         },
         "weight": 45
+    },
+    {
+        "id": "t_bed",
+        "type": "GENERIC",
+        "name": "Bed",
+        "description": "A soft comfy bed",
+        "symbol": "%",
+        "color": "White",
+        "flags": {
+            "VIEW_BLOCK": 0.2,
+            "TERRAIN_DIFFICULTY": 0.5
+        },
+        "weight": 50
+    },
+    {
+        "id": "t_counter",
+        "type": "GENERIC",
+        "name": "Counter",
+        "description": "A solid countertop for cooking",
+        "symbol": "%",
+        "color": "DarkSlateGray",
+        "flags": {
+            "VIEW_BLOCK": 0.2,
+            "TERRAIN_DIFFICULTY": 0.5
+        },
+        "weight": 45
+    },
+    {
+        "id": "t_hearth",
+        "type": "GENERIC",
+        "name": "Hearth",
+        "description": "A great hearth for warmth and cooking",
+        "symbol": "}",
+        "color": "Red",
+        "flags": {
+            "VIEW_BLOCK": 0.9,
+            "TERRAIN_DIFFICULTY": 0.1
+        },
+        "weight": 100
     }
 ]

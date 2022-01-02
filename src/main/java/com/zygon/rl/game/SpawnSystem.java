@@ -16,7 +16,10 @@ import com.zygon.rl.world.action.Action;
 import com.zygon.rl.world.action.SetItemAction;
 import com.zygon.rl.world.action.SummonAction;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -37,10 +40,12 @@ public class SpawnSystem extends GameSystem {
     private final Set<Location> spawnedLivingLocations = new HashSet<>();
     private final Set<Location> spawnedItemLocations = new HashSet<>();
     private final Random random;
+    private final SpawnContext spawnContext;
 
     public SpawnSystem(GameConfiguration gameConfiguration) {
         super(gameConfiguration);
         this.random = gameConfiguration.getRandom();
+        this.spawnContext = gameConfiguration.getSpawnContext();
     }
 
     @Override
@@ -51,7 +56,7 @@ public class SpawnSystem extends GameSystem {
     }
 
     private GameState spawnItem(Set<Location> spawnedLocations, GameState state, Location center) {
-        double freq = getGameConfiguration().getWorldSpawn().getCityBuildingDistance();
+        double freq = spawnContext.getCityBuildingDistance();
 
         // rounding should use double, not ints
         //
@@ -94,13 +99,15 @@ public class SpawnSystem extends GameSystem {
 
         return () -> {
             GameState callableState = state;
-            WorldRegion region = callableState.getWorld().getRegion(location);
+            World world = callableState.getWorld();
+            WorldRegion region = world.getRegion(location);
 
             // TODO: other areas
             if (region == WorldRegion.TOWN_RESIDENCE || region == WorldRegion.TOWN_OUTER) {
 
-                // TODO: noise-based chosing of building type
-                BuildingData building = Data.get("house_1");
+                List<String> buildingIds = new ArrayList<>(BuildingData.getAllIds());
+                Collections.shuffle(buildingIds, World.getNoiseRandom(location));
+                BuildingData building = Data.get(buildingIds.get(0));
 
                 Set<Action> spawnActions = spawnBuilding(location, building);
 
@@ -110,6 +117,7 @@ public class SpawnSystem extends GameSystem {
                     }
                 }
             }
+
             return callableState;
         };
     }
@@ -140,7 +148,7 @@ public class SpawnSystem extends GameSystem {
 
     private GameState spawnLiving(Set<Location> spawnedLocations, GameState state, Location center) {
 
-        int freq = getGameConfiguration().getWorldSpawn().getLivingSpawnFrequency();
+        int freq = spawnContext.getLivingSpawnFrequency();
 
         // round
         Location roundedCenter = Location.create(freq * (Math.round(center.getX() / freq)),

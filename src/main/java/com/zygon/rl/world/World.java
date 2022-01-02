@@ -12,6 +12,7 @@ import com.zygon.rl.world.character.CharacterSheet;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -36,7 +37,6 @@ public class World {
     // runtime characteristics. E.g. fields have a half-life
     private final GenericEntityManager<Tangible> staticObjects;
     private final GenericEntityManager<CharacterSheet> actors;
-    // got lazy, partially immutable
     private Location playerLocation;
 
     public World(Calendar calendar, GenericEntityManager<Tangible> staticObjects,
@@ -244,6 +244,13 @@ public class World {
         }
     }
 
+    // Intended for use as consistent random
+    public static Random getNoiseRandom(Location location) {
+        double terrainVal = terrainNoise.getScaledValue(location.getX(), location.getY());
+        // Times a million OK?
+        return new Random((long) (terrainVal * 1000000));
+    }
+
     public Terrain getTerrain(Location location) {
         double terrainVal = terrainNoise.getScaledValue(location.getX(), location.getY());
 
@@ -294,18 +301,13 @@ public class World {
                 int roundXPos = (int) (Math.round(location.getX() / CITY_BUILDINGS_DISTANCE) * CITY_BUILDINGS_DISTANCE);
                 int roundYPos = (int) (Math.round(location.getY() / CITY_BUILDINGS_DISTANCE) * CITY_BUILDINGS_DISTANCE);
 
-                // Adding a tree in the center to mark (and it's christmas time)
-                if (location.getX() == roundXPos && location.getY() == roundYPos) {
-                    return Terrain.Ids.TREE.get();
-                }
+                Location buildingCenter = Location.create(roundXPos, roundYPos);
 
-                // TODO: noise-based or WFC (wave function collapse) choosing of building type
-                BuildingData building = Data.get("house_1");
+                List<String> buildingIds = new ArrayList<>(BuildingData.getAllIds());
+                Collections.shuffle(buildingIds, getNoiseRandom(buildingCenter));
+                BuildingData building = Data.get(buildingIds.get(0));
 
-//                long start = System.nanoTime();
                 Terrain terrain = getBuildingTerrain(building, location.getX() - roundXPos, location.getY() - roundYPos);
-//                long duration = System.nanoTime() - start;
-//                System.out.println("t:" + TimeUnit.NANOSECONDS.toMillis(duration) + "ms");
 
                 return terrain;
         }
