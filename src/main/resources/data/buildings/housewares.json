@@ -1,42 +1,11 @@
 [
     {
-        "id": "arms_leather_bracers",
-        "type": "ARMOR",
-        "symbol": "[",
-        "color": "Brown",
-        "name": "leather bracers",
-        "description": "Tough leather arm bracers",
-        "weight": 1,
-        "slots" : [ "ARM", "ARM" ]
-    },
-    {
-        "id": "arms_chainmail_bracers",
-        "type": "ARMOR",
-        "symbol": "[",
-        "color": "Silver",
-        "name": "chainmail bracers",
-        "description": "Chainmail arm bracers",
-        "weight": 2,
-        "slots" : [ "ARM", "ARM" ]
-    },
-    {
-        "id": "arms_leather_vambraces",
-        "type": "ARMOR",
-        "symbol": "[",
-        "color": "Brown",
-        "name": "leather vambraces",
-        "description": "Leather vambraces",
-        "weight": 1,
-        "slots" : [ "ARM", "ARM" ]
-    },
-    {
-        "id": "arms_chainmail_vambraces",
-        "type": "ARMOR",
-        "symbol": "[",
-        "color": "Silver",
-        "name": "chainmail vambraces",
-        "description": "Chainmail vambraces",
-        "weight": 2,
-        "slots" : [ "ARM", "ARM" ]
+        "id": "t_spoon",
+        "type": "GENERIC",
+        "symbol": "]",
+        "color": "Gray",
+        "name": "Fork",
+        "description": "A common metal spoon",
+        "weight": 1
     }
 ]
