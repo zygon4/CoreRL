@@ -116,6 +116,11 @@ public final class CharacterSheet extends Tangible {
         return abilities;
     }
 
+    @Override
+    public String getName() {
+        return name;
+    }
+
     public Set<Spell> getSpells() {
         return spells;
     }

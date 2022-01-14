@@ -1,5 +1,7 @@
 package com.zygon.rl.util.rng.family;
 
+import com.stewsters.util.name.FantasyNameGen;
+
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -28,7 +30,11 @@ public class FamilyTreeGenerator {
 
         boolean male = NAME_RANDOM.nextBoolean();
 
-        Name name = male ? Names.getRandomMaleName() : Names.getRandomFemaleName();
+        // I added the "FantasyNameGen" to the "stewsters-util", fun!
+        Name name = new Name(male
+                ? FantasyNameGen.randomMaleFirstName()
+                : FantasyNameGen.randomFemaleFirstName(),
+                FantasyNameGen.randomLastName());
         Sex sex = male ? Sex.MALE : Sex.FEMALE;
 
         return new Person(name, sex);
