@@ -7,6 +7,7 @@ import com.zygon.rl.data.buildings.Building;
 import com.zygon.rl.data.buildings.BuildingData;
 import com.zygon.rl.data.buildings.Layout;
 import com.zygon.rl.data.context.Data;
+import com.zygon.rl.game.Weather;
 import com.zygon.rl.util.NoiseUtil;
 import com.zygon.rl.world.character.CharacterSheet;
 
@@ -33,27 +34,29 @@ public class World {
     private static final double CITY_BUILDINGS_DISTANCE = 20.0;
 
     private final Calendar calendar;
+    private final Weather weather;
     // These were originally plain static objects, but now they take on some
     // runtime characteristics. E.g. fields have a half-life
     private final GenericEntityManager<Tangible> staticObjects;
     private final GenericEntityManager<CharacterSheet> actors;
     private Location playerLocation;
 
-    public World(Calendar calendar, GenericEntityManager<Tangible> staticObjects,
+    public World(Calendar calendar, Weather weather, GenericEntityManager<Tangible> staticObjects,
             GenericEntityManager<CharacterSheet> actors, Location playerLocation) {
-        this.calendar = calendar;
+        this.calendar = Objects.requireNonNull(calendar);
+        this.weather = Objects.requireNonNull(weather);
         this.staticObjects = staticObjects;
         this.actors = actors;
         this.playerLocation = playerLocation;
     }
 
-    public World(Calendar calendar) {
-        this(calendar, new GenericEntityManager<>(), new GenericEntityManager<>(), null);
+    public World(Calendar calendar, Weather weather) {
+        this(calendar, weather, new GenericEntityManager<>(), new GenericEntityManager<>(), null);
     }
 
     // this is fresh world only
     public World() {
-        this(new Calendar(20).addTime(TimeUnit.DAYS.toSeconds(1000)));
+        this(new Calendar(20).addTime(TimeUnit.DAYS.toSeconds(1000)), Weather.CLEAR);
     }
 
     public void add(Tangible thing, Location location) {
@@ -213,6 +216,10 @@ public class World {
         return total;
     }
 
+    public Weather getWeather() {
+        return weather;
+    }
+
     // Only used in a single thread
     private static final byte[] NOISE_BYTES = new byte[8];
     private static final NoiseUtil terrainNoise = new NoiseUtil(new Random().nextInt(), 1.0, 1.0);
@@ -365,10 +372,14 @@ public class World {
     }
 
     public World setCalendar(Calendar calendar) {
-        return new World(calendar, staticObjects, actors, playerLocation);
+        return new World(calendar, weather, staticObjects, actors, playerLocation);
+    }
+
+    public World setWeather(Weather weather) {
+        return new World(calendar, weather, staticObjects, actors, playerLocation);
     }
 
     public World addTime(long addSeconds) {
-        return new World(calendar.addTime(addSeconds), staticObjects, actors, playerLocation);
+        return new World(calendar.addTime(addSeconds), weather, staticObjects, actors, playerLocation);
     }
 }

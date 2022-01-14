@@ -14,8 +14,6 @@ import com.zygon.rl.world.Attribute;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
 import com.zygon.rl.world.character.CharacterSheet;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
 import org.hexworks.zircon.api.Components;
 import org.hexworks.zircon.api.Functions;
 import org.hexworks.zircon.api.behavior.TextOverride;
@@ -45,6 +43,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 /**
  *
@@ -252,6 +253,7 @@ final class GameView extends BaseView {
 
         String worldText = "Day " + world.getCalendar().getDayOfYear() + ", year " + world.getCalendar().getYear();
         worldText += "\n" + world.getCalendar().getTime() + "  " + world.getCalendar().getSeason().getDisplay();
+        worldText += "\n" + world.getWeather().getDisplayName();
         ((TextArea) componentsByName.get("world")).setText(worldText);
 
         // Gathering these attributes could be expensive.. should only

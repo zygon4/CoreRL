@@ -54,7 +54,7 @@ public final class Game {
         // happening. e.g. if the player is fiddling with menus, don't continue
         // the systems.
         if (newState.getInputContext().size() == 1) {
-            for (GameSystem gs : gameSystems) {
+            for (GameSystem gs : getGameSystems()) {
                 long gameSystemStart = System.nanoTime();
                 newState = gs.apply(newState);
                 // If they need a name to distinguish, can add later
@@ -103,6 +103,7 @@ public final class Game {
             this.gameSystems.add(new FieldEffectSystem(gameConfiguration));
             this.gameSystems.add(new SpawnSystem(gameConfiguration));
             this.gameSystems.add(new AISystem(gameConfiguration));
+            this.gameSystems.add(new WeatherSystem(gameConfiguration));
             this.configuration = gameConfiguration;
         }
 

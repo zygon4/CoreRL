@@ -15,6 +15,7 @@ import com.zygon.rl.data.monster.Species;
 import com.zygon.rl.game.Game;
 import com.zygon.rl.game.GameConfiguration;
 import com.zygon.rl.game.GameState;
+import com.zygon.rl.game.Weather;
 import com.zygon.rl.game.ui.GameUI;
 import com.zygon.rl.world.Calendar;
 import com.zygon.rl.world.CorpseItem;
@@ -27,8 +28,6 @@ import com.zygon.rl.world.character.CharacterSheet;
 import com.zygon.rl.world.character.Stats;
 import com.zygon.rl.world.character.Status;
 import com.zygon.rl.world.character.Weapon;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
@@ -41,6 +40,9 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 /**
  * This is a testing area until a new BloodRL2.0 project is made.
@@ -174,8 +176,9 @@ public class BloodRLMain {
 
         int daysPerYear = 20;
         int startingYear = 1208;
-        World world = new World(new Calendar(
-                TimeUnit.HOURS.toSeconds(7), startingYear * daysPerYear, daysPerYear));
+        World world = new World(
+                new Calendar(TimeUnit.HOURS.toSeconds(7), startingYear * daysPerYear, daysPerYear),
+                Weather.RAINY);
 
         Melee dagger = Melee.get("dagger");
         Melee scythe = Melee.get("scythe");
