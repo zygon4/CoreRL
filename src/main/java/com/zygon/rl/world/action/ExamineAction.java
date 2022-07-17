@@ -1,5 +1,6 @@
 package com.zygon.rl.world.action;
 
+import com.zygon.rl.data.Terrain;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.Tangible;
@@ -17,41 +18,42 @@ import java.util.stream.Collectors;
  */
 public class ExamineAction extends Action {
 
-    private final Location location;
+  private final Location location;
 
-    public ExamineAction(Location location) {
-        this.location = location;
+  public ExamineAction(Location location) {
+    this.location = location;
+  }
+
+  @Override
+  public boolean canExecute(GameState state) {
+    return true;
+  }
+
+  @Override
+  public GameState execute(GameState state) {
+
+    World world = state.getWorld();
+    List<CharacterSheet> characters = world.getAll(location);
+
+    String examineLog = null;
+
+    if (!characters.isEmpty()) {
+      examineLog = "You see:\n" + characters.stream()
+              .map(e -> " - " + e.getName())
+              .collect(Collectors.joining("\n"));
+    } else {
+      List<Tangible> things = world.getAll(location, null);
+
+      if (!things.isEmpty()) {
+        examineLog = "You see:\n" + things.stream()
+                .map(e -> " - " + e.getName())
+                .collect(Collectors.joining("\n"));
+      } else {
+        Terrain terrain = world.getTerrain(location);
+        examineLog = "You see: " + terrain.getDescription();
+      }
     }
 
-    @Override
-    public boolean canExecute(GameState state) {
-        return true;
-    }
-
-    @Override
-    public GameState execute(GameState state) {
-
-        World world = state.getWorld();
-        List<CharacterSheet> characters = world.getAll(location);
-
-        String examineLog = null;
-
-        if (!characters.isEmpty()) {
-            examineLog = "You see:\n" + characters.stream()
-                    .map(e -> " - " + e.getName())
-                    .collect(Collectors.joining("\n"));
-        } else {
-            List<Tangible> things = world.getAll(location, null);
-
-            if (!things.isEmpty()) {
-                examineLog = "You see:\n" + things.stream()
-                        .map(e -> " - " + e.getName())
-                        .collect(Collectors.joining("\n"));
-            } else {
-                examineLog = "There is nothing to examine.";
-            }
-        }
-
-        return state.log(examineLog);
-    }
+    return state.log(examineLog);
+  }
 }
