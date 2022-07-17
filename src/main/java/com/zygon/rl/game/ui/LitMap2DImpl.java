@@ -15,7 +15,13 @@ final class LitMap2DImpl implements LitMap2d {
   @Override
   public void setLight(int startx, int starty, float force) {
     // Inversed Y
-    this.light[startx][this.light[0].length - starty] = force;
+
+    // This fixes an issue that seems to come from the LitMap2d library, it
+    // shows a shadow on tiles directly south of the player when that tiles is
+    // only supposed to cause shadows behind it.
+    int adjustedY = this.light[0].length - starty;
+    adjustedY = Math.min(adjustedY, this.light[0].length - 1);
+    this.light[startx][adjustedY] = force;
   }
 
   @Override
@@ -41,7 +47,6 @@ final class LitMap2DImpl implements LitMap2d {
   @Override
   public void addLight(int currentX, int currentY, float bright) {
     // Inversed Y because the zircon screen's columns are bottom left, not top left
-    this.light[currentX][this.light[0].length - currentY] = bright;
+    this.light[currentX][this.light[0].length - 1 - currentY] = bright;
   }
-
 }

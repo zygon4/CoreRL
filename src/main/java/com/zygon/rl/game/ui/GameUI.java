@@ -17,31 +17,31 @@ import java.awt.Color;
  */
 public class GameUI {
 
-    private final Game game;
+  private final Game game;
 
-    public GameUI(Game game) {
-        this.game = game;
-    }
+  public GameUI(Game game) {
+    this.game = game;
+  }
 
-    public void start() {
-        //LibgdxApplications
-        TileGrid tileGrid = SwingApplications.startTileGrid(
-                AppConfig.newBuilder()
-                        .withTitle(game.getConfiguration().getGameName() + "      " + POWERED_BY)
-                        .withSize(Size.create(80, 60))
-                        //                        .withDebugMode(true)
-                        //                        .withDebugConfig(DebugConfig.newBuilder().withRelaxBoundsCheck(true).build())
-                        .withDefaultTileset(CP437TilesetResources.rexPaint16x16())
-                        .build());
+  public void start() {
+    //LibgdxApplications
+    TileGrid tileGrid = SwingApplications.startTileGrid(
+            AppConfig.newBuilder()
+                    .withTitle(game.getConfiguration().getGameName() + "      " + POWERED_BY)
+                    .withSize(Size.create(120, 90))
+                    //                        .withDebugMode(true)
+                    //                        .withDebugConfig(DebugConfig.newBuilder().withRelaxBoundsCheck(true).build())
+                    .withDefaultTileset(CP437TilesetResources.rexPaint16x16())
+                    .build());
 
-        TitleView titleView = new TitleView(tileGrid, ColorThemes.afterDark(), game);
+    TitleView titleView = new TitleView(tileGrid, ColorThemes.afterDark(), game);
 
-        titleView.dock();
-    }
+    titleView.dock();
+  }
 
-    private static final String POWERED_BY = "[powered by https://github.com/zygon4/CoreRL]";
+  private static final String POWERED_BY = "[powered by https://github.com/zygon4/CoreRL]";
 
-    static TileColor convert(Color color) {
-        return TileColor.create(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
-    }
+  static TileColor convert(Color color) {
+    return TileColor.create(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+  }
 }
