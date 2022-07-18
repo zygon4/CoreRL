@@ -96,7 +96,7 @@ final class GameView extends BaseView {
             if (musicFile != null) {
                 try {
                     Audio audio = new Audio(musicFile);
-                    audio.play();
+                    audio.playLoop();
                 } catch (IOException | LineUnavailableException | UnsupportedAudioFileException ex) {
                     logger.log(System.Logger.Level.ERROR, "Unable to play music file: " + musicFile, ex);
                 }
