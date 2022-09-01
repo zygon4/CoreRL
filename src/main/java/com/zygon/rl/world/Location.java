@@ -1,5 +1,7 @@
 package com.zygon.rl.world;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.stewsters.util.math.Point2i;
 import com.stewsters.util.pathing.twoDimention.heuristic.ManhattanHeuristic2d;
 import com.stewsters.util.pathing.twoDimention.pathfinder.AStarPathFinder2d;
@@ -8,9 +10,7 @@ import org.apache.commons.math3.util.Pair;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -23,13 +23,9 @@ import java.util.stream.Collectors;
  */
 public class Location {
 
-    // singleton cache
-    private static final Map<String, Location> KNOWN_LOCATIONS = new LinkedHashMap<>() {
-        @Override
-        protected boolean removeEldestEntry(Map.Entry<String, Location> eldest) {
-            return size() > 1024;
-        }
-    };
+    private static final Cache<String, Location> KNOWN_LOCATIONS = CacheBuilder.newBuilder()
+            .maximumSize(1024 * 100)
+            .build();
 
     // For use with path finding
     private static final int BOX_SIZE = 50;
@@ -82,7 +78,8 @@ public class Location {
         return getSuperCoverLine(this, to);
     }
 
-    public List<Location> getPath(final Location to, Function<Location, Boolean> canTraverse) {
+    public List<Location> getPath(final Location to,
+            Function<Location, Boolean> canTraverse) {
 
         Pair<Location, Location> projected = projectToBox(this, to, BOX_SIZE);
 
@@ -209,17 +206,21 @@ public class Location {
 
     public static Location create(int x, int y, int z) {
         String hash = getDisplay(x, y, z);
-        if (KNOWN_LOCATIONS.containsKey(hash)) {
+
+        Location cachedLoc = KNOWN_LOCATIONS.getIfPresent(hash);
+        if (cachedLoc != null) {
             synchronized (KNOWN_LOCATIONS) {
                 // double-check
-                Location loc = KNOWN_LOCATIONS.get(hash);
+                Location loc = KNOWN_LOCATIONS.getIfPresent(hash);
 
+                // Was de-cached
                 if (loc == null) {
                     loc = store(x, y, z, hash);
                 }
 
                 if (loc == null) {
-                    throw new IllegalStateException("loc is null? " + hash + ". contains?" + KNOWN_LOCATIONS.containsKey(hash) + "?");
+                    throw new IllegalStateException("loc is null? " + hash
+                            + ". contains?" + KNOWN_LOCATIONS.asMap().containsKey(hash) + "?");
                 }
 
                 if (loc.getX() != x || loc.getY() != y) {
@@ -308,7 +309,8 @@ public class Location {
 
     // To project against the box size and become a value between 0-49
     // e.g.
-    private static Pair<Location, Location> projectToBox(Location from, Location to, int boxSize) {
+    private static Pair<Location, Location> projectToBox(Location from,
+            Location to, int boxSize) {
         // first place the center. e.g. -5 -> 25, 218 -> 25
         int diffX = to.getX() - from.getX();
         int diffY = to.getY() - from.getY();
