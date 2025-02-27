@@ -2,6 +2,7 @@
 plugins {
     application
     `java-library`
+    `maven-publish`
 }
 
 repositories {
@@ -37,4 +38,26 @@ dependencies {
 
 application {
     mainClass = "com.zygon.rl.game.example.BloodRLMain"
+}
+
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+group = "com.lds.blood.core"
+version = "0.1"
+
+val javaComponent = components["java"] as AdhocComponentWithVariants
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+            afterEvaluate {
+                artifactId = tasks.jar.get().archiveBaseName.get()
+            }
+        }
+    }
 }
