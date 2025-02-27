@@ -1,4 +1,4 @@
-package com.zygon.rl.game;
+package com.zygon.rl.world;
 
 /**
  * Weather enum
@@ -20,7 +20,7 @@ public enum Weather {
         return displayName;
     }
 
-    int getValue() {
+    public int getValue() {
         return value;
     }
 

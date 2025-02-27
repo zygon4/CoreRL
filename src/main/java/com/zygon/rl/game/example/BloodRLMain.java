@@ -16,7 +16,7 @@ import com.zygon.rl.game.Game;
 import com.zygon.rl.game.GameConfiguration;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.game.SoundEffects;
-import com.zygon.rl.game.Weather;
+import com.zygon.rl.world.Weather;
 import com.zygon.rl.game.ui.GameUI;
 import com.zygon.rl.world.Calendar;
 import com.zygon.rl.world.CorpseItem;

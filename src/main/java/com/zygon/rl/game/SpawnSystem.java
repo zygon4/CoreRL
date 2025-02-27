@@ -6,6 +6,7 @@ import com.zygon.rl.data.buildings.Building;
 import com.zygon.rl.data.buildings.BuildingData;
 import com.zygon.rl.data.buildings.Layout;
 import com.zygon.rl.data.context.Data;
+import com.zygon.rl.data.items.ArmorData;
 import com.zygon.rl.data.monster.Monster;
 import com.zygon.rl.data.npc.Npc;
 import com.zygon.rl.world.Item;
@@ -15,6 +16,7 @@ import com.zygon.rl.world.WorldRegion;
 import com.zygon.rl.world.action.Action;
 import com.zygon.rl.world.action.SetItemAction;
 import com.zygon.rl.world.action.SummonAction;
+import com.zygon.rl.world.character.Armor;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,7 +57,8 @@ public class SpawnSystem extends GameSystem {
         return state;
     }
 
-    private GameState spawnItem(Set<Location> spawnedLocations, GameState state, Location center) {
+    private GameState spawnItem(Set<Location> spawnedLocations, GameState state,
+            Location center) {
         double freq = spawnContext.getCityBuildingDistance();
 
         // rounding should use double, not ints
@@ -95,7 +98,8 @@ public class SpawnSystem extends GameSystem {
         return state;
     }
 
-    private Callable<GameState> getItemSpawnAction(Location location, GameState state) {
+    private Callable<GameState> getItemSpawnAction(Location location,
+            GameState state) {
 
         return () -> {
             GameState callableState = state;
@@ -109,11 +113,13 @@ public class SpawnSystem extends GameSystem {
                 Collections.shuffle(buildingIds, World.getNoiseRandom(location));
                 BuildingData building = Data.get(buildingIds.get(0));
 
-                Set<Action> spawnActions = spawnBuilding(location, building);
+                if (World.canBuild(callableState.getWorld(), location, building)) {
+                    Set<Action> spawnActions = spawnBuildingItems(location, building);
 
-                for (Action spawnAction : spawnActions) {
-                    if (spawnAction.canExecute(callableState)) {
-                        callableState = spawnAction.execute(callableState);
+                    for (Action spawnAction : spawnActions) {
+                        if (spawnAction.canExecute(callableState)) {
+                            callableState = spawnAction.execute(callableState);
+                        }
                     }
                 }
             }
@@ -122,7 +128,14 @@ public class SpawnSystem extends GameSystem {
         };
     }
 
-    private Set<Action> spawnBuilding(Location center, Building building) {
+    /**
+     * Returns a set of actions to spawn building layout Items.
+     *
+     * @param center
+     * @param building
+     * @return
+     */
+    private Set<Action> spawnBuildingItems(Location center, Building building) {
 
         Set<Action> spawnActions = new HashSet<>();
         Layout layout = building.getLayout();
@@ -134,11 +147,18 @@ public class SpawnSystem extends GameSystem {
         for (int mapY = center.getY() - heightFromCenter, buildingY = 0; mapY < center.getY() + 1 + heightFromCenter; mapY++, buildingY++) {
             for (int mapX = center.getX() - widthFromCenter, buildingX = 0; mapX < center.getX() + 1 + widthFromCenter; mapX++, buildingX++) {
 
-                String itemId = layout.getItems().getId(buildingX, buildingY);
-                if (itemId != null) {
-                    Location spawnLocation = Location.create(mapX, mapY);
-                    ItemClass item = Data.get(itemId);
-                    spawnActions.add(new SetItemAction(new Item(item), spawnLocation));
+                // Z: testing
+                // How to prevent partial-building spawn??????
+                if (Location.create(mapX, mapY).equals(center)) {
+                    spawnActions.add(new SetItemAction(new Armor(ArmorData.get("torso_tunic_black")), Location.create(mapX, mapY)));
+                } else {
+                    String itemId = layout.getItems().getId(buildingX, buildingY);
+                    if (itemId != null) {
+                        Location spawnLocation = Location.create(mapX, mapY);
+
+                        ItemClass item = Data.get(itemId);
+                        spawnActions.add(new SetItemAction(new Item(item), spawnLocation));
+                    }
                 }
             }
         }
@@ -146,7 +166,8 @@ public class SpawnSystem extends GameSystem {
         return spawnActions;
     }
 
-    private GameState spawnLiving(Set<Location> spawnedLocations, GameState state, Location center) {
+    private GameState spawnLiving(Set<Location> spawnedLocations,
+            GameState state, Location center) {
 
         int freq = spawnContext.getLivingSpawnFrequency();
 
@@ -185,7 +206,8 @@ public class SpawnSystem extends GameSystem {
         return state;
     }
 
-    private Callable<GameState> getLivingSpawnAction(Location location, GameState state) {
+    private Callable<GameState> getLivingSpawnAction(Location location,
+            GameState state) {
 
         return () -> {
             GameState callableState = state;

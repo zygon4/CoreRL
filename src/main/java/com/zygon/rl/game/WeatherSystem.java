@@ -2,6 +2,8 @@ package com.zygon.rl.game;
 
 import java.util.Random;
 
+import com.zygon.rl.world.Weather;
+
 /**
  * Simple markov weather system.
  */

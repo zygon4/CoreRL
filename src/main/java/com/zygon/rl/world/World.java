@@ -7,7 +7,6 @@ import com.zygon.rl.data.buildings.Building;
 import com.zygon.rl.data.buildings.BuildingData;
 import com.zygon.rl.data.buildings.Layout;
 import com.zygon.rl.data.context.Data;
-import com.zygon.rl.game.Weather;
 import com.zygon.rl.util.NoiseUtil;
 import com.zygon.rl.world.character.CharacterSheet;
 
@@ -41,7 +40,8 @@ public class World {
     private final GenericEntityManager<CharacterSheet> actors;
     private Location playerLocation;
 
-    public World(Calendar calendar, Weather weather, GenericEntityManager<Tangible> staticObjects,
+    public World(Calendar calendar, Weather weather,
+            GenericEntityManager<Tangible> staticObjects,
             GenericEntityManager<CharacterSheet> actors, Location playerLocation) {
         this.calendar = Objects.requireNonNull(calendar);
         this.weather = Objects.requireNonNull(weather);
@@ -122,7 +122,8 @@ public class World {
                 .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
     }
 
-    public Map<Location, CharacterSheet> getAll(Location center, String type, int radius) {
+    public Map<Location, CharacterSheet> getAll(Location center, String type,
+            int radius) {
         return getAll(center, type, radius, false);
     }
 
@@ -314,15 +315,43 @@ public class World {
                 Collections.shuffle(buildingIds, getNoiseRandom(buildingCenter));
                 BuildingData building = Data.get(buildingIds.get(0));
 
-                Terrain terrain = getBuildingTerrain(building, location.getX() - roundXPos, location.getY() - roundYPos);
-
-                return terrain;
+//                if (buildingCenter.equals(location)) {
+//                    return Terrain.Ids.DEEP_WATER.get();
+//                }
+                if (canBuild(this, buildingCenter, building)) {
+                    return getBuildingTerrain(building, location.getX() - roundXPos, location.getY() - roundYPos);
+                } else {
+                    return Terrain.Ids.GRASS.get();
+                }
         }
 
         throw new IllegalArgumentException("No terrain for " + location);
     }
 
-    private Terrain getBuildingTerrain(Building building, int distToCenterX, int distToCenterY) {
+    public static boolean canBuild(World world, Location center,
+            Building building) {
+
+        Layout layout = building.getLayout();
+
+        int widthFromCenter = layout.getStructure().getWidthFromCenter();
+        int heightFromCenter = layout.getStructure().getHeightFromCenter();
+
+        //  "+1" to account for the center tile itself.
+        for (int mapY = center.getY() - heightFromCenter, buildingY = 0; mapY < center.getY() + 1 + heightFromCenter; mapY++, buildingY++) {
+            for (int mapX = center.getX() - widthFromCenter, buildingX = 0; mapX < center.getX() + 1 + widthFromCenter; mapX++, buildingX++) {
+                Location buildingLocation = Location.create(mapX, mapY);
+                WorldRegion region = world.getRegion(buildingLocation);
+                if (region != WorldRegion.TOWN_RESIDENCE && region != WorldRegion.TOWN_OUTER) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private Terrain getBuildingTerrain(Building building, int distToCenterX,
+            int distToCenterY) {
 
         int absX = Math.abs(distToCenterX);
         int absY = Math.abs(distToCenterY);
