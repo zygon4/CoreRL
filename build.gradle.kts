@@ -7,7 +7,7 @@ plugins {
 repositories {
     // Use jcenter for resolving dependencies.
     // You can declare any Maven/Ivy/file repository here.
-    jcenter()
+    //jcenter()
     mavenCentral()
     maven {
         url = uri("https://jitpack.io")
@@ -36,5 +36,5 @@ dependencies {
 }
 
 application {
-    mainClassName = "com.zygon.rl.game.example.BloodRLMain"
+    mainClass = "com.zygon.rl.game.example.BloodRLMain"
 }
