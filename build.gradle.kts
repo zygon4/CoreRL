@@ -53,6 +53,7 @@ val javaComponent = components["java"] as AdhocComponentWithVariants
 
 publishing {
     publications {
+        // Use: ./gradlew publishToMavenLocal
         create<MavenPublication>("mavenJava") {
             from(components["java"])
             afterEvaluate {
