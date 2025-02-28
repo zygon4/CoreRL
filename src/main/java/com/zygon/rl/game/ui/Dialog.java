@@ -1,5 +1,6 @@
 package com.zygon.rl.game.ui;
 
+import org.hexworks.zircon.api.CP437TilesetResources;
 import org.hexworks.zircon.api.builder.component.ModalBuilder;
 import org.hexworks.zircon.api.component.Container;
 import org.hexworks.zircon.api.component.modal.Modal;
@@ -29,7 +30,10 @@ final class Dialog implements ModalFragment<ModalResult> {
     public Modal<ModalResult> getRoot() {
         Modal<ModalResult> modal = ModalBuilder.newBuilder()
                 .withComponent(container)
-                .withParentSize(parentSize)
+                .withColorTheme(container.getTheme())
+                .withComponentStyleSet(container.getComponentStyleSet())
+                .withPreferredSize(parentSize)
+                .withTileset(CP437TilesetResources.rexPaint16x16())
                 .build();
 
         modal.handleKeyboardEvents(KeyboardEventType.KEY_PRESSED, (event, phase) -> {

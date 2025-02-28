@@ -1,6 +1,7 @@
 package com.zygon.rl.game.ui;
 
 import com.zygon.rl.game.Game;
+
 import org.hexworks.zircon.api.CP437TilesetResources;
 import org.hexworks.zircon.api.Components;
 import org.hexworks.zircon.api.component.Button;
@@ -21,7 +22,8 @@ final class TitleView extends BaseView {
     private final GameView gameView;
     private final String headerText;
 
-    public TitleView(TileGrid tileGrid, ColorTheme colorTheme, Game game, String headerText) {
+    public TitleView(TileGrid tileGrid, ColorTheme colorTheme, Game game,
+            String headerText) {
         super(tileGrid, colorTheme);
         this.tileGrid = tileGrid;
         this.game = game;

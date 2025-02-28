@@ -1,11 +1,13 @@
 package com.zygon.rl.game.ui;
 
 import com.zygon.rl.game.Game;
+
 import org.hexworks.zircon.api.CP437TilesetResources;
 import org.hexworks.zircon.api.Components;
 import org.hexworks.zircon.api.component.Button;
 import org.hexworks.zircon.api.component.ComponentAlignment;
 import org.hexworks.zircon.api.component.Panel;
+import org.hexworks.zircon.api.data.Size;
 import org.hexworks.zircon.api.graphics.BoxType;
 import org.hexworks.zircon.api.uievent.MouseEventType;
 import org.hexworks.zircon.api.uievent.UIEventResponse;
@@ -52,7 +54,8 @@ final class HelpView extends BaseView {
 
         controlsButton.handleMouseEvents(MouseEventType.MOUSE_CLICKED, (p1, p2) -> {
             Panel modalPanel = Components.panel()
-                    .withSize(50, 10)
+                    .withSize(Size.create(50, 10))
+                    .withColorTheme(gameView.getTheme())
                     .withAlignmentWithin(titleMenuPanel, ComponentAlignment.CENTER)
                     .withDecorations(org.hexworks.zircon.api.ComponentDecorations.box(BoxType.SINGLE))
                     .build();

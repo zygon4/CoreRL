@@ -17,14 +17,14 @@ repositories {
 
 dependencies {
     api("org.apache.commons:commons-math3:3.6.1")
-    implementation("org.apache.commons:commons-text:1.9")
+    implementation("org.apache.commons:commons-text:1.13.0")
 
-    implementation("com.github.stewsters:stewsters-util:0.19")
+    implementation("com.github.stewsters:stewsters-util:0.20")
 
-    implementation("com.google.guava:guava:30.0-jre")
-    implementation("com.google.code.gson:gson:2.8.6")
+    implementation("com.google.guava:guava:33.4.0-jre")
+    implementation("com.google.code.gson:gson:2.12.1")
 
-    implementation("commons-io:commons-io:2.8.0")
+    implementation("commons-io:commons-io:2.18.0")
 
     implementation("org.hexworks.zircon:zircon.core-jvm:2021.1.0-RELEASE")
     implementation("org.hexworks.zircon:zircon.jvm.swing:2021.1.0-RELEASE")
