@@ -35,6 +35,16 @@ Can run with:
 
 to launch the Swing game app.
 
-Requires java 14!
+To write jar to local maven:
+```
+./gradlew publishToMavenLocal
+```
+
+and then import:
+```
+com.lds.blood.core:CoreRL:0.1
+```
+
+Requires java 14+
 
 ![Alt text](/images/PoisonGas.png?raw=true "Blood")
