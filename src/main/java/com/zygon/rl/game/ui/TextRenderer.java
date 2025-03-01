@@ -1,6 +1,7 @@
 package com.zygon.rl.game.ui;
 
 import java.awt.Color;
+import java.lang.System.Logger.Level;
 import java.util.Objects;
 
 import com.zygon.rl.game.GameState;
@@ -14,6 +15,8 @@ import org.hexworks.zircon.api.graphics.Layer;
  * @author zygon
  */
 public class TextRenderer implements GameComponentRenderer {
+
+    private static final System.Logger LOGGER = System.getLogger(TextRenderer.class.getCanonicalName());
 
     private final Layer textLayer;
     private final RenderUtil renderUtil;
@@ -32,7 +35,16 @@ public class TextRenderer implements GameComponentRenderer {
     public void render(GameState gameState) {
         Notification note = gameState.getNotification();
         if (note != null) {
-            renderUtil.render(textLayer, Position.create(0, 1), note.note(), Color.WHITE);
+
+            LOGGER.log(Level.DEBUG, "Rendering note:\n" + note);
+
+            String[] splitText = note.note().split("\\r?\\n");
+            if (splitText != null) {
+                int y = 1;
+                for (String text : splitText) {
+                    renderUtil.render(textLayer, Position.create(0, y++), text, Color.WHITE);
+                }
+            }
         }
     }
 }
