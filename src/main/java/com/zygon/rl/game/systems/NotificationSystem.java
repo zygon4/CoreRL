@@ -1,9 +1,15 @@
-package com.zygon.rl.game;
+package com.zygon.rl.game.systems;
+
+import com.zygon.rl.game.ContinueInputHandler;
+import com.zygon.rl.game.GameConfiguration;
+import com.zygon.rl.game.GameState;
+import com.zygon.rl.game.GameSystem;
+import com.zygon.rl.game.Notification;
 
 /**
  * @author zygon
  */
-/*pkg*/ final class NotificationSystem extends GameSystem {
+public final class NotificationSystem extends GameSystem {
 
     private static final System.Logger logger = System.getLogger(NotificationSystem.class.getCanonicalName());
 

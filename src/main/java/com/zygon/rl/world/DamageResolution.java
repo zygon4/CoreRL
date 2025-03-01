@@ -1,7 +1,5 @@
 package com.zygon.rl.world;
 
-import com.zygon.rl.world.DamageType;
-
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -15,7 +13,6 @@ import java.util.stream.Collectors;
  */
 public class DamageResolution {
 
-    private final String attacker;
     private final String defender;
     private final boolean miss;
     private final boolean critial;
@@ -25,8 +22,7 @@ public class DamageResolution {
     // TODO: damage to weapons/armor/items on person, or even damage
     // to the local area (acid spray, etc.), and status effects like knockdown.
     //
-    public DamageResolution(String attacker, String defender, boolean miss, boolean critial) {
-        this.attacker = attacker;
+    public DamageResolution(String defender, boolean miss, boolean critial) {
         this.defender = defender;
         this.miss = miss;
         this.critial = critial;
@@ -45,6 +41,10 @@ public class DamageResolution {
         return Collections.unmodifiableMap(damageByType);
     }
 
+    public String getDefender() {
+        return defender;
+    }
+
     public int getTotalDamage() {
         return totalDamage;
     }
@@ -57,21 +57,34 @@ public class DamageResolution {
         return miss;
     }
 
+    protected String getMissMessage() {
+        return "No effect";
+    }
+
+    protected String getCritMessage() {
+        return "String effect";
+    }
+
+    protected String getDamageMessage() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getDefender()).append(" for ")
+                .append(getTotalDamage()).append(" damage\n  ")
+                .append(getDamageByType().entrySet().stream()
+                        .map(entry -> entry.getKey().name() + " - " + entry.getValue() + " damage")
+                        .collect(Collectors.joining("\n  ")));
+        return sb.toString();
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        if (miss) {
-            sb.append(attacker).append(" missed!\n");
+        if (isMiss()) {
+            sb.append(getMissMessage());
         } else {
-            if (critial) {
-                sb.append("Critical!\n");
+            if (isCritial()) {
+                sb.append(getCritMessage()).append("\n");
             }
-            sb.append(attacker).append(" hit ")
-                    .append(defender).append(" for ")
-                    .append(getTotalDamage()).append(" damage\n  ")
-                    .append(damageByType.entrySet().stream()
-                            .map(entry -> entry.getKey().name() + " - " + entry.getValue() + " damage")
-                            .collect(Collectors.joining("\n  ")));
+            sb.append(getDamageMessage());
         }
         return sb.toString();
     }

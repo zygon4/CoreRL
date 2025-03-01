@@ -1,8 +1,5 @@
 package com.zygon.rl.data;
 
-import com.google.gson.reflect.TypeToken;
-import com.zygon.rl.util.StringUtil;
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -14,6 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.google.gson.reflect.TypeToken;
+import com.zygon.rl.util.StringUtil;
 
 /**
  *
@@ -42,6 +42,7 @@ public final class Effect extends WorldElement {
 
     // Not sure if this can keep up..
     public static enum EffectNames {
+        BLEEDING_MAJOR(Effect.get("effect_bleeding_major")),
         HOSTILE(Effect.get("effect_hostile")),
         PET(Effect.get("effect_pet"));
 
@@ -53,6 +54,15 @@ public final class Effect extends WorldElement {
 
         public Effect getEffect() {
             return effect;
+        }
+
+        public static EffectNames getInstance(String effectId) {
+            for (EffectNames effectName : EffectNames.values()) {
+                if (effectName.getId().equals(effectId)) {
+                    return effectName;
+                }
+            }
+            return null;
         }
 
         private EffectNames(Effect effect) {
@@ -69,7 +79,7 @@ public final class Effect extends WorldElement {
 
     public static void load() throws FileNotFoundException, IOException {
 
-        try ( Reader jsonReader = new BufferedReader(new InputStreamReader(
+        try (Reader jsonReader = new BufferedReader(new InputStreamReader(
                 Effect.class.getResourceAsStream(PATH)))) {
             List<Effect> data = StringUtil.JSON.fromJson(jsonReader, TYPE);
 

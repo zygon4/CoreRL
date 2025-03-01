@@ -1,12 +1,13 @@
 package com.zygon.rl.world.combat;
 
+import java.util.Random;
+
+import com.zygon.rl.util.DiceRoller;
 import com.zygon.rl.world.DamageResolution;
 import com.zygon.rl.world.DamageType;
+import com.zygon.rl.world.SourcedDamageResolution;
 import com.zygon.rl.world.character.CharacterSheet;
-import com.zygon.rl.util.DiceRoller;
 import com.zygon.rl.world.character.Weapon;
-
-import java.util.Random;
 
 /**
  *
@@ -22,7 +23,8 @@ public class CombatResolver {
         this.dice = new DiceRoller(this.random);
     }
 
-    public DamageResolution resolveCloseCombat(CharacterSheet attacker, CharacterSheet defender) {
+    public DamageResolution resolveCloseCombat(CharacterSheet attacker,
+            CharacterSheet defender) {
         // TODO: check on weapon type and call specific method
         return resolveMelee(attacker, defender);
     }
@@ -42,7 +44,8 @@ public class CombatResolver {
         return roll == 1;
     }
 
-    private DamageResolution resolveMelee(CharacterSheet attacker, CharacterSheet defender) {
+    private DamageResolution resolveMelee(CharacterSheet attacker,
+            CharacterSheet defender) {
 
         Weapon weapon = attacker.getEquipment().getWeapons().size() > 1
                 ? attacker.getEquipment().getWeapons().get(0) : null;
@@ -75,7 +78,7 @@ public class CombatResolver {
             }
         }
 
-        DamageResolution resolution = new DamageResolution(attacker.getName(),
+        DamageResolution resolution = new SourcedDamageResolution(attacker.getName(),
                 defender.getName(), miss, critical);
         if (dmg > 0) {
             // TODO: different weapon types

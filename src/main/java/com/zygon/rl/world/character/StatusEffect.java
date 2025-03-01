@@ -10,12 +10,18 @@ import com.zygon.rl.data.Effect;
 public final class StatusEffect {
 
     private final Effect effectId;
+    private final int turn;
 
-    public StatusEffect(Effect id) {
+    public StatusEffect(Effect id, int turn) {
         this.effectId = id;
+        this.turn = turn;
     }
 
     public Effect getEffect() {
         return effectId;
+    }
+
+    public int getTurn() {
+        return turn;
     }
 }

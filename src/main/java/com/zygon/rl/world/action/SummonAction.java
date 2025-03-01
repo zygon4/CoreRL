@@ -1,5 +1,12 @@
 package com.zygon.rl.world.action;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import com.stewsters.util.name.FantasyNameGen;
 import com.zygon.rl.data.Creature;
 import com.zygon.rl.data.Effect;
@@ -11,13 +18,6 @@ import com.zygon.rl.world.character.CharacterSheet;
 import com.zygon.rl.world.character.Stats;
 import com.zygon.rl.world.character.Status;
 import com.zygon.rl.world.character.StatusEffect;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  *
@@ -36,7 +36,8 @@ public class SummonAction extends Action {
 
     // This is intended to be a actor-only summon, but summoning random items
     // is pretty valid as well. This will need enhancement.
-    public SummonAction(Location location, int count, String id, Set<Effect> effects, Random random) {
+    public SummonAction(Location location, int count, String id,
+            Set<Effect> effects, Random random) {
         this.location = location;
         this.count = count;
         this.id = id;
@@ -61,7 +62,7 @@ public class SummonAction extends Action {
         Creature actor = Data.get(id);
 
         for (Location loc : summonLocations) {
-            CharacterSheet generated = getRandomCharacter(actor);
+            CharacterSheet generated = getRandomCharacter(state, actor);
             state.getWorld().add(generated, loc);
         }
 
@@ -87,10 +88,10 @@ public class SummonAction extends Action {
     }
 
     // TODO: this is clearly insufficient, maybe stats based on size?
-    private CharacterSheet getRandomCharacter(Creature actor) {
+    private CharacterSheet getRandomCharacter(GameState state, Creature actor) {
         int stats = random.nextInt(4) + 1;
         Set<StatusEffect> statusEffects = effects.stream()
-                .map(StatusEffect::new)
+                .map(e -> new StatusEffect(e, state.getTurnCount()))
                 .collect(Collectors.toSet());
 
         return new CharacterSheet(actor,

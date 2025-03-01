@@ -1,19 +1,22 @@
-package com.zygon.rl.game;
-
-import com.zygon.rl.data.field.FieldData;
-import com.zygon.rl.world.Field;
-import com.zygon.rl.world.Location;
-import com.zygon.rl.world.World;
-import com.zygon.rl.world.action.SetTangibleAction;
+package com.zygon.rl.game.systems;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.zygon.rl.data.field.FieldData;
+import com.zygon.rl.game.GameConfiguration;
+import com.zygon.rl.game.GameState;
+import com.zygon.rl.game.GameSystem;
+import com.zygon.rl.world.Field;
+import com.zygon.rl.world.Location;
+import com.zygon.rl.world.World;
+import com.zygon.rl.world.action.SetTangibleAction;
+
 /**
  * @author zygon
  */
-/*pkg*/ final class FieldPropagationSystem extends GameSystem {
+public final class FieldPropagationSystem extends GameSystem {
 
     private static final System.Logger logger = System.getLogger(FieldPropagationSystem.class.getCanonicalName());
 

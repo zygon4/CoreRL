@@ -1,5 +1,8 @@
 package com.zygon.rl.world.action;
 
+import java.util.Objects;
+import java.util.function.Predicate;
+
 import com.zygon.rl.data.Effect;
 import com.zygon.rl.game.GameConfiguration;
 import com.zygon.rl.game.GameState;
@@ -7,12 +10,8 @@ import com.zygon.rl.world.CorpseItem;
 import com.zygon.rl.world.DamageResolution;
 import com.zygon.rl.world.Item;
 import com.zygon.rl.world.Location;
-import com.zygon.rl.world.World;
 import com.zygon.rl.world.character.CharacterSheet;
 import com.zygon.rl.world.character.StatusEffect;
-
-import java.util.Objects;
-import java.util.function.Predicate;
 
 /**
  *
@@ -26,7 +25,8 @@ public abstract class DamageAction extends Action {
     private final CharacterSheet damaged;
     private final Location defenderLocation;
 
-    public DamageAction(GameConfiguration gameConfiguration, CharacterSheet defender,
+    public DamageAction(GameConfiguration gameConfiguration,
+            CharacterSheet defender,
             Location defenderLocation) {
         this.gameConfiguration = gameConfiguration;
         this.damaged = Objects.requireNonNull(defender, "Need defender");
@@ -62,7 +62,7 @@ public abstract class DamageAction extends Action {
 
         if (!updatedDefender.isDead()) {
             state.getWorld().add(updatedDefender, defenderLocation);
-            updateToHostile(state.getWorld(), updatedDefender, defenderLocation);
+            updateToHostile(state, updatedDefender, defenderLocation);
         } else {
             logger.log(System.Logger.Level.TRACE,
                     "DEAD: " + updatedDefender.getId() + " at " + defenderLocation);
@@ -76,25 +76,27 @@ public abstract class DamageAction extends Action {
         return state;
     }
 
-    private void updateToHostile(World world, CharacterSheet characterSheet, Location location) {
+    private void updateToHostile(GameState state, CharacterSheet characterSheet,
+            Location location) {
         if (!characterSheet.getId().equals("player")) {
             if (!characterSheet.getStatus().isEffected(Effect.EffectNames.HOSTILE.getId())) {
                 CharacterSheet updatedToHostile = characterSheet.set(characterSheet.getStatus()
-                        .addEffect(new StatusEffect(Effect.EffectNames.HOSTILE.getEffect())));
+                        .addEffect(new StatusEffect(Effect.EffectNames.HOSTILE.getEffect(), state.getTurnCount())));
 
-                world.add(updatedToHostile, location);
+                state.getWorld().add(updatedToHostile, location);
             }
         }
     }
 
     // Also seems like a possible pattern..
-    private void updateToHostile(World world, Predicate<CharacterSheet> isHostileFn, Location near) {
+    private void updateToHostile(GameState state,
+            Predicate<CharacterSheet> isHostileFn, Location near) {
         near.getNeighbors(20).stream()
                 .forEach(n -> {
-                    CharacterSheet hostileCharacter = world.get(n);
+                    CharacterSheet hostileCharacter = state.getWorld().get(n);
                     if (hostileCharacter != null && isHostileFn.test(hostileCharacter)) {
 
-                        updateToHostile(world, hostileCharacter, n);
+                        updateToHostile(state, hostileCharacter, n);
                     }
                 });
     }

@@ -1,4 +1,4 @@
-package com.zygon.rl.game;
+package com.zygon.rl.game.systems;
 
 import com.zygon.rl.data.ItemClass;
 import com.zygon.rl.data.Terrain;
@@ -9,6 +9,10 @@ import com.zygon.rl.data.context.Data;
 import com.zygon.rl.data.items.ArmorData;
 import com.zygon.rl.data.monster.Monster;
 import com.zygon.rl.data.npc.Npc;
+import com.zygon.rl.game.GameConfiguration;
+import com.zygon.rl.game.GameState;
+import com.zygon.rl.game.GameSystem;
+import com.zygon.rl.game.SpawnContext;
 import com.zygon.rl.world.Item;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;

@@ -1,9 +1,19 @@
-package com.zygon.rl.game;
+package com.zygon.rl.game.systems;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 import com.zygon.rl.data.Creature;
 import com.zygon.rl.data.Effect;
 import com.zygon.rl.data.field.FieldData;
 import com.zygon.rl.data.monster.Species;
+import com.zygon.rl.game.Behavior;
+import com.zygon.rl.game.GameConfiguration;
+import com.zygon.rl.game.GameState;
+import com.zygon.rl.game.GameSystem;
 import com.zygon.rl.world.CommonAttributes;
 import com.zygon.rl.world.Field;
 import com.zygon.rl.world.Location;
@@ -14,17 +24,11 @@ import com.zygon.rl.world.action.MeleeAttackAction;
 import com.zygon.rl.world.action.MoveAction;
 import com.zygon.rl.world.character.CharacterSheet;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.stream.Collectors;
-
 /**
  *
  * @author zygon
  */
-final class AISystem extends GameSystem {
+public final class AISystem extends GameSystem {
 
     private final Random random;
 
@@ -78,7 +82,8 @@ final class AISystem extends GameSystem {
         return state;
     }
 
-    private Collection<Action> getEnvironmentalActions(World world, Location location,
+    private Collection<Action> getEnvironmentalActions(World world,
+            Location location,
             CharacterSheet character) {
 
         // First resolve fields in the air
@@ -155,7 +160,8 @@ final class AISystem extends GameSystem {
         return null;
     }
 
-    private Behavior defend(Location defenderLoc, Location toDefendLoc, World world, int close) {
+    private Behavior defend(Location defenderLoc, Location toDefendLoc,
+            World world, int close) {
 
         for (var possibleHostile : toDefendLoc.getNeighbors(close)) {
             CharacterSheet neighborToDefendLoc = world.get(possibleHostile);
@@ -181,7 +187,8 @@ final class AISystem extends GameSystem {
         return null;
     }
 
-    private Behavior follow(Location followerLocation, Location destination, World world, int close) {
+    private Behavior follow(Location followerLocation, Location destination,
+            World world, int close) {
 
         if (followerLocation.getDistance(destination) > close) {
             List<Location> pathToDest = followerLocation.getPath(destination,
@@ -203,7 +210,8 @@ final class AISystem extends GameSystem {
         return null;
     }
 
-    private Behavior hostile(Location hostileLocation, Location destination, World world) {
+    private Behavior hostile(Location hostileLocation, Location destination,
+            World world) {
         if (hostileLocation.getNeighbors().contains(world.getPlayerLocation())) {
             CharacterSheet player = world.getPlayer();
             return (c) -> new MeleeAttackAction(getGameConfiguration(),

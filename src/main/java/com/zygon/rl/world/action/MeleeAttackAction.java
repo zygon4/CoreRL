@@ -1,18 +1,17 @@
 package com.zygon.rl.world.action;
 
+import java.util.Objects;
+import java.util.function.Predicate;
+
 import com.zygon.rl.data.Effect;
 import com.zygon.rl.data.monster.Monster;
 import com.zygon.rl.game.GameConfiguration;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.world.DamageResolution;
 import com.zygon.rl.world.Location;
-import com.zygon.rl.world.World;
 import com.zygon.rl.world.character.CharacterSheet;
 import com.zygon.rl.world.character.StatusEffect;
 import com.zygon.rl.world.combat.CombatResolver;
-
-import java.util.Objects;
-import java.util.function.Predicate;
 
 /**
  * Eventually can introduce a generic CombatAction that Melee and Ranged hang
@@ -25,7 +24,8 @@ public class MeleeAttackAction extends DamageAction {
     private final CharacterSheet attacker;
 
     public MeleeAttackAction(GameConfiguration gameConfiguration,
-            CharacterSheet attacker, CharacterSheet defender, Location defenderLocation) {
+            CharacterSheet attacker, CharacterSheet defender,
+            Location defenderLocation) {
         super(gameConfiguration, defender, defenderLocation);
         this.attacker = Objects.requireNonNull(attacker, "Need attacker");
     }
@@ -43,7 +43,7 @@ public class MeleeAttackAction extends DamageAction {
         state = super.execute(state);
 
         // For all nearby creatures of the same type and species (if monster)
-        updateToHostile(state.getWorld(), (couldBeHostile) -> {
+        updateToHostile(state, (couldBeHostile) -> {
             // if same type AND species AND NOT PET
             // Getting a bit weird.. let's see how it goes..
 
@@ -72,25 +72,27 @@ public class MeleeAttackAction extends DamageAction {
         return combatDamage;
     }
 
-    private void updateToHostile(World world, CharacterSheet characterSheet, Location location) {
+    private void updateToHostile(GameState state, CharacterSheet characterSheet,
+            Location location) {
         if (!characterSheet.getId().equals("player")) {
             if (!characterSheet.getStatus().isEffected(Effect.EffectNames.HOSTILE.getId())) {
                 CharacterSheet updatedToHostile = characterSheet.set(characterSheet.getStatus()
-                        .addEffect(new StatusEffect(Effect.EffectNames.HOSTILE.getEffect())));
+                        .addEffect(new StatusEffect(Effect.EffectNames.HOSTILE.getEffect(), state.getTurnCount())));
 
-                world.add(updatedToHostile, location);
+                state.getWorld().add(updatedToHostile, location);
             }
         }
     }
 
     // Also seems like a possible pattern..
-    private void updateToHostile(World world, Predicate<CharacterSheet> isHostileFn, Location near) {
+    private void updateToHostile(GameState state,
+            Predicate<CharacterSheet> isHostileFn, Location near) {
         near.getNeighbors(20).stream()
                 .forEach(n -> {
-                    CharacterSheet hostileCharacter = world.get(n);
+                    CharacterSheet hostileCharacter = state.getWorld().get(n);
                     if (hostileCharacter != null && isHostileFn.test(hostileCharacter)) {
 
-                        updateToHostile(world, hostileCharacter, n);
+                        updateToHostile(state, hostileCharacter, n);
                     }
                 });
     }

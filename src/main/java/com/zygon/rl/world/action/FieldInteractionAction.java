@@ -1,14 +1,15 @@
 package com.zygon.rl.world.action;
 
+import java.util.Map;
+
 import com.zygon.rl.game.GameConfiguration;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.world.DamageResolution;
 import com.zygon.rl.world.DamageType;
 import com.zygon.rl.world.Field;
 import com.zygon.rl.world.Location;
+import com.zygon.rl.world.SourcedDamageResolution;
 import com.zygon.rl.world.character.CharacterSheet;
-
-import java.util.Map;
 
 /**
  *
@@ -35,7 +36,7 @@ public class FieldInteractionAction extends DamageAction {
 
     @Override
     protected DamageResolution getDamage(GameState state) {
-        DamageResolution dmg = new DamageResolution(field.getTemplate().getName(),
+        DamageResolution dmg = new SourcedDamageResolution(field.getTemplate().getName(),
                 getDamaged().getName(), false, false);
 
         DamageType type = getDmgByField.get(field.getId());

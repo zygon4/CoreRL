@@ -1,4 +1,8 @@
-package com.zygon.rl.game;
+package com.zygon.rl.game.systems;
+
+import com.zygon.rl.game.GameConfiguration;
+import com.zygon.rl.game.GameState;
+import com.zygon.rl.game.GameSystem;
 
 import java.util.Random;
 

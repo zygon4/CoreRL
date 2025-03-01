@@ -15,6 +15,14 @@
         "statMods": [ { "name":"INT", "amount":-2 }, { "name":"WIS", "amount":-2 } ]
     },
     {
+        "id": "effect_bleeding_major",
+        "type": "EFFECT",
+        "name": "Bleeding",
+        "description": "You're bleeding profously, you may die",
+        "maxDuration": 8,
+        "statMods": [ { "name":"STR", "amount":-4 }, { "name":"DEX", "amount":-4 }, { "name":"CON", "amount":-4 }, { "name":"INT", "amount":-4 }, { "name":"WIS", "amount":-4 }, { "name":"CHA", "amount":-4 } ]
+    },
+    {
         "id": "effect_hostile",
         "type": "EFFECT",
         "name": "Hostile",

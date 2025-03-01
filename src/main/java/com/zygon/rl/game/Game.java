@@ -6,6 +6,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import com.zygon.rl.game.systems.AISystem;
+import com.zygon.rl.game.systems.FieldEffectSystem;
+import com.zygon.rl.game.systems.FieldPropagationSystem;
+import com.zygon.rl.game.systems.NotificationSystem;
+import com.zygon.rl.game.systems.SpawnSystem;
+import com.zygon.rl.game.systems.StatusEffectSystem;
+import com.zygon.rl.game.systems.WeatherSystem;
+
 /**
  * Goals: hold data, be serializable
  *
@@ -99,6 +107,7 @@ public final class Game {
         private Builder(GameConfiguration gameConfiguration) {
             this.gameSystems.add(new DefaultGameSystem(gameConfiguration));
             this.gameSystems.add(new NotificationSystem(gameConfiguration));
+            this.gameSystems.add(new StatusEffectSystem(gameConfiguration));
             this.gameSystems.add(new FieldPropagationSystem(gameConfiguration));
             this.gameSystems.add(new FieldEffectSystem(gameConfiguration));
             this.gameSystems.add(new SpawnSystem(gameConfiguration));
