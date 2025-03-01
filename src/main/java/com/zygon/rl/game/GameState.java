@@ -1,9 +1,9 @@
 package com.zygon.rl.game;
 
-import com.zygon.rl.world.World;
-
 import java.util.Objects;
 import java.util.Stack;
+
+import com.zygon.rl.world.World;
 
 /**
  * Goals: immutable, serializable, reasonable performance
@@ -98,6 +98,7 @@ public class GameState {
 
     private final int turnCount;
     private final GameLog gameLog;
+    private final Notification notification;
     private final Stack<InputContext> inputContext;
     private final World world;
     private final GameConfiguration gameConfiguration;
@@ -116,6 +117,7 @@ public class GameState {
         }
         this.turnCount = builder.turnCount;
         this.gameLog = builder.gameLog != null ? builder.gameLog : new GameLog();
+        this.notification = builder.notification;
         this.inputContext = stackCopy;
         this.world = builder.world;
         this.gameConfiguration = builder.gameConfiguration;
@@ -131,6 +133,10 @@ public class GameState {
 
     public GameLog getLog() {
         return gameLog;
+    }
+
+    public Notification getNotification() {
+        return notification;
     }
 
     public Stack<InputContext> getInputContext() {
@@ -164,6 +170,7 @@ public class GameState {
 
         private int turnCount = 0;
         private GameLog gameLog;
+        private Notification notification;
         private Stack<InputContext> inputContext;
         private World world;
         private GameConfiguration gameConfiguration;
@@ -175,6 +182,7 @@ public class GameState {
         private Builder(GameState gameState) {
             this.turnCount = gameState.getTurnCount();
             this.gameLog = gameState.getLog();
+            this.notification = gameState.getNotification();
             this.inputContext = gameState.getInputContext();
             this.world = gameState.getWorld();
             this.gameConfiguration = gameState.getGameConfiguration();
@@ -185,6 +193,11 @@ public class GameState {
                 this.gameLog = new GameLog();
             }
             this.gameLog = this.gameLog.add(message);
+            return this;
+        }
+
+        public Builder setNotification(Notification notification) {
+            this.notification = notification;
             return this;
         }
 

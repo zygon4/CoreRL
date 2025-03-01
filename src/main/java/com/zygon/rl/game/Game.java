@@ -70,7 +70,6 @@ public final class Game {
                     System.out.println(deathMessage);
                     System.exit(0);
                 }
-
             }
         }
 
@@ -99,6 +98,7 @@ public final class Game {
 
         private Builder(GameConfiguration gameConfiguration) {
             this.gameSystems.add(new DefaultGameSystem(gameConfiguration));
+            this.gameSystems.add(new NotificationSystem(gameConfiguration));
             this.gameSystems.add(new FieldPropagationSystem(gameConfiguration));
             this.gameSystems.add(new FieldEffectSystem(gameConfiguration));
             this.gameSystems.add(new SpawnSystem(gameConfiguration));

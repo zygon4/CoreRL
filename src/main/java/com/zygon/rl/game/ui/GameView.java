@@ -119,13 +119,12 @@ final class GameView extends BaseView {
                     .build();
             getScreen().addLayer(miniMapLayer);
 
+            RenderUtil renderUtil = new RenderUtil(colorCache);
+
             Layer gameScreenLayer = Layer.newBuilder()
                     .withSize(gameScreen.getSize())
                     .build();
             getScreen().addLayer(gameScreenLayer);
-
-            RenderUtil renderUtil = new RenderUtil(colorCache);
-
             componentRenderersByPrompt.put(GameState.InputContextPrompt.PRIMARY,
                     new OuterWorldRenderer(gameScreenLayer, game, renderUtil));
 
@@ -133,14 +132,21 @@ final class GameView extends BaseView {
                     .withSize(gameScreen.getSize())
                     .build();
             getScreen().addLayer(inventoryLayer);
-
             componentRenderersByPrompt.put(GameState.InputContextPrompt.INVENTORY,
                     new InventoryRenderer(inventoryLayer, renderUtil));
 
-            updateGameScreen(game);
+            Layer notificationLayer = Layer.newBuilder()
+                    .withSize(gameScreen.getSize())
+                    .build();
+            getScreen().addLayer(notificationLayer);
+            componentRenderersByPrompt.put(GameState.InputContextPrompt.MODAL,
+                    new TextRenderer(notificationLayer, renderUtil));
+
             updateSideBar(sideBar, game);
             updateMiniMap(miniMapLayer, game);
+            updateGameScreen(game);
 
+            // At bottom of screen
             Header promptHeader = Components.header()
                     .withSize(50, 1)
                     .withPosition(1, gameScreen.getHeight() + 1)
@@ -180,9 +186,11 @@ final class GameView extends BaseView {
                                     promptHeader.setHidden(false);
                                     break;
                                 case MODAL:
-                                    // TODO: this isn't meant to be specifically
-                                    // the help view..
-                                    replaceWith(new HelpView(this, game));
+                                    switch (inputCtx.getName()) {
+                                        case "GAME_MENU" ->
+                                            // This uses UI engine components to register model open/close
+                                            replaceWith(new HelpView(this, game));
+                                    }
                                     break;
                             }
                         }
@@ -300,26 +308,26 @@ final class GameView extends BaseView {
         logArea.setText(collect);
     }
 
+    // Added a loop, keep an eye out for performance issues
     private void updateGameScreen(Game game) {
 
-        GameState.InputContext inputCtx = game.getState()
-                .getInputContext().firstElement();
+        for (GameState.InputContext inputCtx : game.getState().getInputContext()) {
+            // This is a HACK and shows that the *direction* handlers need better
+            // integration with the rendering, when should we clear?
+            if (inputCtx.getPrompt() != GameState.InputContextPrompt.DIRECTION) {
+                // Clear the renders not associated with the current context
+                componentRenderersByPrompt.forEach((p, r) -> {
+                    if (p != inputCtx.getPrompt()) {
+                        r.clear();
+                    }
+                });
+            }
 
-        // This is a HACK and show that the direction handlers need better
-        // integration with the rendering, when should we clear?
-        if (inputCtx.getPrompt() != GameState.InputContextPrompt.DIRECTION) {
-            // Clear the renders not associated with the current context
-            componentRenderersByPrompt.forEach((p, r) -> {
-                if (p != inputCtx.getPrompt()) {
-                    r.clear();
-                }
-            });
-        }
-
-        GameComponentRenderer gameComponentRenderer
-                = componentRenderersByPrompt.get(inputCtx.getPrompt());
-        if (gameComponentRenderer != null) {
-            gameComponentRenderer.render(game.getState());
+            GameComponentRenderer gameComponentRenderer
+                    = componentRenderersByPrompt.get(inputCtx.getPrompt());
+            if (gameComponentRenderer != null) {
+                gameComponentRenderer.render(game.getState());
+            }
         }
     }
 

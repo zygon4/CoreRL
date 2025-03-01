@@ -1,13 +1,14 @@
 package com.zygon.rl.game;
 
-import com.zygon.rl.game.GameState.InputContext;
-import com.zygon.rl.world.Item;
-import com.zygon.rl.world.character.Inventory;
-import org.hexworks.zircon.api.uievent.KeyCode;
-
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+
+import com.zygon.rl.game.GameState.InputContext;
+import com.zygon.rl.world.Item;
+import com.zygon.rl.world.character.Inventory;
+
+import org.hexworks.zircon.api.uievent.KeyCode;
 
 // We need a "list" handler which dynamically adds the controls to show
 // more (scroll up, down).
@@ -35,7 +36,8 @@ final class InventoryInputHandler extends BaseInputHandler {
         this.escapeContext = escapeContext;
     }
 
-    public static final InventoryInputHandler create(GameConfiguration gameConfiguration,
+    public static final InventoryInputHandler create(
+            GameConfiguration gameConfiguration,
             Inventory inventory, InputContext escapeContext) {
         Map<Input, Item> inputs = createAlphaInputs(inventory.getItems());
         return new InventoryInputHandler(gameConfiguration, inputs, escapeContext);
@@ -66,9 +68,5 @@ final class InventoryInputHandler extends BaseInputHandler {
     public String getDisplayText(Input input) {
         Item item = itemsByKeyCode.get(input);
         return item.getName();
-    }
-
-    /*pkg*/ Map<Input, Item> getItemByKeyCode() {
-        return itemsByKeyCode;
     }
 }

@@ -1,17 +1,18 @@
 package com.zygon.rl.game.ui;
 
+import java.awt.Color;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.world.character.Armor;
 import com.zygon.rl.world.character.CharacterSheet;
 import com.zygon.rl.world.character.Equipment;
 import com.zygon.rl.world.character.Weapon;
+
 import org.hexworks.zircon.api.data.Position;
 import org.hexworks.zircon.api.graphics.Layer;
-
-import java.awt.Color;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  *
@@ -42,7 +43,7 @@ public class InventoryRenderer implements GameComponentRenderer {
         Equipment eq = character.getEquipment();
         List<Weapon> weapons = eq.getWeapons();
 
-        if (weapons.size() > 0) {
+        if (!weapons.isEmpty()) {
             Weapon rWeap = weapons.get(0);
             if (rWeap != null) {
                 String txt = "[RIGHT HAND] " + rWeap;
