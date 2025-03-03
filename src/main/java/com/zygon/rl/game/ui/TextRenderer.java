@@ -2,10 +2,11 @@ package com.zygon.rl.game.ui;
 
 import java.awt.Color;
 import java.lang.System.Logger.Level;
+import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 
 import com.zygon.rl.game.GameState;
-import com.zygon.rl.game.Notification;
 
 import org.hexworks.zircon.api.data.Position;
 import org.hexworks.zircon.api.graphics.Layer;
@@ -20,10 +21,13 @@ public class TextRenderer implements GameComponentRenderer {
 
     private final Layer textLayer;
     private final RenderUtil renderUtil;
+    private final Function<GameState, List<String>> getTextFn;
 
-    public TextRenderer(Layer textLayer, RenderUtil renderUtil) {
+    public TextRenderer(Layer textLayer, RenderUtil renderUtil,
+            Function<GameState, List<String>> getTextFn) {
         this.textLayer = Objects.requireNonNull(textLayer);
         this.renderUtil = Objects.requireNonNull(renderUtil);
+        this.getTextFn = getTextFn;
     }
 
     @Override
@@ -33,16 +37,18 @@ public class TextRenderer implements GameComponentRenderer {
 
     @Override
     public void render(GameState gameState) {
-        Notification note = gameState.getNotification();
-        if (note != null) {
+        List<String> text = getTextFn.apply(gameState);
 
-            LOGGER.log(Level.DEBUG, "Rendering note:\n" + note);
+        if (text != null) {
+            LOGGER.log(Level.INFO, "Rendering text:\n" + text);
 
-            String[] splitText = note.note().split("\\r?\\n");
-            if (splitText != null) {
-                int y = 1;
-                for (String text : splitText) {
-                    renderUtil.render(textLayer, Position.create(0, y++), text, Color.WHITE);
+            int y = 1;
+            for (String t : text) {
+                String[] splitText = t.split("\\r?\\n");
+                if (splitText != null) {
+                    for (String st : splitText) {
+                        renderUtil.render(textLayer, Position.create(0, y++), st, Color.WHITE);
+                    }
                 }
             }
         }

@@ -1,5 +1,10 @@
 package com.zygon.rl.world.combat;
 
+import java.awt.Color;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+
 import com.zygon.rl.data.Creature;
 import com.zygon.rl.data.WorldElement;
 import com.zygon.rl.data.context.Data;
@@ -10,13 +15,9 @@ import com.zygon.rl.world.character.CharacterSheet;
 import com.zygon.rl.world.character.Stats;
 import com.zygon.rl.world.character.Status;
 import com.zygon.rl.world.character.Weapon;
+
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.awt.Color;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
 
 /**
  *
@@ -42,7 +43,7 @@ public class CombatResolveTest {
                 new Status(20, 10, Set.of()),
                 null,
                 null,
-                Set.of(), Set.of());
+                Set.of(), Set.of(), null);
 
         attacker = attacker.add(weapon).wield(weapon);
 
@@ -54,7 +55,7 @@ public class CombatResolveTest {
                 new Status(20, 10, Set.of()),
                 null,
                 null,
-                Set.of(), Set.of());
+                Set.of(), Set.of(), null);
 
         defender = defender.add(weapon).wield(weapon);
 

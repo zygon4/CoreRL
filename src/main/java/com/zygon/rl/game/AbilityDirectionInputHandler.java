@@ -1,9 +1,9 @@
 package com.zygon.rl.game;
 
+import java.util.Optional;
+
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.character.Ability;
-
-import java.util.Optional;
 
 /**
  * Handles ability directions, could be used for spells/other actions in the
@@ -89,7 +89,7 @@ public class AbilityDirectionInputHandler extends BaseInputHandler {
         return input.toString();
     }
 
-    private static GameState popInputContext(GameState state) {
+    protected GameState popInputContext(GameState state) {
         return state.copy()
                 .removeInputContext()// ability target
                 .removeInputContext()// specific ability

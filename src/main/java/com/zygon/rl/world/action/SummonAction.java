@@ -3,6 +3,7 @@ package com.zygon.rl.world.action;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -12,6 +13,8 @@ import com.zygon.rl.data.Creature;
 import com.zygon.rl.data.Effect;
 import com.zygon.rl.data.context.Data;
 import com.zygon.rl.game.GameState;
+import com.zygon.rl.util.dialog.Dialog;
+import com.zygon.rl.util.dialog.DialogChoice;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
 import com.zygon.rl.world.character.CharacterSheet;
@@ -94,10 +97,26 @@ public class SummonAction extends Action {
                 .map(e -> new StatusEffect(e, state.getTurnCount()))
                 .collect(Collectors.toSet());
 
+        Dialog start = Dialog.create("Greetings traveller. Pick a world..");
+        Dialog darkness = Dialog.create("Ah Darkness is excellent..", Optional.empty());
+//                Dialog darkness2 = Dialog.create("Yess.. the darkness binds us.. ", Optional.empty());
+        Dialog light = Dialog.create("I see. Light it is..", Optional.empty());
+
+        DialogChoice leafDark = DialogChoice.create("I pick the world of darkness", Optional.empty(), Optional.of(darkness));
+        DialogChoice leafDark2 = DialogChoice.create("I serve the darkness.. goodbye..", Optional.empty(), Optional.empty());
+        DialogChoice leafLight = DialogChoice.create("I pick the world of light.", Optional.empty(), Optional.of(light));
+        DialogChoice leafLoop = DialogChoice.create("I pick the world of unending", Optional.empty(), Optional.of(start));
+
+        start.addChoices(List.of(leafDark, leafLight, leafLoop));
+        darkness.addChoices(List.of(leafDark2));
+
+        String name = FantasyNameGen.generate();
         return new CharacterSheet(actor,
-                FantasyNameGen.generate(),
+                name,
                 new Stats(stats, stats, stats, stats, stats, stats),
                 new Status(stats, actor.getHitPoints(), statusEffects),
-                null, null, Set.of(), Set.of());
+                null, null, Set.of(), Set.of(),
+                //TODO: proc gen dialog
+                start);
     }
 }

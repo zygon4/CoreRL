@@ -1,14 +1,15 @@
 package com.zygon.rl.world.character;
 
-import com.zygon.rl.data.Creature;
-import com.zygon.rl.data.Effect;
-import com.zygon.rl.world.Item;
-import com.zygon.rl.world.Tangible;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.zygon.rl.data.Creature;
+import com.zygon.rl.data.Effect;
+import com.zygon.rl.util.dialog.Dialog;
+import com.zygon.rl.world.Item;
+import com.zygon.rl.world.Tangible;
 
 /**
  * Represents any kind of "actor" in the game.
@@ -37,9 +38,12 @@ public final class CharacterSheet extends Tangible {
     private final Inventory inventory;
     private final Set<Ability> abilities;
     private final Set<Spell> spells;
+    private final Dialog dialog;
 
-    public CharacterSheet(Creature template, String name, Stats stats, Status status,
-            Equipment equipment, Inventory inventory, Set<Ability> abilities, Set<Spell> spells) {
+    public CharacterSheet(Creature template, String name, Stats stats,
+            Status status,
+            Equipment equipment, Inventory inventory, Set<Ability> abilities,
+            Set<Spell> spells, Dialog dialog) {
         super(template);
 
         this.name = name;
@@ -49,6 +53,7 @@ public final class CharacterSheet extends Tangible {
         this.inventory = inventory != null ? inventory : new Inventory();
         this.abilities = Collections.unmodifiableSet(abilities);
         this.spells = Collections.unmodifiableSet(spells);
+        this.dialog = dialog;
     }
 
     public Equipment getEquipment() {
@@ -125,6 +130,10 @@ public final class CharacterSheet extends Tangible {
         return spells;
     }
 
+    public Dialog getDialog() {
+        return dialog;
+    }
+
     public boolean isDead() {
         return getStatus().getHitPoints() <= 0;
     }
@@ -164,7 +173,7 @@ public final class CharacterSheet extends Tangible {
             }
 
             return new CharacterSheet(getTemplate(), name, stats, status,
-                    newEq, inventory.remove(item), abilities, spells);
+                    newEq, inventory.remove(item), abilities, spells, dialog);
 
         }
 
@@ -173,7 +182,7 @@ public final class CharacterSheet extends Tangible {
 
     public CharacterSheet add(Item item) {
         CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
-                equipment, inventory.add(item), abilities, spells);
+                equipment, inventory.add(item), abilities, spells, dialog);
 
         return copy;
     }
@@ -181,7 +190,7 @@ public final class CharacterSheet extends Tangible {
     public CharacterSheet remove(Item item) {
         // TODO: drop equipped/wielded
         CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
-                equipment, inventory.remove(item), abilities, spells);
+                equipment, inventory.remove(item), abilities, spells, dialog);
 
         return copy;
     }
@@ -189,21 +198,28 @@ public final class CharacterSheet extends Tangible {
     // hopefully not necessary, use the helper functions
     public CharacterSheet set(Equipment equipment) {
         CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
-                equipment, inventory, abilities, spells);
+                equipment, inventory, abilities, spells, dialog);
 
         return copy;
     }
 
     public CharacterSheet set(Status status) {
         CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
-                equipment, inventory, abilities, spells);
+                equipment, inventory, abilities, spells, dialog);
 
         return copy;
     }
 
     public CharacterSheet set(Set<Ability> abilities) {
         CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
-                equipment, inventory, abilities, spells);
+                equipment, inventory, abilities, spells, dialog);
+
+        return copy;
+    }
+
+    public CharacterSheet set(Dialog dialog) {
+        CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
+                equipment, inventory, abilities, spells, dialog);
 
         return copy;
     }
@@ -221,7 +237,7 @@ public final class CharacterSheet extends Tangible {
             }
 
             return new CharacterSheet(getTemplate(), name, stats, status,
-                    newEq, inventory.remove(item), abilities, spells);
+                    newEq, inventory.remove(item), abilities, spells, dialog);
 
         }
 

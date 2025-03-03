@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -18,6 +19,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.zygon.rl.data.Terrain;
 import com.zygon.rl.data.context.Data;
+import com.zygon.rl.game.DialogInputHandler;
 import com.zygon.rl.game.Game;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.game.Input;
@@ -140,7 +142,15 @@ final class GameView extends BaseView {
                     .build();
             getScreen().addLayer(notificationLayer);
             componentRenderersByPrompt.put(GameState.InputContextPrompt.MODAL,
-                    new TextRenderer(notificationLayer, renderUtil));
+                    new TextRenderer(notificationLayer, renderUtil,
+                            (gs) -> gs.getNotification() != null ? List.of(gs.getNotification().note()) : null));
+
+            Layer dialogLayer = Layer.newBuilder()
+                    .withSize(gameScreen.getSize().minus(Size.create(20, 10)))
+                    .build();
+            getScreen().addLayer(dialogLayer);
+            componentRenderersByPrompt.put(GameState.InputContextPrompt.DIALOG,
+                    new TextRenderer(dialogLayer, renderUtil, DialogInputHandler.getTextFn()));
 
             updateSideBar(sideBar, game);
             updateMiniMap(miniMapLayer, game);

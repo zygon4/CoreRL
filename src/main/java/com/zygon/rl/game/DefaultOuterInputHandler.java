@@ -28,7 +28,9 @@ import com.zygon.rl.world.action.MeleeAttackAction;
 import com.zygon.rl.world.action.MoveAction;
 import com.zygon.rl.world.action.OpenDoorAction;
 import com.zygon.rl.world.action.SetTangibleAction;
+import com.zygon.rl.world.action.SoundEffectAction;
 import com.zygon.rl.world.character.CharacterSheet;
+import com.zygon.rl.world.character.InitiateDialog;
 
 import org.apache.commons.math3.util.Pair;
 import org.hexworks.zircon.api.uievent.KeyCode;
@@ -41,6 +43,7 @@ import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_7;
 import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_8;
 import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_9;
 import static org.hexworks.zircon.api.uievent.KeyCode.ESCAPE;
+import static org.hexworks.zircon.api.uievent.KeyCode.KEY_I;
 
 public final class DefaultOuterInputHandler extends BaseInputHandler {
 
@@ -56,13 +59,14 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
         defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_E.getCode()));
         // 'c' for close adjacent
         defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_C.getCode()));
-        // 'd' for get
+        // 'd' for drop
         defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_D.getCode()));
         // 'i' for inventory
         defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_I.getCode()));
+        // 't' for talk
+        defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_T.getCode()));
         // 'g' for get
         defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_G.getCode()));
-        // 's' for get
 
         // These are for testing spells out and how fields will act.. not permanent
         // However, i can see a hotkeys being assigned..
@@ -86,6 +90,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
         GameState.Builder copy = state.copy();
         KeyCode inputKeyCode = convert(input);
         switch (inputKeyCode) {
+            // CLOSE
             case KEY_C -> {
                 Map<Location, List<WorldElement>> neighborsWithSomethingOpen
                         = state.getWorld().getPlayerLocation().getNeighbors(true).stream()
@@ -140,6 +145,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                     }
                 }
             }
+            // DROP
             case KEY_D -> {
                 // This is pretty clunky, eh?
                 List<Item> items = state.getWorld().getPlayer().getInventory().getItems();
@@ -161,6 +167,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                                     .build());
                 }
             }
+            // EXAMINE
             case KEY_E -> {
                 Map<Location, List<Identifable>> neighborsWithSomething
                         = state.getWorld().getPlayerLocation().getNeighbors(true).stream()
@@ -205,6 +212,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                     }
                 }
             }
+            // CANCEL
             case ESCAPE -> {
                 copy.addInputContext(
                         GameState.InputContext.builder()
@@ -213,6 +221,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                                 .setPrompt(GameState.InputContextPrompt.MODAL)
                                 .build());
             }
+            // GET
             case KEY_G -> {
                 // This is pretty clunky, eh?
                 List<Item> items = state.getWorld()
@@ -241,7 +250,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                                     .build());
                 }
             }
-            // ability - present abilities
+            // ABILITIES - present abilities
             case KEY_A -> {
                 CharacterSheet character = state.getWorld().getPlayer();
 
@@ -255,7 +264,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                                 .setPrompt(GameState.InputContextPrompt.LIST)
                                 .build());
             }
-            // ability - present abilities
+            // INVENTORY
             case KEY_I -> {
                 CharacterSheet player = state.getWorld().getPlayer();
 
@@ -272,12 +281,46 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                                         .setPrompt(GameState.InputContextPrompt.INVENTORY)
                                         .build());
             }
+            // TALK / could be E?
+            case KEY_T -> {
+                copy.addInputContext(
+                        GameState.InputContext.builder()
+                                .setName("ABILITY")
+                                .setHandler(new AbilityDirectionInputHandler(
+                                        getGameConfiguration(), new InitiateDialog(getGameConfiguration()),
+                                        state.getWorld().getPlayerLocation()) {
+
+                                    // A couple of tweaks to AbilityDirectionInputHandler:
+                                    //
+                                    // Override the default invalid which pops several
+                                    // layers, just pop the AbilityDirectionInputHandler instead.
+                                    @Override
+                                    public GameState handleInvalidInput(
+                                            GameState state) {
+                                        return state.copy()
+                                                .removeInputContext()// ability target
+                                                .removeInputContext()// ability target
+                                                .build();
+                                    }
+
+                                    // Don't pop the state for dialog, let the dialog do it.
+                                    @Override
+                                    protected GameState popInputContext(
+                                            GameState state) {
+                                        return state;
+                                    }
+                                })
+                                .setPrompt(GameState.InputContextPrompt.DIRECTION)
+                                .build());
+            }
+            // WAIT
             case NUMPAD_5, DIGIT_5 -> {
                 // TODO: wait action
                 copy.addLog("Waiting");
                 copy.setWorld(state.getWorld().addTime(DEFAULT_ACTION_TIME));
                 break;
             }
+            // MOVE/BUMP
             case NUMPAD_1, NUMPAD_2, NUMPAD_3, NUMPAD_4, /* NOT 5*/ NUMPAD_6, NUMPAD_7, NUMPAD_8, NUMPAD_9, DIGIT_1, DIGIT_2, DIGIT_3, DIGIT_4, /* NOT 5*/ DIGIT_6, DIGIT_7, DIGIT_8, DIGIT_9 -> {
 
                 final World world = state.getWorld();
@@ -319,7 +362,8 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                                 Action open = new OpenDoorAction(destination);
                                 if (open.canExecute(gs)) {
                                     copy = open.execute(gs).copy();
-                                    getGameConfiguration().getSoundEffects().play("door_open");
+                                    SoundEffectAction playEffect = new SoundEffectAction(getGameConfiguration(), "door_open");
+                                    playEffect.execute(state);
                                     // Only open one thing..
                                     break;
                                 }

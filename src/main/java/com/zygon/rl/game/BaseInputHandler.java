@@ -1,12 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ *
  */
 package com.zygon.rl.game;
-
-import com.zygon.rl.world.Location;
-import org.hexworks.zircon.api.uievent.KeyCode;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -16,6 +11,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import com.zygon.rl.world.Location;
+
+import org.hexworks.zircon.api.uievent.KeyCode;
 import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_1;
 import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_2;
 import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_3;
@@ -74,7 +72,8 @@ public abstract class BaseInputHandler implements LayerInputHandler {
     private final GameConfiguration gameConfiguration;
     private final Set<Input> inputs;
 
-    protected BaseInputHandler(GameConfiguration gameConfiguration, Set<Input> inputs) {
+    protected BaseInputHandler(GameConfiguration gameConfiguration,
+            Set<Input> inputs) {
         this.gameConfiguration = Objects.requireNonNull(gameConfiguration);
         this.inputs = inputs != null
                 ? Collections.unmodifiableSet(inputs) : Collections.emptySet();
@@ -87,7 +86,7 @@ public abstract class BaseInputHandler implements LayerInputHandler {
 
     // This bleeds out the zircon API. This basically says this is a zircon
     // "core" jar.
-    protected final KeyCode convert(Input input) {
+    protected static final KeyCode convert(Input input) {
         return keyCodesByInt.get(input.getInput());
     }
 
