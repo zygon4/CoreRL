@@ -97,5 +97,19 @@
         "speed": 80,
         "flags": {},
         "weight": 12
+    },
+    {
+        "id": "mon_vampire",
+        "type": "MONSTER",
+        "name": "Vampire",
+        "description": "An Vampire",
+        "symbol": "v",
+        "color": "DarkSlateGray",
+        "species": "VAMPIRE",
+        "aggression": 100,
+        "hitPoints": 40,
+        "speed": 110,
+        "flags": {},
+        "weight": 180
     }
 ]

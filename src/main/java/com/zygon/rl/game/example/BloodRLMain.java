@@ -126,7 +126,7 @@ public class BloodRLMain {
             String id = random.nextBoolean() ? "mon_simple_bat" : "mon_wolf";
 
             SummonAction summonAction = new SummonAction(
-                    state.getWorld().getPlayerLocation(), 1, id,
+                    state.getWorld().getPlayerLocation(), 1, SummonAction.DEFAULT_RADIUS, id,
                     Set.of(Effect.EffectNames.PET.getEffect()), random);
 
             GameState.Builder copy = state.copy();
@@ -211,8 +211,7 @@ public class BloodRLMain {
                 null,
                 null,
                 abilities,
-                Set.of(),
-                null);
+                Set.of());
 
         ArmorData dataTunic = ArmorData.get("torso_tunic_black");
         ArmorData dataBoots = ArmorData.get("boots_leather");

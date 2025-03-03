@@ -7,5 +7,8 @@ package com.zygon.rl.data.monster;
 public enum Species {
 
     AMPHIBIAN,
-    MAMMAL;
+    HUMAN,
+    LICH,
+    MAMMAL,
+    VAMPIRE;
 }

@@ -23,34 +23,41 @@ import com.zygon.rl.world.character.Status;
 import com.zygon.rl.world.character.StatusEffect;
 
 /**
+ * Summons a 1+ group of same-type monsters/NPCS around the location specified.
  *
  * @author zygon
  */
 public class SummonAction extends Action {
 
-    // Maybe wants to be a parameter?
-    private static final int MAX_RADIUS = 5;
+    public static final int DEFAULT_RADIUS = 5;
 
     private final Location location;
     private final int count;
+    private final int radius;
     private final String id;
     private final Set<Effect> effects;
     private final Random random;
 
     // This is intended to be a actor-only summon, but summoning random items
     // is pretty valid as well. This will need enhancement.
-    public SummonAction(Location location, int count, String id,
+    public SummonAction(Location location, int count, int radius, String id,
             Set<Effect> effects, Random random) {
         this.location = location;
         this.count = count;
+        this.radius = radius;
         this.id = id;
         this.effects = effects != null
                 ? Collections.unmodifiableSet(effects) : Collections.emptySet();
         this.random = random;
     }
 
+    public SummonAction(Location location, int count, int radius, String id,
+            Random random) {
+        this(location, count, radius, id, null, random);
+    }
+
     public SummonAction(Location location, int count, String id, Random random) {
-        this(location, count, id, null, random);
+        this(location, count, DEFAULT_RADIUS, id, null, random);
     }
 
     @Override
@@ -75,7 +82,7 @@ public class SummonAction extends Action {
     private Set<Location> getSummonLocations(int count, World world) {
         Set<Location> locations = new HashSet<>();
 
-        List<Location> legalLocations = location.getNeighbors(MAX_RADIUS).stream()
+        List<Location> legalLocations = location.getNeighbors(radius, true).stream()
                 .filter(world::canMove)
                 .collect(Collectors.toList());
 
@@ -111,12 +118,12 @@ public class SummonAction extends Action {
         darkness.addChoices(List.of(leafDark2));
 
         String name = FantasyNameGen.generate();
-        return new CharacterSheet(actor,
+        CharacterSheet rando = new CharacterSheet(actor,
                 name,
                 new Stats(stats, stats, stats, stats, stats, stats),
                 new Status(stats, actor.getHitPoints(), statusEffects),
-                null, null, Set.of(), Set.of(),
-                //TODO: proc gen dialog
-                start);
+                null, null, Set.of(), Set.of());
+        //TODO: proc gen dialog);
+        return rando.set(start);
     }
 }

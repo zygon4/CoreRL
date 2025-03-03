@@ -1,14 +1,13 @@
 package com.zygon.rl.world.action;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 
 import com.zygon.rl.data.Effect;
 import com.zygon.rl.game.GameConfiguration;
 import com.zygon.rl.game.GameState;
-import com.zygon.rl.world.CorpseItem;
 import com.zygon.rl.world.DamageResolution;
-import com.zygon.rl.world.Item;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.character.CharacterSheet;
 import com.zygon.rl.world.character.StatusEffect;
@@ -62,15 +61,26 @@ public abstract class DamageAction extends Action {
 
         if (!updatedDefender.isDead()) {
             state.getWorld().add(updatedDefender, defenderLocation);
+
+            // TODO: some should flee..
             updateToHostile(state, updatedDefender, defenderLocation);
         } else {
             logger.log(System.Logger.Level.TRACE,
                     "DEAD: " + updatedDefender.getId() + " at " + defenderLocation);
 
-            state = state.log(updatedDefender.getName() + " died!");
-            state.getWorld().remove(updatedDefender, defenderLocation);
-            Item corpse = CorpseItem.create(damaged);
-            state.getWorld().add(corpse, defenderLocation);
+            Map<CharacterSheet.Trigger, Action> triggers = updatedDefender.getTriggers();
+            if (triggers.containsKey(CharacterSheet.Trigger.DEATH)) {
+                Action action = triggers.get(CharacterSheet.Trigger.DEATH);
+                if (action.canExecute(state)) {
+                    state = action.execute(state);
+                }
+            } else {
+                // standard death
+                DeathAction deathAction = new DeathAction(updatedDefender, defenderLocation);
+                if (deathAction.canExecute(state)) {
+                    state = deathAction.execute(state);
+                }
+            }
         }
 
         return state;
