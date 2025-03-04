@@ -32,6 +32,7 @@ public class GameState {
         NONE,
         // Starting the above idea here:
         DIALOG,
+        QUESTS,
         INVENTORY,
         PRIMARY
     }
@@ -102,6 +103,7 @@ public class GameState {
     private final Notification notification;
     private final Stack<InputContext> inputContext;
     private final World world;
+    private final QuestState questState;
     private final GameConfiguration gameConfiguration;
 
     private GameState(Builder builder) {
@@ -121,6 +123,7 @@ public class GameState {
         this.notification = builder.notification;
         this.inputContext = stackCopy;
         this.world = builder.world;
+        this.questState = builder.questState != null ? builder.questState : new QuestState();
         this.gameConfiguration = builder.gameConfiguration;
     }
 
@@ -152,6 +155,10 @@ public class GameState {
         return world;
     }
 
+    public QuestState getQuestState() {
+        return questState;
+    }
+
     public boolean isPlayerDead() {
         // TODO: for now the player is removed from the game (to be eventually
         // replaced with a corpse). So we only expect the "== null" case to be active.
@@ -174,6 +181,7 @@ public class GameState {
         private Notification notification;
         private Stack<InputContext> inputContext;
         private World world;
+        private QuestState questState;
         private GameConfiguration gameConfiguration;
 
         private Builder(GameConfiguration gameConfiguration) {
@@ -186,6 +194,7 @@ public class GameState {
             this.notification = gameState.getNotification();
             this.inputContext = gameState.getInputContext();
             this.world = gameState.getWorld();
+            this.questState = gameState.getQuestState();
             this.gameConfiguration = gameState.getGameConfiguration();
         }
 
@@ -228,6 +237,11 @@ public class GameState {
 
         public Builder setWorld(World world) {
             this.world = world;
+            return this;
+        }
+
+        public Builder setQuestState(QuestState questState) {
+            this.questState = questState;
             return this;
         }
 

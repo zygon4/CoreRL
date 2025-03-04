@@ -1,3 +1,6 @@
+/*
+ * Copyright Liminal Data Systems 2025
+ */
 package com.zygon.rl.game.ui;
 
 import java.awt.Color;
@@ -44,13 +47,19 @@ public class TextRenderer implements GameComponentRenderer {
 
             int y = 1;
             for (String t : text) {
-                String[] splitText = t.split("\\r?\\n");
-                if (splitText != null) {
-                    for (String st : splitText) {
-                        renderUtil.render(textLayer, Position.create(0, y++), st, Color.WHITE);
-                    }
-                }
+                y = render(textLayer, y, renderUtil, t, Color.WHITE);
             }
         }
+    }
+
+    public static int render(Layer textLayer, int y, RenderUtil renderUtil,
+            String text, Color color) {
+        String[] splitText = text.split("\\r?\\n");
+        if (splitText != null) {
+            for (String st : splitText) {
+                renderUtil.render(textLayer, Position.create(0, y++), st, color);
+            }
+        }
+        return y;
     }
 }

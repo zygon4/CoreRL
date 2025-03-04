@@ -1,0 +1,18 @@
+@startuml
+
+skinparam Shadowing false
+
+
+ReqDialogAction_A -> DialogueA: Initiate dialog
+DialogueA -> RegQuestAction: Initiate quest
+RegQuestAction -> CharacterSheet: Set quest
+RegQuestAction -> GameState.QuestState: Set quest context
+
+ReqDialogAction_B -> DialogueB: Complete dialog\nquest
+ReqDialogAction_B -> GameState.QuestState: Get dialogue quest context
+GameState.QuestState -> ReqDialogAction_B
+ReqDialogAction_B -> GameState.QuestState: 
+
+QuestSystem -> GameState.QuestState: ???
+
+@enduml

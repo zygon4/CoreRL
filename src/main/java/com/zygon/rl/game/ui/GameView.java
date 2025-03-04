@@ -152,6 +152,13 @@ final class GameView extends BaseView {
             componentRenderersByPrompt.put(GameState.InputContextPrompt.DIALOG,
                     new TextRenderer(dialogLayer, renderUtil, DialogInputHandler.getTextFn()));
 
+            Layer questLayer = Layer.newBuilder()
+                    .withSize(gameScreen.getSize())
+                    .build();
+            getScreen().addLayer(questLayer);
+            componentRenderersByPrompt.put(GameState.InputContextPrompt.QUESTS,
+                    new QuestRenderer(questLayer, renderUtil));
+
             updateSideBar(sideBar, game);
             updateMiniMap(miniMapLayer, game);
             updateGameScreen(game);

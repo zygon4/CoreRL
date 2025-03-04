@@ -68,9 +68,9 @@ public abstract class DamageAction extends Action {
             logger.log(System.Logger.Level.TRACE,
                     "DEAD: " + updatedDefender.getId() + " at " + defenderLocation);
 
-            Map<CharacterSheet.Trigger, Action> triggers = updatedDefender.getTriggers();
-            if (triggers.containsKey(CharacterSheet.Trigger.DEATH)) {
-                Action action = triggers.get(CharacterSheet.Trigger.DEATH);
+            Map<CharacterSheet.TriggerType, Action> triggers = updatedDefender.getTriggers();
+            if (triggers.containsKey(CharacterSheet.TriggerType.DEATH)) {
+                Action action = triggers.get(CharacterSheet.TriggerType.DEATH);
                 if (action.canExecute(state)) {
                     state = action.execute(state);
                 }

@@ -1,19 +1,20 @@
 package com.zygon.rl.game.ui;
 
-import com.google.common.cache.LoadingCache;
-import org.hexworks.zircon.api.color.ANSITileColor;
-import org.hexworks.zircon.api.color.TileColor;
-import org.hexworks.zircon.api.data.CharacterTile;
-import org.hexworks.zircon.api.data.Position;
-import org.hexworks.zircon.api.data.Tile;
-import org.hexworks.zircon.api.graphics.Layer;
-
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import com.google.common.cache.LoadingCache;
+
+import org.hexworks.zircon.api.color.ANSITileColor;
+import org.hexworks.zircon.api.color.TileColor;
+import org.hexworks.zircon.api.data.CharacterTile;
+import org.hexworks.zircon.api.data.Position;
+import org.hexworks.zircon.api.data.Tile;
+import org.hexworks.zircon.api.graphics.Layer;
 
 /**
  *
@@ -67,11 +68,11 @@ public class RenderUtil {
         return tile;
     }
 
-    public List<CharacterTile> toTiles(Color color, String foo) {
+    public List<CharacterTile> toTiles(Color color, String text) {
         List<CharacterTile> tiles = new ArrayList<>();
 
-        for (int i = 0; i < foo.length(); i++) {
-            tiles.add(toTile(color, foo.charAt(i)));
+        for (int i = 0; i < text.length(); i++) {
+            tiles.add(toTile(color, text.charAt(i)));
         }
 
         return tiles;

@@ -1,6 +1,7 @@
 package com.zygon.rl.world.character;
 
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -8,6 +9,7 @@ import java.util.Set;
 import com.zygon.rl.data.Creature;
 import com.zygon.rl.data.Effect;
 import com.zygon.rl.util.dialog.Dialog;
+import com.zygon.rl.util.quest.QuestInfo;
 import com.zygon.rl.world.Item;
 import com.zygon.rl.world.Tangible;
 import com.zygon.rl.world.action.Action;
@@ -40,17 +42,18 @@ public final class CharacterSheet extends Tangible {
     private final Set<Ability> abilities;
     private final Set<Spell> spells;
     private final Dialog dialog;
-    private final Map<Trigger, Action> triggers;
+    private final Map<TriggerType, Action> triggers;
+    private final Set<QuestInfo> quests;
 
     // What else?
-    public enum Trigger {
+    public enum TriggerType {
         DEATH
     }
 
     public CharacterSheet(Creature template, String name, Stats stats,
             Status status, Equipment equipment, Inventory inventory,
             Set<Ability> abilities, Set<Spell> spells, Dialog dialog,
-            Map<Trigger, Action> triggers) {
+            Map<TriggerType, Action> triggers, Set<QuestInfo> quests) {
         super(template);
 
         this.name = name;
@@ -62,13 +65,14 @@ public final class CharacterSheet extends Tangible {
         this.spells = Collections.unmodifiableSet(spells);
         this.dialog = dialog;
         this.triggers = Collections.unmodifiableMap(triggers);
+        this.quests = Collections.unmodifiableSet(quests);
     }
 
     public CharacterSheet(Creature template, String name, Stats stats,
             Status status, Equipment equipment, Inventory inventory,
             Set<Ability> abilities, Set<Spell> spells) {
         this(template, name, stats, status, equipment, inventory, abilities,
-                spells, null, Map.of());
+                spells, null, Map.of(), Set.of());
     }
 
     public Equipment getEquipment() {
@@ -154,8 +158,12 @@ public final class CharacterSheet extends Tangible {
         return dialog;
     }
 
-    public Map<Trigger, Action> getTriggers() {
+    public Map<TriggerType, Action> getTriggers() {
         return triggers;
+    }
+
+    public Set<QuestInfo> getQuests() {
+        return quests;
     }
 
     public boolean isDead() {
@@ -197,7 +205,7 @@ public final class CharacterSheet extends Tangible {
             }
 
             return new CharacterSheet(getTemplate(), name, stats, status, newEq,
-                    inventory.remove(item), abilities, spells, dialog, triggers);
+                    inventory.remove(item), abilities, spells, dialog, triggers, quests);
 
         }
 
@@ -206,7 +214,7 @@ public final class CharacterSheet extends Tangible {
 
     public CharacterSheet add(Item item) {
         CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
-                equipment, inventory.add(item), abilities, spells, dialog, triggers);
+                equipment, inventory.add(item), abilities, spells, dialog, triggers, quests);
 
         return copy;
     }
@@ -214,7 +222,7 @@ public final class CharacterSheet extends Tangible {
     public CharacterSheet remove(Item item) {
         // TODO: drop equipped/wielded
         CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
-                equipment, inventory.remove(item), abilities, spells, dialog, triggers);
+                equipment, inventory.remove(item), abilities, spells, dialog, triggers, quests);
 
         return copy;
     }
@@ -222,35 +230,35 @@ public final class CharacterSheet extends Tangible {
     // hopefully not necessary, use the helper functions
     public CharacterSheet set(Equipment equipment) {
         CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
-                equipment, inventory, abilities, spells, dialog, triggers);
+                equipment, inventory, abilities, spells, dialog, triggers, quests);
 
         return copy;
     }
 
     public CharacterSheet set(Status status) {
         CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
-                equipment, inventory, abilities, spells, dialog, triggers);
+                equipment, inventory, abilities, spells, dialog, triggers, quests);
 
         return copy;
     }
 
     public CharacterSheet set(Set<Ability> abilities) {
         CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
-                equipment, inventory, abilities, spells, dialog, triggers);
+                equipment, inventory, abilities, spells, dialog, triggers, quests);
 
         return copy;
     }
 
     public CharacterSheet set(Dialog dialog) {
         CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
-                equipment, inventory, abilities, spells, dialog, triggers);
+                equipment, inventory, abilities, spells, dialog, triggers, quests);
 
         return copy;
     }
 
     public CharacterSheet set(Creature creature) {
         CharacterSheet copy = new CharacterSheet(creature, name, stats, status,
-                equipment, inventory, abilities, spells, dialog, triggers);
+                equipment, inventory, abilities, spells, dialog, triggers, quests);
 
         return copy;
     }
@@ -261,9 +269,25 @@ public final class CharacterSheet extends Tangible {
      * @param triggers
      * @return
      */
-    public CharacterSheet set(Map<Trigger, Action> triggers) {
+    public CharacterSheet set(Map<TriggerType, Action> triggers) {
         CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
-                equipment, inventory, abilities, spells, dialog, triggers);
+                equipment, inventory, abilities, spells, dialog, triggers, quests);
+
+        return copy;
+    }
+
+    /**
+     * Add a quest.
+     *
+     * @param quest
+     * @return
+     */
+    public CharacterSheet add(QuestInfo quest) {
+        Set<QuestInfo> allQuests = new LinkedHashSet<>();
+        allQuests.addAll(this.getQuests());
+        allQuests.add(quest);
+        CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
+                equipment, inventory, abilities, spells, dialog, triggers, allQuests);
 
         return copy;
     }
@@ -281,7 +305,7 @@ public final class CharacterSheet extends Tangible {
             }
 
             return new CharacterSheet(getTemplate(), name, stats, status, newEq,
-                    inventory.remove(item), abilities, spells, dialog, triggers);
+                    inventory.remove(item), abilities, spells, dialog, triggers, quests);
 
         }
 

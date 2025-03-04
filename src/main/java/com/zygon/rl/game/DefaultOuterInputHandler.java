@@ -67,6 +67,8 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
         defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_T.getCode()));
         // 'g' for get
         defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_G.getCode()));
+        // 'q' for quests
+        defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_Q.getCode()));
 
         // These are for testing spells out and how fields will act.. not permanent
         // However, i can see a hotkeys being assigned..
@@ -436,6 +438,18 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                                         getGameConfiguration(), playerLocation, null, examine, true))
                                 .setPrompt(GameState.InputContextPrompt.DIRECTION)
                                 .build());
+            }
+            case KEY_Q -> {
+                // TODO: A QuestInputHandler so the player can select a quest
+                // and see more info about it..
+
+                copy.removeInputContext()
+                        .addInputContext(
+                                GameState.InputContext.builder()
+                                        .setName("QUESTS")
+                                        .setHandler(ContinueInputHandler.create(getGameConfiguration()))
+                                        .setPrompt(GameState.InputContextPrompt.QUESTS)
+                                        .build());
             }
             case KEY_X -> {
                 Location playerLocation = state.getWorld().getPlayerLocation();
