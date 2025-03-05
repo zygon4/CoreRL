@@ -1,0 +1,11 @@
+[
+    {
+        "id": "book_sacred_text",
+        "type": "BOOK",
+        "symbol": "?",
+        "color": "Brown",
+        "name": "The sacred text",
+        "description": "An ancient tomb.",
+        "weight": 3
+    }
+]

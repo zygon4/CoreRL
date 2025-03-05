@@ -3,13 +3,11 @@
  */
 package com.zygon.rl.world.action;
 
-import java.util.List;
-
 import com.zygon.rl.game.GameState;
+import com.zygon.rl.game.quest.DialogueQuestContext;
+import com.zygon.rl.game.quest.QuestType;
 import com.zygon.rl.util.quest.QuestInfo;
 import com.zygon.rl.world.character.CharacterSheet;
-import com.zygon.rl.world.quest.DialogueQuestContext;
-import com.zygon.rl.world.quest.QuestType;
 
 /**
  *
@@ -32,33 +30,18 @@ public class RegisterDialogueQuestAction extends Action {
     @Override
     public GameState execute(GameState state) {
 
-        // TODO; this is for testing..
-        QuestInfo subQuest = new QuestInfo("Locate " + this.targetName,
-                this.targetName + " was last seen by the swamp.",
-                new QuestInfo.QuestContext() {
-            @Override
-            public boolean isComplete() {
-                return true;
-            }
-
-            @Override
-            public boolean isSuccess() {
-                return true;
-            }
-        });
-
         DialogueQuestContext dialogue = new DialogueQuestContext(this.targetName);
         QuestInfo quest = new QuestInfo("Speak to " + this.targetName,
                 "Seek out and speak with " + this.targetName + " to discuss your vampirism.",
-                dialogue, List.of(subQuest));
+                dialogue);
 
+        // TODO: notifications
         CharacterSheet sheet = state.getWorld().getPlayer().add(quest);
         Action setCharacterAction
                 = new SetCharacterAction(state.getWorld().getPlayerLocation(), sheet);
-
         GameState newState = setCharacterAction.execute(state);
-        newState.getQuestState().register(QuestType.DIALOGUE, dialogue);
 
+        newState.getQuestState().register(QuestType.DIALOGUE, dialogue);
         return newState;
     }
 }

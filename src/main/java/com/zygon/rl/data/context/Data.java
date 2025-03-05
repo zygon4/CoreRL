@@ -1,20 +1,21 @@
 package com.zygon.rl.data.context;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.zygon.rl.data.Effect;
 import com.zygon.rl.data.Element;
 import com.zygon.rl.data.Terrain;
 import com.zygon.rl.data.buildings.BuildingData;
 import com.zygon.rl.data.field.FieldData;
 import com.zygon.rl.data.items.ArmorData;
+import com.zygon.rl.data.items.BookData;
 import com.zygon.rl.data.items.Building;
 import com.zygon.rl.data.items.Corpse;
 import com.zygon.rl.data.items.Melee;
 import com.zygon.rl.data.monster.Monster;
 import com.zygon.rl.data.npc.Npc;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Contains all of the data by Id.
@@ -28,6 +29,7 @@ public class Data {
     static {
         try {
             ArmorData.load();
+            BookData.load();
             Building.load(); // building items
             BuildingData.load(); // building templates
             Effect.load();
@@ -48,6 +50,10 @@ public class Data {
         // get key -> val vs. just gimme the map directly?
         for (var v : ArmorData.getAllIds()) {
             elementsById.put(v, ArmorData.get(v));
+        }
+
+        for (var v : BookData.getAllIds()) {
+            elementsById.put(v, BookData.get(v));
         }
 
         for (var v : Building.getAllIds()) {

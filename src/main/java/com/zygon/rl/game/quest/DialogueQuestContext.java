@@ -1,15 +1,16 @@
 /*
  * Copyright Liminal Data Systems 2025
  */
-package com.zygon.rl.world.quest;
+package com.zygon.rl.game.quest;
 
+import com.zygon.rl.game.GameState;
 import com.zygon.rl.util.quest.QuestInfo;
 
 /**
  *
  * @author djc
  */
-public class DialogueQuestContext implements QuestInfo.QuestContext {
+public class DialogueQuestContext implements QuestInfo.QuestContext<GameState> {
 
     private final String targetName;
     private boolean complete = false;
@@ -19,13 +20,13 @@ public class DialogueQuestContext implements QuestInfo.QuestContext {
     }
 
     @Override
-    public boolean isComplete() {
+    public boolean isComplete(GameState gs) {
         return complete;
     }
 
     @Override
-    public boolean isSuccess() {
-        return complete; // same as complete
+    public boolean isSuccess(GameState gs) {
+        return complete; // same as complete, check if target is alive?
     }
 
     // Hate mutable data but let's go with this for now..
@@ -40,7 +41,7 @@ public class DialogueQuestContext implements QuestInfo.QuestContext {
         if (this.targetName.equals(targetName) && !this.complete) {
             this.complete = true;
         }
-        return this.isComplete();
+        return this.complete;
     }
 
     @Override

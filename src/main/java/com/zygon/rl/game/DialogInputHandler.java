@@ -76,6 +76,10 @@ public final class DialogInputHandler extends BaseInputHandler {
                             }
                         });
 
+                        if (session.getResultingState() != null) {
+                            newState.set(session.getResultingState());
+                        }
+
                         newState.set(newState.get().copy()
                                 .removeInputContext()
                                 .addInputContext(InputContext.builder()

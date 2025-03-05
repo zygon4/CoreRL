@@ -17,14 +17,30 @@ import com.zygon.rl.world.action.Action;
  */
 public final class DialogSession {
 
+    private final GameState state;
     private final Dialog dialog;
 
-    private DialogSession(Dialog dialog) {
+    private DialogSession(GameState state, Dialog dialog) {
+        this.state = state;
         this.dialog = dialog;
     }
 
     public static DialogSession play(Dialog dialog) {
-        return new DialogSession(dialog);
+        return new DialogSession(null, dialog);
+    }
+
+    private static DialogSession play(GameState state, Dialog dialog) {
+        return new DialogSession(state, dialog);
+    }
+
+    /**
+     * Returns a {@link GameState} if the previous {@code pick} call had side
+     * effects.
+     *
+     * @return
+     */
+    public GameState getResultingState() {
+        return state;
     }
 
     public Optional<Action> getAction() {
@@ -61,12 +77,12 @@ public final class DialogSession {
             }
 
             // Assumes side effect
-            action.execute(state);
+            state = action.execute(state);
         }
 
         if (dialogChoice.getTransition().isPresent()) {
             Dialog transition = dialogChoice.getTransition().get();
-            return play(transition);
+            return play(state, transition);
         }
 
         // done..

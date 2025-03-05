@@ -11,7 +11,7 @@ import java.util.Set;
 
 import com.zygon.rl.util.quest.QuestInfo.QuestContext;
 import com.zygon.rl.world.action.DamageAction;
-import com.zygon.rl.world.quest.QuestType;
+import com.zygon.rl.game.quest.QuestType;
 
 /**
  *

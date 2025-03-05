@@ -9,7 +9,7 @@ import java.util.List;
  *
  * @author djc
  */
-public interface TaskInfo {
+public interface TaskInfo<T> {
 
     /**
      * Returns the name of the task.
@@ -32,26 +32,26 @@ public interface TaskInfo {
      * @return true if the task is complete (regardless of result), false
      * otherwise.
      */
-    boolean isComplete();
+    boolean isComplete(T t);
 
     /**
      * Returns true if the task is completed successfully, false otherwise.
      *
      * @return true if the task is completed successfully, false otherwise.
      */
-    boolean isSuccess();
+    boolean isSuccess(T t);
 
     /**
      * Returns a list of the immediate sub tasks.
      *
      * @return a list of the immediate sub tasks.
      */
-    List<TaskInfo> getAllSubTasks();
+    List<TaskInfo<T>> getAllSubTasks();
 
     /**
      * Returns a list of all subtasks.
      *
      * @return a list of all subtasks.
      */
-    List<TaskInfo> getDependentSubTasks();
+    List<TaskInfo<T>> getDependentSubTasks(T t);
 }

@@ -1,12 +1,12 @@
 /*
  * Copyright Liminal Data Systems 2025
  */
-package com.zygon.rl.world.quest;
+package com.zygon.rl.game.quest;
 
 /**
  *
  * @author djc
  */
 public enum QuestType {
-    DIALOGUE, GATHER, KILL
+    DIALOGUE, FETCH, KILL
 }

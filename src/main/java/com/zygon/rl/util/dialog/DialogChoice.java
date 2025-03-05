@@ -49,4 +49,8 @@ public class DialogChoice {
     public static DialogChoice create(String message) {
         return create(message, Optional.empty());
     }
+
+    public DialogChoice set(Optional<Dialog> transition) {
+        return new DialogChoice(message, action, transition);
+    }
 }

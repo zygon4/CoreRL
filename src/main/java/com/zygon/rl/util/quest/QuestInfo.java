@@ -15,24 +15,24 @@ import java.util.function.BiConsumer;
  *
  * @author djc
  */
-public class QuestInfo implements TaskInfo {
+public class QuestInfo<T> implements TaskInfo<T> {
 
     private static final int PADDING = 4;
 
-    public static interface QuestContext {
+    public interface QuestContext<T> {
 
-        boolean isComplete();
+        boolean isComplete(T t);
 
-        boolean isSuccess();
+        boolean isSuccess(T t);
     }
 
     private final String name;
     private final String description;
-    private final QuestContext context;
-    private final List<TaskInfo> subQuests;
+    private final QuestContext<T> context;
+    private final List<TaskInfo<T>> subQuests;
 
-    public QuestInfo(String name, String description, QuestContext context,
-            List<TaskInfo> subQuests) {
+    public QuestInfo(String name, String description, QuestContext<T> context,
+            List<TaskInfo<T>> subQuests) {
         this.name = Objects.requireNonNull(name);
         this.description = Objects.requireNonNull(description);
         this.context = Objects.requireNonNull(context);
@@ -45,17 +45,17 @@ public class QuestInfo implements TaskInfo {
     }
 
     @Override
-    public boolean isComplete() {
-        return context.isComplete() && subQuests.stream()
-                .map(TaskInfo::isComplete)
+    public boolean isComplete(T t) {
+        return context.isComplete(t) && subQuests.stream()
+                .map(ti -> ti.isComplete(t))
                 .filter(complete -> !complete)
                 .findAny().orElse(Boolean.TRUE);
     }
 
     @Override
-    public boolean isSuccess() {
-        return context.isSuccess() && subQuests.stream()
-                .map(TaskInfo::isSuccess)
+    public boolean isSuccess(T t) {
+        return context.isSuccess(t) && subQuests.stream()
+                .map(ti -> ti.isSuccess(t))
                 .filter(success -> !success)
                 .findAny().orElse(Boolean.TRUE);
     }
@@ -71,20 +71,20 @@ public class QuestInfo implements TaskInfo {
     }
 
     @Override
-    public List<TaskInfo> getAllSubTasks() {
+    public List<TaskInfo<T>> getAllSubTasks() {
         return subQuests;
     }
 
     @Override
-    public List<TaskInfo> getDependentSubTasks() {
+    public List<TaskInfo<T>> getDependentSubTasks(T t) {
 
-        List<TaskInfo> depSubTasks = new ArrayList<>();
+        List<TaskInfo<T>> depSubTasks = new ArrayList<>();
 
-        BiConsumer<TaskInfo, Integer> fn = (TaskInfo t, Integer depth) -> {
+        BiConsumer<TaskInfo<T>, Integer> fn = (TaskInfo<T> ti, Integer depth) -> {
 
             // deliberate reference check, don't include the top level task (ie 'this')
-            if (t != this && (!t.isComplete() || !t.isSuccess())) {
-                depSubTasks.add(t);
+            if (ti != this && (!ti.isComplete(t) || !ti.isSuccess(t))) {
+                depSubTasks.add(ti);
             }
         };
 
@@ -93,19 +93,19 @@ public class QuestInfo implements TaskInfo {
         return depSubTasks;
     }
 
-    public String getDisplayString() {
+    public String getDisplayString(T t) {
         StringBuilder sb = new StringBuilder();
-        buildToString(sb);
+        buildToString(t, sb);
         return sb.toString();
     }
 
     @Override
     public String toString() {
-        return getDisplayString();
+        return this.name + ") " + this.description;
     }
 
-    private static void visitTree(BiConsumer<TaskInfo, Integer> fn,
-            TaskInfo taskInfo, int depth) {
+    private static <T> void visitTree(BiConsumer<TaskInfo<T>, Integer> fn,
+            TaskInfo<T> taskInfo, int depth) {
 
         fn.accept(taskInfo, depth);
 
@@ -114,9 +114,9 @@ public class QuestInfo implements TaskInfo {
         });
     }
 
-    private void buildToString(StringBuilder sb) {
+    private void buildToString(T t, StringBuilder sb) {
 
-        BiConsumer<TaskInfo, Integer> fn = (TaskInfo t, Integer depth) -> {
+        BiConsumer<TaskInfo<T>, Integer> fn = (TaskInfo<T> ti, Integer depth) -> {
             String pad = "";
             for (int i = 0; i < depth * PADDING; i++) {
                 pad += " ";
@@ -124,14 +124,14 @@ public class QuestInfo implements TaskInfo {
             final String padding = pad;
 
             sb.append(padding).append(" - ")
-                    .append(toDisplay(t))
+                    .append(toDisplay(t, ti))
                     .append("\n");
         };
         visitTree(fn, this, 0);
     }
 
-    private static String toDisplay(TaskInfo questInfo) {
-        String status = questInfo.isComplete() ? (questInfo.isSuccess() ? "[+]" : "[F]") : "[ ]";
+    private static <T> String toDisplay(T t, TaskInfo<T> questInfo) {
+        String status = questInfo.isComplete(t) ? (questInfo.isSuccess(t) ? "[+]" : "[F]") : "[ ]";
         return status + " " + questInfo.getName() + ": " + questInfo.getDescription();
     }
 }

@@ -1,5 +1,17 @@
 package com.zygon.rl.game.systems;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.Future;
+
 import com.zygon.rl.data.ItemClass;
 import com.zygon.rl.data.Terrain;
 import com.zygon.rl.data.buildings.Building;
@@ -21,18 +33,6 @@ import com.zygon.rl.world.action.Action;
 import com.zygon.rl.world.action.SetItemAction;
 import com.zygon.rl.world.action.SummonAction;
 import com.zygon.rl.world.character.Armor;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.Future;
 
 /**
  *
@@ -214,41 +214,48 @@ public class SpawnSystem extends GameSystem {
             GameState state) {
 
         return () -> {
-            GameState callableState = state;
-            World world = callableState.getWorld();
-
-            int noiseX = -20 + random.nextInt(40);
-            int noiseY = -20 + random.nextInt(40);
-
-            Location rngLocation = Location.create(location.getX() + noiseX, location.getY() + noiseY);
-            Terrain terrain = world.getTerrain(location);
-            Action summonAction = null;
-
-            if (!terrain.getId().equals(Terrain.Ids.PUDDLE.getId())
-                    && !terrain.getId().equals(Terrain.Ids.DEEP_WATER.getId())) {
-
-                String creatureId = null;
-
-                if (random.nextDouble() > .10) {
-                    creatureId = getRandomSetElement(Monster.getAllIds());
-                } else {
-                    // TODO: set names on resulting spawns
-                    // TODO: equipment/items on NPCs
-                    creatureId = getRandomSetElement(Npc.getAllIds());
-                }
-
-                summonAction = new SummonAction(rngLocation, random.nextInt(4), creatureId, random);
-            }
-
-            if (summonAction != null && summonAction.canExecute(callableState)) {
-                callableState = summonAction.execute(callableState);
-            }
-
-            return callableState;
+            return getLivingSpawnAction(state, random, location);
         };
     }
 
-    private <E> E getRandomSetElement(Set<E> set) {
+    // Ought to be in a spawn utility somewhere..
+    public static GameState getLivingSpawnAction(GameState state, Random random,
+            Location location) {
+
+        GameState callableState = state;
+        World world = callableState.getWorld();
+
+        int noiseX = -20 + random.nextInt(40);
+        int noiseY = -20 + random.nextInt(40);
+
+        Location rngLocation = Location.create(location.getX() + noiseX, location.getY() + noiseY);
+        Terrain terrain = world.getTerrain(location);
+        Action summonAction = null;
+
+        if (!terrain.getId().equals(Terrain.Ids.PUDDLE.getId())
+                && !terrain.getId().equals(Terrain.Ids.DEEP_WATER.getId())) {
+
+            String creatureId = null;
+
+            if (random.nextDouble() > .10) {
+                creatureId = getRandomSetElement(Monster.getAllIds(), random);
+            } else {
+                // TODO: set names on resulting spawns
+                // TODO: equipment/items on NPCs
+                creatureId = getRandomSetElement(Npc.getAllIds(), random);
+            }
+
+            summonAction = new SummonAction(rngLocation, random.nextInt(4), creatureId, random);
+        }
+
+        if (summonAction != null && summonAction.canExecute(callableState)) {
+            callableState = summonAction.execute(callableState);
+        }
+
+        return callableState;
+    }
+
+    private static <E> E getRandomSetElement(Set<E> set, Random random) {
         return set.stream()
                 .skip(random.nextInt(set.size()))
                 .findFirst().orElse(null);

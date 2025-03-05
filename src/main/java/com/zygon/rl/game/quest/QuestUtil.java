@@ -1,4 +1,4 @@
-package com.zygon.rl.world.quest;
+package com.zygon.rl.game.quest;
 
 import com.zygon.rl.util.quest.TaskInfo;
 

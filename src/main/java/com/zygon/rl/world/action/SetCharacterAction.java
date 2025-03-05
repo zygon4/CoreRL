@@ -26,6 +26,8 @@ public class SetCharacterAction extends Action {
 
     @Override
     public GameState execute(GameState state) {
+
+        // TBD: check if the character has an item from a quest?
         state.getWorld().add(sheet, location);
 
         return state;

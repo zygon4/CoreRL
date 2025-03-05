@@ -4,7 +4,7 @@
 package com.zygon.rl.util.dialog;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -19,15 +19,15 @@ public class Dialog {
 
     private final String greeting; // top level information/greeting
     private final Optional<Action> action; // give/take item, etc.
-    private final List<DialogChoice> choices = new ArrayList<>();
+    private final List<DialogChoice> choices;
 
     private Dialog(String headerText, Optional<Action> action,
-            Collection<DialogChoice> choices) {
+            List<DialogChoice> choices) {
         this.greeting = Objects.requireNonNull(headerText);
         this.action = action;
-        if (choices != null) {
-            this.choices.addAll(choices);
-        }
+        this.choices = choices != null
+                ? Collections.unmodifiableList(choices)
+                : Collections.emptyList();
     }
 
     public String getGreeting() {
@@ -59,9 +59,9 @@ public class Dialog {
         return create(text, Optional.empty());
     }
 
-    // MUTATES
-    public Dialog addChoices(List<DialogChoice> choices) {
-        this.choices.addAll(choices);
-        return this;
+    public final Dialog addChoices(List<DialogChoice> choices) {
+        List<DialogChoice> allChoices = new ArrayList<>(getChoices());
+        allChoices.addAll(choices);
+        return new Dialog(greeting, action, choices);
     }
 }

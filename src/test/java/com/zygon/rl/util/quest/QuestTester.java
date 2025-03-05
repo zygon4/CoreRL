@@ -18,7 +18,7 @@ import org.junit.Test;
  */
 public class QuestTester {
 
-    private static final class QuestContextImpl implements QuestContext {
+    private static final class QuestContextImpl implements QuestContext<String> {
 
         private final boolean isComplete;
         private final boolean isSuccess;
@@ -29,12 +29,12 @@ public class QuestTester {
         }
 
         @Override
-        public boolean isComplete() {
+        public boolean isComplete(String s) {
             return isComplete;
         }
 
         @Override
-        public boolean isSuccess() {
+        public boolean isSuccess(String s) {
             return isSuccess;
         }
 
@@ -65,11 +65,11 @@ public class QuestTester {
                 List.of(summonQuest, weakenQuest, trapQuest));
 
         System.out.println(deicideQuest);
-        System.out.println("Complete? " + deicideQuest.isComplete());
-        System.out.println("Successful? " + deicideQuest.isSuccess());
+        System.out.println("Complete? " + deicideQuest.isComplete(""));
+        System.out.println("Successful? " + deicideQuest.isSuccess(""));
 
-        System.out.println(deicideQuest.getDependentSubTasks().stream()
-                .map(TaskInfo::toString)
+        System.out.println(deicideQuest.getDependentSubTasks("").stream()
+                .map(ti -> ti.toString())
                 .collect(Collectors.joining("\n")));
 
     }

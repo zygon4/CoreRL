@@ -102,8 +102,8 @@
         "id": "mon_vampire",
         "type": "MONSTER",
         "name": "Vampire",
-        "description": "An Vampire",
-        "symbol": "v",
+        "description": "A Vampire",
+        "symbol": "V",
         "color": "DarkSlateGray",
         "species": "VAMPIRE",
         "aggression": 100,
@@ -111,5 +111,19 @@
         "speed": 110,
         "flags": {},
         "weight": 180
+    },
+    {
+        "id": "mon_lich",
+        "type": "MONSTER",
+        "name": "Lich",
+        "description": "An ancient Lich",
+        "symbol": "L",
+        "color": "DarkSeaGreen",
+        "species": "LICH",
+        "aggression": 100,
+        "hitPoints": 180,
+        "speed": 80,
+        "flags": {},
+        "weight": 120
     }
 ]

@@ -114,8 +114,8 @@ public class SummonAction extends Action {
         DialogChoice leafLight = DialogChoice.create("I pick the world of light.", Optional.empty(), Optional.of(light));
         DialogChoice leafLoop = DialogChoice.create("I pick the world of unending", Optional.empty(), Optional.of(start));
 
-        start.addChoices(List.of(leafDark, leafLight, leafLoop));
-        darkness.addChoices(List.of(leafDark2));
+        darkness = darkness.addChoices(List.of(leafDark2));
+        start = start.addChoices(List.of(leafDark.set(Optional.of(darkness)), leafLight, leafLoop));
 
         String name = FantasyNameGen.generate();
         CharacterSheet rando = new CharacterSheet(actor,

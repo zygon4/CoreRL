@@ -73,14 +73,22 @@ public abstract class DamageAction extends Action {
                 Action action = triggers.get(CharacterSheet.TriggerType.DEATH);
                 if (action.canExecute(state)) {
                     state = action.execute(state);
+                } else {
+                    state = updateToDead(state, updatedDefender);
                 }
             } else {
-                // standard death
-                DeathAction deathAction = new DeathAction(updatedDefender, defenderLocation);
-                if (deathAction.canExecute(state)) {
-                    state = deathAction.execute(state);
-                }
+                state = updateToDead(state, updatedDefender);
             }
+        }
+
+        return state;
+    }
+
+    private GameState updateToDead(GameState state,
+            CharacterSheet updatedDefender) {
+        DeathAction deathAction = new DeathAction(updatedDefender, defenderLocation);
+        if (deathAction.canExecute(state)) {
+            state = deathAction.execute(state);
         }
 
         return state;

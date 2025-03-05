@@ -47,7 +47,7 @@ public class QuestRenderer implements GameComponentRenderer {
         yOffset++;
 
         for (QuestInfo quest : quests) {
-            String txt = quest.getDisplayString();
+            String txt = quest.getDisplayString(gameState);
 
             yOffset = TextRenderer.render(layer, yOffset, renderUtil, txt, Color.MAGENTA);
         }

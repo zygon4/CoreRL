@@ -38,7 +38,7 @@ public class DialogSessionTest {
         DialogChoice choiceX = DialogChoice.create("Choice X");
 //        DialogChoice choiceY = DialogChoice.create("Choice Y");
 
-        dialogA.addChoices(List.of(choiceX));
+        dialogA = dialogA.addChoices(List.of(choiceX));
 
         DialogSession session = DialogSession.play(dialogA);
 
@@ -60,7 +60,7 @@ public class DialogSessionTest {
 
         DialogChoice choiceX = DialogChoice.create("Choice X", Optional.empty(), Optional.of(dialogA));
 
-        dialogA.addChoices(List.of(choiceX));
+        dialogA = dialogA.addChoices(List.of(choiceX));
 
         DialogSession session = DialogSession.play(dialogA);
 
@@ -84,7 +84,7 @@ public class DialogSessionTest {
         DialogChoice choiceX = DialogChoice.create("Choice X", Optional.empty(), Optional.of(dialogA));
         DialogChoice choiceY = DialogChoice.create("Choice Y", Optional.empty(), Optional.of(dialogB));
 
-        dialogA.addChoices(List.of(choiceX, choiceY));
+        dialogA = dialogA.addChoices(List.of(choiceX, choiceY));
 
         DialogSession session = DialogSession.play(dialogA);
 
