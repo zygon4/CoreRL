@@ -11,7 +11,8 @@
         "hitPoints": 5,
         "speed": 140,
         "flags": { "FLIES": true },
-        "weight": 1
+        "weight": 1,
+        "spawns": ["DEEP_WATER", "SHALLOW_WATER", "SHORT_FIELD", "TOWN_OUTER", "TOWN_RESIDENCE"]
     },
     {
         "id": "mon_giant_frog",
@@ -25,7 +26,8 @@
         "hitPoints": 25,
         "speed": 80,
         "flags": {},
-        "weight": 30
+        "weight": 30,
+        "spawns": ["SHALLOW_WATER", "SHORE"]
     },
     {
         "id": "mon_wolf",
@@ -39,8 +41,8 @@
         "hitPoints": 40,
         "speed": 100,
         "flags": {},
-        "weight": 75
-        
+        "weight": 75,
+        "spawns": ["FOREST", "TALL_FIELD"]
     },
     {
         "id": "mon_rat",
@@ -54,7 +56,8 @@
         "hitPoints": 8,
         "speed": 40,
         "flags": {},
-        "weight": 2
+        "weight": 2,
+        "spawns": ["SHALLOW_WATER", "SHORE", "SHORT_FIELD", "TOWN_RESIDENCE"]
     },
     {
         "id": "mon_bear",
@@ -68,7 +71,8 @@
         "hitPoints": 100,
         "speed": 90,
         "flags": {},
-        "weight": 285
+        "weight": 285,
+        "spawns": ["SHALLOW_WATER", "SHORE", "TALL_FIELD", "FOREST"]
     },
     {
         "id": "mon_deer",
@@ -82,7 +86,8 @@
         "hitPoints": 30,
         "speed": 120,
         "flags": {},
-        "weight": 105
+        "weight": 105,
+        "spawns": ["SHALLOW_WATER", "SHORE", "TALL_FIELD", "SHORT_FIELD", "FOREST"]
     },
     {
         "id": "mon_opossum",
@@ -96,7 +101,8 @@
         "hitPoints": 10,
         "speed": 80,
         "flags": {},
-        "weight": 12
+        "weight": 12,
+        "spawns": ["TALL_FIELD", "SHORT_FIELD"]
     },
     {
         "id": "mon_vampire",
@@ -112,7 +118,8 @@
         "flags": {
             "MAGIC": 2
         },
-        "weight": 180
+        "weight": 180,
+        "spawns": []
     },
     {
         "id": "mon_lich",
@@ -128,6 +135,7 @@
         "flags": {
             "MAGIC": 4
         },
-        "weight": 120
+        "weight": 120,
+        "spawns": []
     }
 ]

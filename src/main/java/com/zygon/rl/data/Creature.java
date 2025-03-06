@@ -1,5 +1,7 @@
 package com.zygon.rl.data;
 
+import java.util.List;
+
 /**
  *
  */
@@ -9,16 +11,24 @@ public class Creature extends WorldElement {
     private int aggression;
     private int hitPoints;
     private int speed;
+    private List<String> spawns;
 
     public Creature() {
     }
 
-    public Creature(WorldElement template, String species, int aggression, int hitPoints, int speed) {
+    public Creature(WorldElement template, String species, int aggression,
+            int hitPoints, int speed, List<String> spawns) {
         super(template);
         this.species = species;
         this.aggression = aggression;
         this.hitPoints = hitPoints;
         this.speed = speed;
+        this.spawns = spawns;
+    }
+
+    public Creature(WorldElement template, String species, int aggression,
+            int hitPoints, int speed) {
+        this(template, species, aggression, hitPoints, speed, null);
     }
 
     public String getSpecies() {
@@ -35,5 +45,9 @@ public class Creature extends WorldElement {
 
     public int getSpeed() {
         return speed;
+    }
+
+    public List<String> getSpawns() {
+        return spawns;
     }
 }

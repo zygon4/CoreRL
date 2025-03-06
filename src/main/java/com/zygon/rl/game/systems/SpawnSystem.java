@@ -2,8 +2,10 @@ package com.zygon.rl.game.systems;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -47,11 +49,34 @@ public class SpawnSystem extends GameSystem {
     private final Set<Location> spawnedItemLocations = new HashSet<>();
     private final Random random;
     private final SpawnContext spawnContext;
+    // TODO: this seems to belong somewhere else - Monster maybe?
+    private static Map<WorldRegion, Set<String>> creatureIds;
+
+    static {
+        // Wish this were more functional..
+        Map<WorldRegion, Set<String>> spawnsByRegion = new HashMap<>();
+        for (String id : Monster.getAllIds()) {
+            Monster mon = Monster.get(id);
+            List<String> spawns = mon.getSpawns();
+            for (String spawn : spawns) {
+                WorldRegion wr = WorldRegion.valueOf(spawn);
+                Set<String> creatureIds = spawnsByRegion.computeIfAbsent(wr, k -> new HashSet<>());
+                creatureIds.add(id);
+            }
+        }
+
+        creatureIds = Collections.unmodifiableMap(spawnsByRegion);
+    }
+
+    public static Map<WorldRegion, Set<String>> getCreatureSpawnRegions() {
+        return creatureIds;
+    }
 
     public SpawnSystem(GameConfiguration gameConfiguration) {
         super(gameConfiguration);
         this.random = gameConfiguration.getRandom();
         this.spawnContext = gameConfiguration.getSpawnContext();
+
     }
 
     @Override
@@ -230,6 +255,9 @@ public class SpawnSystem extends GameSystem {
 
         Location rngLocation = Location.create(location.getX() + noiseX, location.getY() + noiseY);
         Terrain terrain = world.getTerrain(location);
+        WorldRegion region = world.getRegion(location);
+        Set<String> regionCreatureIds = creatureIds.get(region);
+
         Action summonAction = null;
 
         if (!terrain.getId().equals(Terrain.Ids.PUDDLE.getId())
@@ -238,7 +266,7 @@ public class SpawnSystem extends GameSystem {
             String creatureId = null;
 
             if (random.nextDouble() > .10) {
-                creatureId = getRandomSetElement(Monster.getAllIds(), random);
+                creatureId = getRandomSetElement(regionCreatureIds, random);
             } else {
                 // TODO: set names on resulting spawns
                 // TODO: equipment/items on NPCs
