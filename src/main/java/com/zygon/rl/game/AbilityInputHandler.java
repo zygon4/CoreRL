@@ -97,7 +97,7 @@ public final class AbilityInputHandler extends BaseInputHandler {
     @Override
     public String getDisplayText(Input input) {
         Ability ability = abilitiesByKeyCode.get(input);
-        return ability.getName();
+        return ability.getName() + " - " + ability.getDescription();
     }
 
     public static Function<GameState, List<String>> getInputsFn() {

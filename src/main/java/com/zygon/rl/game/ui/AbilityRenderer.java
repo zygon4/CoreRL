@@ -11,39 +11,40 @@ import org.hexworks.zircon.api.data.Position;
 import org.hexworks.zircon.api.graphics.Layer;
 
 /**
+ * This looks a lot like a generic text renderer...
  *
  * @author zygon
  */
 public class AbilityRenderer implements GameComponentRenderer {
 
-    private final Layer inventoryLayer;
+    private final Layer layer;
     private final RenderUtil renderUtil;
     private final Function<GameState, List<String>> getTextFn;
 
     public AbilityRenderer(Layer inventoryLayer, RenderUtil renderUtil,
             Function<GameState, List<String>> getTextFn) {
-        this.inventoryLayer = Objects.requireNonNull(inventoryLayer);
+        this.layer = Objects.requireNonNull(inventoryLayer);
         this.renderUtil = Objects.requireNonNull(renderUtil);
         this.getTextFn = getTextFn;
     }
 
     @Override
     public void clear() {
-        inventoryLayer.clear();
+        layer.clear();
     }
 
     @Override
     public void render(GameState gameState) {
 
-        renderUtil.fill(inventoryLayer);
+        renderUtil.fill(layer);
 
         int yOffset = 1;
-        renderUtil.render(inventoryLayer, Position.create(0, yOffset++), "*ABILITIES*", Color.yellow);
+        renderUtil.render(layer, Position.create(0, yOffset++), "*ABILITIES*", Color.yellow);
 
         List<String> abilities = getTextFn.apply(gameState);
         if (abilities != null) {
             for (String text : abilities) {
-                renderUtil.render(inventoryLayer, Position.create(0, yOffset), text, Color.RED);
+                renderUtil.render(layer, Position.create(0, yOffset), text, Color.RED);
                 yOffset++;
             }
         }
