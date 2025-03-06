@@ -1,5 +1,17 @@
 package com.zygon.rl.world;
 
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 import com.zygon.rl.data.Identifable;
 import com.zygon.rl.data.Terrain;
 import com.zygon.rl.data.WorldElement;
@@ -9,17 +21,6 @@ import com.zygon.rl.data.buildings.Layout;
 import com.zygon.rl.data.context.Data;
 import com.zygon.rl.util.NoiseUtil;
 import com.zygon.rl.world.character.CharacterSheet;
-
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * This is an ugly sweater on the ECS, could really use some more structure.
@@ -110,6 +111,32 @@ public class World {
         // This needs to be reconciled with the check above
         List<CharacterSheet> get = actors.get(destination, (t) -> true);
         return get == null || get.isEmpty();
+    }
+
+    private static <T extends WorldElement> boolean hasflag(T worldElement,
+            String flag) {
+        return worldElement.getFlags() != null
+                && worldElement.getFlags().containsKey(flag);
+    }
+
+    public Map<Location, Tangible> getAllByFlag(Location center, String flag,
+            int radius, boolean includeCenter) {
+        Map<Location, List<CharacterSheet>> allCharactersByflag = actors.get(center,
+                (t) -> hasflag(t.getTemplate(), flag), radius, includeCenter);
+
+        Map<Location, List<Tangible>> allStaticsByflag = staticObjects.get(center,
+                (t) -> hasflag(t.getTemplate(), flag), radius, includeCenter);
+
+        Map<Location, Tangible> all = new HashMap<>();
+        all.putAll(allCharactersByflag.entrySet().stream()
+                .map(entry -> Map.entry(entry.getKey(), entry.getValue().get(0)))
+                .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue())));
+
+        all.putAll(allStaticsByflag.entrySet().stream()
+                .map(entry -> Map.entry(entry.getKey(), entry.getValue().get(0)))
+                .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue())));
+
+        return all;
     }
 
     public Map<Location, CharacterSheet> getAll(Location center, String type,

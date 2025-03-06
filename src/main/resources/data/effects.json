@@ -7,6 +7,14 @@
         "statMods": [ { "name":"INT", "amount":-1 } ]
     },
     {
+        "id": "effect_confusion",
+        "type": "EFFECT",
+        "name": "Confusion",
+        "description": "You are confused.",
+        "maxDuration": 8,
+        "statMods": [ { "name":"INT", "amount":-4 }, { "name":"WIS", "amount":-4 }, { "name":"CHA", "amount":-2 } ]
+    },
+    {
         "id": "effect_terror",
         "type": "EFFECT",
         "name": "Terror",
@@ -19,7 +27,7 @@
         "type": "EFFECT",
         "name": "Bleeding",
         "description": "You're bleeding profously, you may die",
-        "maxDuration": 8,
+        "maxDuration": 100,
         "statMods": [ { "name":"STR", "amount":-4 }, { "name":"DEX", "amount":-4 }, { "name":"CON", "amount":-4 }, { "name":"INT", "amount":-4 }, { "name":"WIS", "amount":-4 }, { "name":"CHA", "amount":-4 } ]
     },
     {
@@ -27,5 +35,13 @@
         "type": "EFFECT",
         "name": "Hostile",
         "description": "Hostile"
+    },
+    {
+        "id": "effect_enhanced_speed",
+        "type": "EFFECT",
+        "name": "EnhancedSpeed",
+        "description": "You are possessed with enhanced speed",
+        "maxDuration": 10,
+        "statMods": [ { "name":"SPD", "amount": 100 } ]
     }
 ]

@@ -5,6 +5,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 import java.awt.Color;
 import java.io.IOException;
+import java.lang.System.Logger.Level;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -130,6 +131,14 @@ final class GameView extends BaseView {
             componentRenderersByPrompt.put(GameState.InputContextPrompt.PRIMARY,
                     new OuterWorldRenderer(gameScreenLayer, game, renderUtil));
 
+            Layer overlayLayer = Layer.newBuilder()
+                    .withSize(gameScreen.getSize())
+                    .build();
+            getScreen().addLayer(overlayLayer);
+            componentRenderersByPrompt.put(GameState.InputContextPrompt.OVERLAY,
+                    new OverlayRenderer(gameScreenLayer, game, renderUtil));
+            //overlayLayer, renderUtil, DialogInputHandler.getTextFn())
+
             Layer inventoryLayer = Layer.newBuilder()
                     .withSize(gameScreen.getSize())
                     .build();
@@ -146,7 +155,7 @@ final class GameView extends BaseView {
                             (gs) -> gs.getNotification() != null ? List.of(gs.getNotification().note()) : null));
 
             Layer dialogLayer = Layer.newBuilder()
-                    .withSize(gameScreen.getSize().minus(Size.create(20, 10)))
+                    .withSize(gameScreen.getSize())
                     .build();
             getScreen().addLayer(dialogLayer);
             componentRenderersByPrompt.put(GameState.InputContextPrompt.DIALOG,
@@ -329,6 +338,9 @@ final class GameView extends BaseView {
     private void updateGameScreen(Game game) {
 
         for (GameState.InputContext inputCtx : game.getState().getInputContext()) {
+
+            logger.log(Level.INFO, "Rendering for input context {0}", inputCtx.getName());
+
             // This is a HACK and shows that the *direction* handlers need better
             // integration with the rendering, when should we clear?
             if (inputCtx.getPrompt() != GameState.InputContextPrompt.DIRECTION) {

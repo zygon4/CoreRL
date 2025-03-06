@@ -12,14 +12,11 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import com.zygon.rl.data.Creature;
-import com.zygon.rl.data.Effect;
-import com.zygon.rl.data.Identifable;
 import com.zygon.rl.data.WorldElement;
 import com.zygon.rl.data.context.Data;
 import com.zygon.rl.data.items.ArmorData;
@@ -36,7 +33,6 @@ import com.zygon.rl.world.CorpseItem;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.Weather;
 import com.zygon.rl.world.World;
-import com.zygon.rl.world.action.SummonAction;
 import com.zygon.rl.world.character.Ability;
 import com.zygon.rl.world.character.Armor;
 import com.zygon.rl.world.character.CharacterSheet;
@@ -55,98 +51,107 @@ public class BloodRLMain {
 
 //    private static final StatusEffect THIRST_STATUS = new StatusEffect("blood_status_thirst",
 //            "Blood Thirst", "You thirst for blood of the living", true, 150);
-    private static final class DrainBlood implements Ability {
-
-        @Override
-        public String getName() {
-            return "Drain Blood";
-        }
-
-        @Override
-        public Target getTargeting() {
-            // TODO: and 'held' or disabled
-            return Target.ADJACENT;
-        }
-
-        @Override
-        public GameState use(GameState state, Optional<Identifable> empty,
-                Optional<Location> victimLocation) {
-
-            GameState.Builder copy = state.copy();
-
-            CharacterSheet victim = state.getWorld().get(victimLocation.get());
-
-            if (victim != null && !victimLocation.get().equals(state.getWorld().getPlayerLocation())) {
-                // TODO: biting is a special case attack
-                // needs combat resolution
-                // TODO: calculate bite stats and what happens to the player, etc.
-                // gain health
-                copy.addLog("You feed on the blood of " + victim.getName());
-                state.getWorld().remove(victim, victimLocation.get());
-
-                // TODO: finish after re-implementing status effects engine
-//                int hungerLevel = player.getStatus().getEffects().get(THIRST_STATUS.getId()).getValue();
-                // this feels really clunky.. better than before but not perfect
-//                state.getWorld().move(
-//                        player.set(player.getStatus().addEffect("Hunger", hungerLevel - 10)),
-//                        state.getWorld().getPlayerLocation(),
-//                        state.getWorld().getPlayerLocation());
-                copy.setWorld(state.getWorld().addTime(30));
-            } else {
-                copy.addLog("Cannot drain that");
-            }
-
-            return copy.build();
-        }
-    }
-
-    // TODO: reimplement Ability to return an Action to call
-    private static final class SummonFamiliar implements Ability {
-
-        private final Random random;
-
-        public SummonFamiliar(Random random) {
-            this.random = random;
-        }
-
-        @Override
-        public String getName() {
-            return "Summon Familiar";
-        }
-
-        @Override
-        public Ability.Target getTargeting() {
-            return Ability.Target.NONE;
-        }
-
-        @Override
-        public GameState use(GameState state, Optional<Identifable> empty,
-                Optional<Location> expectEmpty) {
-
-            String id = random.nextBoolean() ? "mon_simple_bat" : "mon_wolf";
-
-            SummonAction summonAction = new SummonAction(
-                    state.getWorld().getPlayerLocation(), 1, SummonAction.DEFAULT_RADIUS, id,
-                    Set.of(Effect.EffectNames.PET.getEffect()), random);
-
-            GameState.Builder copy = state.copy();
-
-            if (summonAction.canExecute(state)) {
-                summonAction.execute(state);
-                copy.addLog("You summon a familar!");
-
-                // TODO: this is clunky to move the time
-                // TODO: also it skips over the world's actions. We need a more
-                // generic "energy" system so everyone gets time to act.
-                copy.setWorld(state.getWorld().addTime(TimeUnit.MINUTES.toSeconds(1)));
-            } else {
-                copy.addLog("Cannot summon a familar here.");
-            }
-
-            return copy.build();
-        }
-    }
-
+//    private static final class DrainBlood implements Ability {
+//
+//        @Override
+//        public String getDescription() {
+//            return "Drain the blood of an adjacent being";
+//        }
+//
+//        @Override
+//        public String getName() {
+//            return "Drain Blood";
+//        }
+//
+//        @Override
+//        public Target getTargeting() {
+//            // TODO: and 'held' or disabled
+//            return Target.ADJACENT;
+//        }
+//
+//        @Override
+//        public GameState use(GameState state, Optional<Identifable> empty,
+//                Optional<Location> victimLocation) {
+//
+//            GameState.Builder copy = state.copy();
+//
+//            CharacterSheet victim = state.getWorld().get(victimLocation.get());
+//
+//            if (victim != null && !victimLocation.get().equals(state.getWorld().getPlayerLocation())) {
+//                // TODO: biting is a special case attack
+//                // needs combat resolution
+//                // TODO: calculate bite stats and what happens to the player, etc.
+//                // gain health
+//                copy.addLog("You feed on the blood of " + victim.getName());
+//                state.getWorld().remove(victim, victimLocation.get());
+//
+//                // TODO: finish after re-implementing status effects engine
+////                int hungerLevel = player.getStatus().getEffects().get(THIRST_STATUS.getId()).getValue();
+//                // this feels really clunky.. better than before but not perfect
+////                state.getWorld().move(
+////                        player.set(player.getStatus().addEffect("Hunger", hungerLevel - 10)),
+////                        state.getWorld().getPlayerLocation(),
+////                        state.getWorld().getPlayerLocation());
+//                copy.setWorld(state.getWorld().addTime(30));
+//            } else {
+//                copy.addLog("Cannot drain that");
+//            }
+//
+//            return copy.build();
+//        }
+//    }
+//
+//    // TODO: reimplement Ability to return an Action to call
+//    private static final class SummonFamiliar implements Ability {
+//
+//        private final Random random;
+//
+//        public SummonFamiliar(Random random) {
+//            this.random = random;
+//        }
+//
+//        @Override
+//        public String getDescription() {
+//            return "Summon a random pet";
+//        }
+//
+//        @Override
+//        public String getName() {
+//            return "Summon Familiar";
+//        }
+//
+//        @Override
+//        public Ability.Target getTargeting() {
+//            return Ability.Target.NONE;
+//        }
+//
+//        @Override
+//        public GameState use(GameState state, Optional<Identifable> empty,
+//                Optional<Location> expectEmpty) {
+//
+//            String id = random.nextBoolean() ? "mon_simple_bat" : "mon_wolf";
+//
+//            SummonAction summonAction = new SummonAction(
+//                    state.getWorld().getPlayerLocation(), 1, SummonAction.DEFAULT_RADIUS, id,
+//                    Set.of(Effect.EffectNames.PET.getEffect()), random);
+//
+//            GameState.Builder copy = state.copy();
+//
+//            if (summonAction.canExecute(state)) {
+//                summonAction.execute(state);
+//                copy.addLog("You summon a familar!");
+//
+//                // TODO: this is clunky to move the time
+//                // TODO: also it skips over the world's actions. We need a more
+//                // generic "energy" system so everyone gets time to act.
+//                copy.setWorld(state.getWorld().addTime(TimeUnit.MINUTES.toSeconds(1)));
+//            } else {
+//                copy.addLog("Cannot summon a familar here.");
+//            }
+//
+//            return copy.build();
+//        }
+//    }
     /**
      * @param args the command line arguments
      */
@@ -182,9 +187,8 @@ public class BloodRLMain {
         config.setSoundEffects(soundEffects);
         config.setRandom(new Random());
 
-        Ability drainBlood = new DrainBlood();
-        Ability summonFamiliar = new SummonFamiliar(config.getRandom());
-
+//        Ability drainBlood = new DrainBlood();
+//        Ability summonFamiliar = new SummonFamiliar(config.getRandom());
         int daysPerYear = 20;
         int startingYear = 1208;
         World world = new World(
@@ -195,8 +199,8 @@ public class BloodRLMain {
         Melee scythe = Melee.get("scythe");
 
         Set<Ability> abilities = new LinkedHashSet<>();
-        abilities.add(drainBlood);
-        abilities.add(summonFamiliar);
+//        abilities.add(drainBlood);
+//        abilities.add(summonFamiliar);
 
         // Not using right now
 //        Effect effect = Effect.get("effect_terror");

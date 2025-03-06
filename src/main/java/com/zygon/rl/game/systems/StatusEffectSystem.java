@@ -17,8 +17,8 @@ import com.zygon.rl.world.character.CharacterSheet;
 import com.zygon.rl.world.character.StatusEffect;
 
 /**
- * Check for status effects. Csonfirm if they should be applied now, continue,
- * or removed. The static (ie stats) bufs/debufs are applied in the
+ * Check for status effects. Confirm if they should be applied now, continue, or
+ * removed. The static (ie stats) buffs/debuffs are applied in the
  * {@link CharacterSheet} itself. Any dynamic effects (ie damage) are performed
  * here.
  *
@@ -30,9 +30,10 @@ public class StatusEffectSystem extends GameSystem {
         super(gameConfiguration);
     }
 
+    // TODO: remove status effects that have a max duration..
+    //
     private Action translate(GameState state, CharacterSheet sheet,
-            Location location,
-            StatusEffect effect) {
+            Location location, StatusEffect effect) {
         switch (EffectNames.getInstance(effect.getEffect().getId())) {
             case BLEEDING_MAJOR:
                 // Doing this "every X turns" should be a utility..

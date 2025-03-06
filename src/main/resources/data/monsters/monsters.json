@@ -109,7 +109,9 @@
         "aggression": 100,
         "hitPoints": 40,
         "speed": 110,
-        "flags": {},
+        "flags": {
+            "MAGIC": 2
+        },
         "weight": 180
     },
     {
@@ -123,7 +125,9 @@
         "aggression": 100,
         "hitPoints": 180,
         "speed": 80,
-        "flags": {},
+        "flags": {
+            "MAGIC": 4
+        },
         "weight": 120
     }
 ]

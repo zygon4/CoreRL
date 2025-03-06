@@ -43,8 +43,11 @@ public final class Effect extends WorldElement {
     // Not sure if this can keep up..
     public static enum EffectNames {
         BLEEDING_MAJOR(Effect.get("effect_bleeding_major")),
+        CONFUSION(Effect.get("effect_confusion")),
+        ENHANCED_SPEED(Effect.get("effect_enhanced_speed")),
         HOSTILE(Effect.get("effect_hostile")),
-        PET(Effect.get("effect_pet"));
+        PET(Effect.get("effect_pet")),
+        TERRIFIED(Effect.get("effect_terror"));
 
         private final Effect effect;
 

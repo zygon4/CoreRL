@@ -1,13 +1,16 @@
 package com.zygon.rl.game;
 
-import com.zygon.rl.world.Tangible;
-import com.zygon.rl.world.character.Ability;
-
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.zygon.rl.world.Tangible;
+import com.zygon.rl.world.action.Action;
+import com.zygon.rl.world.character.Ability;
+import com.zygon.rl.world.character.AbilityActionSet;
 
 final class AbilityInputHandler extends BaseInputHandler {
 
@@ -21,7 +24,8 @@ final class AbilityInputHandler extends BaseInputHandler {
 
     // organizes the ability itself, not the targets
     // E.g. keyboard 'A' could activate the "throw" menu
-    public static final AbilityInputHandler create(GameConfiguration gameConfiguration,
+    public static final AbilityInputHandler create(
+            GameConfiguration gameConfiguration,
             Set<Ability> abilities) {
         Map<Input, Ability> inputs = createAlphaInputs(new ArrayList<>(abilities));
         return new AbilityInputHandler(gameConfiguration, inputs);
@@ -64,11 +68,23 @@ final class AbilityInputHandler extends BaseInputHandler {
                                 .build())
                         .build();
             }
-            case NONE ->
+            case NONE -> {
                 // no target, use ability and pop context.
-                newState = ability.use(state, null, null).copy()
+                AbilityActionSet abilityActions = ability.use(state, Optional.empty(), Optional.empty());
+
+                for (Action abilityAction : abilityActions.actions()) {
+                    if (abilityAction.canExecute(state)) {
+                        newState = abilityAction.execute(state);
+                    } else {
+                        // stop if anything can't execute..
+                        break;
+                    }
+                }
+
+                newState = newState.copy()
                         .removeInputContext()
                         .build();
+            }
         }
 
         return newState;

@@ -91,7 +91,21 @@ public final class CharacterSheet extends Tangible {
     // TODO: Calculate final from species/traits/status/eq
     public int getSpeed() {
         Creature creature = getTemplate();
-        return creature.getSpeed();
+        int baseSpeed = creature.getSpeed();
+
+        // basically sprinting/running..
+        if (getStatus().isEffected(Effect.EffectNames.ENHANCED_SPEED.getId())) {
+            // This is
+            StatusEffect speedBuff = getStatus().getEffects()
+                    .get(Effect.EffectNames.ENHANCED_SPEED.getId());
+            Integer speedAdjustment = speedBuff.getEffect().getStatMods().stream()
+                    .filter(sm -> sm.getName().equals("SPD"))
+                    .map(sm -> sm.getAmount())
+                    .findFirst().orElse(0);
+            return baseSpeed + speedAdjustment;
+        }
+
+        return baseSpeed;
     }
 
     public Stats getStats() {
@@ -125,7 +139,8 @@ public final class CharacterSheet extends Tangible {
                     }
                 }
 
-                baseStats = new Stats(baseStats.getStrength() + strMod,
+                baseStats = new Stats(
+                        baseStats.getStrength() + strMod,
                         baseStats.getDexterity() + dexMod,
                         baseStats.getConstitution() + conMod,
                         baseStats.getIntelligence() + intMod,
@@ -168,6 +183,24 @@ public final class CharacterSheet extends Tangible {
 
     public boolean isDead() {
         return getStatus().getHitPoints() <= 0;
+    }
+
+    public CharacterSheet gainHitPoints(int hps) {
+        Creature creature = getTemplate();
+
+        int maxHp = creature.getHitPoints();
+        int currentHp = getStatus().getHitPoints();
+
+        if (currentHp < maxHp) {
+            int adjustment = hps;
+            if (currentHp + adjustment > maxHp) {
+                // This all feels clunky but it should work.. just subtract the overage from the adjustment.
+                adjustment -= (currentHp + adjustment) - maxHp;
+            }
+            return set(getStatus().incHitPoints(adjustment));
+        }
+
+        return this;
     }
 
     // TODO: maybe future - damage to a specific area

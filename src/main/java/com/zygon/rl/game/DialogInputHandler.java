@@ -1,3 +1,6 @@
+/*
+ * Copyright Liminal Data Systems 2025
+ */
 package com.zygon.rl.game;
 
 import java.util.ArrayList;

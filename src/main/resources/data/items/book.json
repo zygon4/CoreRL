@@ -6,6 +6,9 @@
         "color": "Brown",
         "name": "The sacred text",
         "description": "An ancient tomb.",
-        "weight": 3
+        "weight": 3,
+        "flags": {
+            "MAGIC": 1
+        }
     }
 ]

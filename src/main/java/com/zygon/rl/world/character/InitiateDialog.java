@@ -3,12 +3,14 @@
  */
 package com.zygon.rl.world.character;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.zygon.rl.data.Identifable;
 import com.zygon.rl.game.GameConfiguration;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.world.Location;
+import com.zygon.rl.world.action.Action;
 import com.zygon.rl.world.action.DialogAction;
 
 /**
@@ -26,6 +28,11 @@ public class InitiateDialog implements Ability {
     }
 
     @Override
+    public String getDescription() {
+        return "Talk to an adjacent being";
+    }
+
+    @Override
     public String getName() {
         return "INITIATE_DIALOG";
     }
@@ -36,14 +43,23 @@ public class InitiateDialog implements Ability {
     }
 
     @Override
-    public GameState use(GameState state, Optional<Identifable> targetEntity,
+    public AbilityActionSet use(GameState state,
+            Optional<Identifable> targetEntity,
             Optional<Location> targetLocation) {
 
-        DialogAction dialogAction = new DialogAction(this.gameConfiguration, targetLocation.get());
-        if (dialogAction.canExecute(state)) {
-            return dialogAction.execute(state);
-        }
+        DialogAction dialogAction = new DialogAction(
+                this.gameConfiguration, targetLocation.get());
 
-        return state;
+        return AbilityActionSet.create(List.of(new Action() {
+            @Override
+            public boolean canExecute(GameState state) {
+                return dialogAction.canExecute(state);
+            }
+
+            @Override
+            public GameState execute(GameState state) {
+                return dialogAction.execute(state);
+            }
+        }));
     }
 }

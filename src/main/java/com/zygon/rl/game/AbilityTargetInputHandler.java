@@ -1,13 +1,15 @@
 package com.zygon.rl.game;
 
-import com.zygon.rl.data.Identifable;
-import com.zygon.rl.world.Tangible;
-import com.zygon.rl.world.character.Ability;
-
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import com.zygon.rl.data.Identifable;
+import com.zygon.rl.world.Tangible;
+import com.zygon.rl.world.action.Action;
+import com.zygon.rl.world.character.Ability;
+import com.zygon.rl.world.character.AbilityActionSet;
 
 /**
  * Handles ability targets, could be used for spells/other actions in the
@@ -28,7 +30,8 @@ public class AbilityTargetInputHandler extends BaseInputHandler {
         this.targetsByInput = targetsByInput;
     }
 
-    public static final AbilityTargetInputHandler create(GameConfiguration gameConfiguration,
+    public static final AbilityTargetInputHandler create(
+            GameConfiguration gameConfiguration,
             Ability ability, Set<Tangible> targets) {
 
         // TODO: use location-based inputs vs alphabet
@@ -43,7 +46,15 @@ public class AbilityTargetInputHandler extends BaseInputHandler {
         Identifable target = targetsByInput.get(input);
 
         if (target != null) {
-            newState = ability.use(state, Optional.of(target), Optional.empty());
+            AbilityActionSet abilityActions = ability.use(state, Optional.of(target), Optional.empty());
+            for (Action abilityAction : abilityActions.actions()) {
+                if (abilityAction.canExecute(state)) {
+                    newState = abilityAction.execute(state);
+                } else {
+                    // stop if anything can't execute..
+                    break;
+                }
+            }
         } else {
             invalidInput(input);
         }

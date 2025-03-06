@@ -97,6 +97,10 @@ public final class AISystem extends GameSystem {
     private Behavior get(CharacterSheet character, Location characterLocation,
             World world) {
 
+        if (isConfused(character)) {
+            return wander(characterLocation, world);
+        }
+
         if (character.getStatus().isEffected(Effect.EffectNames.PET.getId())) {
             Location playerLocation = world.getPlayerLocation();
             // player location can be null if dead
@@ -236,5 +240,9 @@ public final class AISystem extends GameSystem {
 
     private static boolean isPet(CharacterSheet character) {
         return character.getStatus().isEffected(Effect.EffectNames.PET.getId());
+    }
+
+    private static boolean isConfused(CharacterSheet character) {
+        return character.getStatus().isEffected(Effect.EffectNames.CONFUSION.getId());
     }
 }

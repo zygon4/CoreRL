@@ -3,7 +3,9 @@ package com.zygon.rl.game;
 import java.util.Optional;
 
 import com.zygon.rl.world.Location;
+import com.zygon.rl.world.action.Action;
 import com.zygon.rl.world.character.Ability;
+import com.zygon.rl.world.character.AbilityActionSet;
 
 /**
  * Handles ability directions, could be used for spells/other actions in the
@@ -70,7 +72,15 @@ public class AbilityDirectionInputHandler extends BaseInputHandler {
         }
 
         if (target != null) {
-            newState = ability.use(state, Optional.empty(), Optional.of(target));
+            AbilityActionSet abilityActions = ability.use(state, Optional.empty(), Optional.of(target));
+            for (Action abilityAction : abilityActions.actions()) {
+                if (abilityAction.canExecute(state)) {
+                    newState = abilityAction.execute(state);
+                } else {
+                    // stop if anything can't execute..
+                    break;
+                }
+            }
         } else {
             invalidInput(input);
         }

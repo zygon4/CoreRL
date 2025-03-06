@@ -32,9 +32,10 @@ public class GameState {
         NONE,
         // Starting the above idea here:
         DIALOG,
-        QUESTS,
         INVENTORY,
-        PRIMARY
+        OVERLAY,
+        PRIMARY,
+        QUESTS
     }
 
     // TODO: This is going to need to hold more info to teach outsiders how to
