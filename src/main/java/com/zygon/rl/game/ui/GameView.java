@@ -20,6 +20,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.zygon.rl.data.Terrain;
 import com.zygon.rl.data.context.Data;
+import com.zygon.rl.game.AbilityInputHandler;
 import com.zygon.rl.game.DialogInputHandler;
 import com.zygon.rl.game.Game;
 import com.zygon.rl.game.GameState;
@@ -144,6 +145,14 @@ final class GameView extends BaseView {
             getScreen().addLayer(overlayLayer);
             componentRenderersByPrompt.put(GameState.InputContextPrompt.OVERLAY,
                     new OverlayRenderer(gameScreenLayer, game, renderUtil));
+
+            Layer abilityLayer = Layer.newBuilder()
+                    .withSize(overlayScreenSize.minus(Size.create(0, 40)))
+                    .withOffset(overlayScreenPos.plus(Position.create(0, 40)))
+                    .build();
+            getScreen().addLayer(abilityLayer);
+            componentRenderersByPrompt.put(GameState.InputContextPrompt.ABILITIES,
+                    new AbilityRenderer(abilityLayer, renderUtil, AbilityInputHandler.getInputsFn()));
 
             Layer inventoryLayer = Layer.newBuilder()
                     .withSize(overlayScreenSize)

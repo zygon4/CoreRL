@@ -4,7 +4,6 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.zygon.rl.game.GameState.InputContext;
 import com.zygon.rl.world.Item;
 import com.zygon.rl.world.character.Inventory;
 
@@ -35,8 +34,7 @@ final class InventoryInputHandler extends BaseInputHandler {
     }
 
     public static final InventoryInputHandler create(
-            GameConfiguration gameConfiguration,
-            Inventory inventory, InputContext escapeContext) {
+            GameConfiguration gameConfiguration, Inventory inventory) {
         Map<Input, Item> inputs = createAlphaInputs(inventory.getItems());
         return new InventoryInputHandler(gameConfiguration, inputs);
     }

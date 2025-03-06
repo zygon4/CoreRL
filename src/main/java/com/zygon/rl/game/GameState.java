@@ -31,6 +31,7 @@ public class GameState {
         @Deprecated
         NONE,
         // Starting the above idea here:
+        ABILITIES,
         DIALOG,
         INVENTORY,
         NOTIFICATION,
