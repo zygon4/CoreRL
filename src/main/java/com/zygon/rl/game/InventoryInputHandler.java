@@ -14,7 +14,6 @@ import org.hexworks.zircon.api.uievent.KeyCode;
 // more (scroll up, down).
 final class InventoryInputHandler extends BaseInputHandler {
 
-    private final InputContext escapeContext;
     private final Map<Input, Item> itemsByKeyCode;
 
     private static Set<Input> getInputs(Map<Input, Item> itemsByKeyCode) {
@@ -30,17 +29,16 @@ final class InventoryInputHandler extends BaseInputHandler {
     // But that means here, when the player mashes escape, or we want to go back to the game, we need to pop us, and add
     // back a context.
     private InventoryInputHandler(GameConfiguration gameConfiguration,
-            Map<Input, Item> itemsByKeyCode, InputContext escapeContext) {
+            Map<Input, Item> itemsByKeyCode) {
         super(gameConfiguration, getInputs(itemsByKeyCode));
         this.itemsByKeyCode = itemsByKeyCode;
-        this.escapeContext = escapeContext;
     }
 
     public static final InventoryInputHandler create(
             GameConfiguration gameConfiguration,
             Inventory inventory, InputContext escapeContext) {
         Map<Input, Item> inputs = createAlphaInputs(inventory.getItems());
-        return new InventoryInputHandler(gameConfiguration, inputs, escapeContext);
+        return new InventoryInputHandler(gameConfiguration, inputs);
     }
 
     @Override
@@ -52,7 +50,6 @@ final class InventoryInputHandler extends BaseInputHandler {
             case ESCAPE -> {
                 newState = newState.copy()
                         .removeInputContext()
-                        .addInputContext(escapeContext)
                         .build();
             }
             default -> {

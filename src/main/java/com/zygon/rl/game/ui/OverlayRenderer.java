@@ -23,7 +23,8 @@ import org.hexworks.zircon.api.data.Tile;
 import org.hexworks.zircon.api.graphics.Layer;
 
 /**
- * For overlaying on top of the the main game screen.
+ * For overlaying on top of the the main game screen.<br>
+ * TODO: this is not used!
  *
  * @author zygon
  */

@@ -113,56 +113,66 @@ final class GameView extends BaseView {
                     .build();
             getScreen().addComponent(gameScreen);
 
+            final Size gameScreenSize = gameScreen.getSize();
+
             sideBar = createSideBar(Position.create(gameScreen.getWidth(), 0), game);
             getScreen().addFragment(sideBar);
 
             miniMapLayer = Layer.newBuilder()
                     .withSize(SIDEBAR_SCREEN_WIDTH, SIDEBAR_SCREEN_WIDTH)
-                    .withOffset(gameScreen.getSize().getWidth() + 1, sideBar.getRoot().getHeight() + 1)
+                    .withOffset(gameScreenSize.getWidth() + 1, sideBar.getRoot().getHeight() + 1)
                     .build();
             getScreen().addLayer(miniMapLayer);
 
             RenderUtil renderUtil = new RenderUtil(colorCache);
 
             Layer gameScreenLayer = Layer.newBuilder()
-                    .withSize(gameScreen.getSize())
+                    .withSize(gameScreenSize)
                     .build();
             getScreen().addLayer(gameScreenLayer);
             componentRenderersByPrompt.put(GameState.InputContextPrompt.PRIMARY,
                     new OuterWorldRenderer(gameScreenLayer, game, renderUtil));
 
+            final Size overlayScreenSize = gameScreenSize.minus(Size.create(20, 20));
+            final Position overlayScreenPos = gameScreen.getPosition().plus(Position.create(9, 11));
+
+            // TODO: not used - fix or remove.
             Layer overlayLayer = Layer.newBuilder()
-                    .withSize(gameScreen.getSize())
+                    .withSize(overlayScreenSize)
+                    .withOffset(overlayScreenPos)
                     .build();
             getScreen().addLayer(overlayLayer);
             componentRenderersByPrompt.put(GameState.InputContextPrompt.OVERLAY,
                     new OverlayRenderer(gameScreenLayer, game, renderUtil));
-            //overlayLayer, renderUtil, DialogInputHandler.getTextFn())
 
             Layer inventoryLayer = Layer.newBuilder()
-                    .withSize(gameScreen.getSize())
+                    .withSize(overlayScreenSize)
+                    .withOffset(overlayScreenPos)
                     .build();
             getScreen().addLayer(inventoryLayer);
             componentRenderersByPrompt.put(GameState.InputContextPrompt.INVENTORY,
                     new InventoryRenderer(inventoryLayer, renderUtil));
 
             Layer notificationLayer = Layer.newBuilder()
-                    .withSize(gameScreen.getSize())
+                    .withSize(overlayScreenSize)
+                    .withOffset(overlayScreenPos)
                     .build();
             getScreen().addLayer(notificationLayer);
-            componentRenderersByPrompt.put(GameState.InputContextPrompt.MODAL,
+            componentRenderersByPrompt.put(GameState.InputContextPrompt.NOTIFICATION,
                     new TextRenderer(notificationLayer, renderUtil,
                             (gs) -> gs.getNotification() != null ? List.of(gs.getNotification().note()) : null));
 
             Layer dialogLayer = Layer.newBuilder()
-                    .withSize(gameScreen.getSize())
+                    .withSize(overlayScreenSize)
+                    .withOffset(overlayScreenPos)
                     .build();
             getScreen().addLayer(dialogLayer);
             componentRenderersByPrompt.put(GameState.InputContextPrompt.DIALOG,
                     new TextRenderer(dialogLayer, renderUtil, DialogInputHandler.getTextFn()));
 
             Layer questLayer = Layer.newBuilder()
-                    .withSize(gameScreen.getSize())
+                    .withSize(overlayScreenSize)
+                    .withOffset(overlayScreenPos)
                     .build();
             getScreen().addLayer(questLayer);
             componentRenderersByPrompt.put(GameState.InputContextPrompt.QUESTS,
@@ -337,20 +347,15 @@ final class GameView extends BaseView {
     // Added a loop, keep an eye out for performance issues
     private void updateGameScreen(Game game) {
 
-        for (GameState.InputContext inputCtx : game.getState().getInputContext()) {
-
-            logger.log(Level.INFO, "Rendering for input context {0}", inputCtx.getName());
-
+        componentRenderersByPrompt.forEach((p, r) -> {
             // This is a HACK and shows that the *direction* handlers need better
-            // integration with the rendering, when should we clear?
-            if (inputCtx.getPrompt() != GameState.InputContextPrompt.DIRECTION) {
-                // Clear the renders not associated with the current context
-                componentRenderersByPrompt.forEach((p, r) -> {
-                    if (p != inputCtx.getPrompt()) {
-                        r.clear();
-                    }
-                });
+            if (p != GameState.InputContextPrompt.DIRECTION) {
+                r.clear();
             }
+        });
+
+        for (GameState.InputContext inputCtx : game.getState().getInputContext()) {
+            logger.log(Level.INFO, "Rendering for input context {0}", inputCtx.getName());
 
             GameComponentRenderer gameComponentRenderer
                     = componentRenderersByPrompt.get(inputCtx.getPrompt());

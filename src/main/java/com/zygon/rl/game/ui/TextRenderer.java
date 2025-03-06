@@ -40,6 +40,9 @@ public class TextRenderer implements GameComponentRenderer {
 
     @Override
     public void render(GameState gameState) {
+
+        renderUtil.fill(textLayer);
+
         List<String> text = getTextFn.apply(gameState);
 
         if (text != null) {

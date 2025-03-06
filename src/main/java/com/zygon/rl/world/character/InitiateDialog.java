@@ -10,7 +10,6 @@ import com.zygon.rl.data.Identifable;
 import com.zygon.rl.game.GameConfiguration;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.world.Location;
-import com.zygon.rl.world.action.Action;
 import com.zygon.rl.world.action.DialogAction;
 
 /**
@@ -50,16 +49,6 @@ public class InitiateDialog implements Ability {
         DialogAction dialogAction = new DialogAction(
                 this.gameConfiguration, targetLocation.get());
 
-        return AbilityActionSet.create(List.of(new Action() {
-            @Override
-            public boolean canExecute(GameState state) {
-                return dialogAction.canExecute(state);
-            }
-
-            @Override
-            public GameState execute(GameState state) {
-                return dialogAction.execute(state);
-            }
-        }));
+        return AbilityActionSet.create(List.of(dialogAction));
     }
 }

@@ -26,6 +26,10 @@ public class RenderUtil {
             .withBackgroundColor(ANSITileColor.BLACK)
             .withForegroundColor(ANSITileColor.BLACK)
             .buildCharacterTile();
+    public static final Tile GRAY_TILE = Tile.newBuilder()
+            .withBackgroundColor(ANSITileColor.GRAY)
+            .withForegroundColor(ANSITileColor.GRAY)
+            .buildCharacterTile();
     public static final Tile WHITE_TILE = Tile.newBuilder()
             .withBackgroundColor(ANSITileColor.WHITE)
             .withForegroundColor(ANSITileColor.WHITE)
@@ -37,6 +41,10 @@ public class RenderUtil {
 
     public RenderUtil(LoadingCache<Color, TileColor> colorCache) {
         this.colorCache = Objects.requireNonNull(colorCache);
+    }
+
+    public void fill(Layer layer) {
+        layer.fill(BLACK_TILE);
     }
 
     public void render(Layer layer, Position offset, String text, Color color) {

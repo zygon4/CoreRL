@@ -38,6 +38,8 @@ public class QuestRenderer implements GameComponentRenderer {
     @Override
     public void render(GameState gameState) {
 
+        renderUtil.fill(layer);
+
         int yOffset = 1;
         renderUtil.render(layer, Position.create(0, yOffset++), "*QUESTS*", Color.yellow);
 

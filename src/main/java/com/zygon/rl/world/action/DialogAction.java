@@ -89,6 +89,7 @@ public class DialogAction extends Action {
                 if (quest.spokeWith(target.getName())) {
                     state.getLog().add("Quest complete: " + quest);
 
+                    // TODO: add back?
                     //                state = state.copy()
                     //                        .setNotification(Notification.create("Quest complete: " + quest, true))
                     //                        .build();
@@ -99,7 +100,7 @@ public class DialogAction extends Action {
         return state.copy()
                 .addInputContext(
                         GameState.InputContext.builder()
-                                .setName("TEXT")
+                                .setName("DIALOG")
                                 .setHandler(dialogHandler)
                                 .setPrompt(GameState.InputContextPrompt.DIALOG)
                                 .build()).build();

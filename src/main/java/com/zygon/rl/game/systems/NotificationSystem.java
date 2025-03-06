@@ -26,7 +26,7 @@ public final class NotificationSystem extends GameSystem {
                     .addInputContext(GameState.InputContext.builder()
                             .setName("TEXT")
                             .setHandler(ContinueInputHandler.create(getGameConfiguration()))
-                            .setPrompt(GameState.InputContextPrompt.MODAL)
+                            .setPrompt(GameState.InputContextPrompt.NOTIFICATION)
                             .build())
                     .build();
         }

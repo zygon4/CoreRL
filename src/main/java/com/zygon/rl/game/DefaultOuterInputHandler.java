@@ -274,20 +274,18 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                 InventoryInputHandler inventoryHandler = InventoryInputHandler.create(
                         getGameConfiguration(), player.getInventory(), state.getInputContext().peek());
 
-                // Remove current context, add inventory
-                copy.removeInputContext()
-                        .addInputContext(
-                                GameState.InputContext.builder()
-                                        .setName("INVENTORY")
-                                        .setHandler(inventoryHandler)
-                                        .setPrompt(GameState.InputContextPrompt.INVENTORY)
-                                        .build());
+                copy.addInputContext(
+                        GameState.InputContext.builder()
+                                .setName("INVENTORY")
+                                .setHandler(inventoryHandler)
+                                .setPrompt(GameState.InputContextPrompt.INVENTORY)
+                                .build());
             }
             // TALK / could be E?
             case KEY_T -> {
                 copy.addInputContext(
                         GameState.InputContext.builder()
-                                .setName("ABILITY")
+                                .setName("DIALOG")
                                 .setHandler(new AbilityDirectionInputHandler(
                                         getGameConfiguration(), new InitiateDialog(getGameConfiguration()),
                                         state.getWorld().getPlayerLocation()) {
@@ -443,13 +441,12 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                 // TODO: A QuestInputHandler so the player can select a quest
                 // and see more info about it..
 
-                copy.removeInputContext()
-                        .addInputContext(
-                                GameState.InputContext.builder()
-                                        .setName("QUESTS")
-                                        .setHandler(ContinueInputHandler.create(getGameConfiguration()))
-                                        .setPrompt(GameState.InputContextPrompt.QUESTS)
-                                        .build());
+                copy.addInputContext(
+                        GameState.InputContext.builder()
+                                .setName("QUESTS")
+                                .setHandler(ContinueInputHandler.create(getGameConfiguration()))
+                                .setPrompt(GameState.InputContextPrompt.QUESTS)
+                                .build());
             }
             case KEY_X -> {
                 Location playerLocation = state.getWorld().getPlayerLocation();

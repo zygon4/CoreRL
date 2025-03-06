@@ -36,6 +36,8 @@ public class InventoryRenderer implements GameComponentRenderer {
     @Override
     public void render(GameState gameState) {
 
+        renderUtil.fill(inventoryLayer);
+
         int yOffset = 1;
         renderUtil.render(inventoryLayer, Position.create(0, yOffset++), "*EQUIPMENT*", Color.yellow);
 

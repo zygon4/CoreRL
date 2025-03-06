@@ -33,6 +33,7 @@ public class GameState {
         // Starting the above idea here:
         DIALOG,
         INVENTORY,
+        NOTIFICATION,
         OVERLAY,
         PRIMARY,
         QUESTS

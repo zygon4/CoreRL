@@ -130,7 +130,7 @@
         "color": "DarkSeaGreen",
         "species": "LICH",
         "aggression": 100,
-        "hitPoints": 180,
+        "hitPoints": 1000,
         "speed": 80,
         "flags": {
             "MAGIC": 4

@@ -60,6 +60,7 @@ public final class DialogInputHandler extends BaseInputHandler {
             case ESCAPE -> {
                 newState.set(newState.get().copy()
                         .removeInputContext()
+                        .removeInputContext()
                         .build());
             }
             default -> {
@@ -70,6 +71,7 @@ public final class DialogInputHandler extends BaseInputHandler {
                     // Done..
                     if (session == null) {
                         newState.set(newState.get().copy()
+                                .removeInputContext()
                                 .removeInputContext()
                                 .build());
                     } else {
