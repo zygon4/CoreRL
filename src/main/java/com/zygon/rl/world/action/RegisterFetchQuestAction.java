@@ -5,6 +5,8 @@ package com.zygon.rl.world.action;
 
 import java.util.List;
 
+import com.zygon.rl.data.Element;
+import com.zygon.rl.data.context.Data;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.game.quest.FetchQuestContext;
 import com.zygon.rl.game.quest.GatherQuestContext;
@@ -40,14 +42,17 @@ public class RegisterFetchQuestAction extends Action {
     @Override
     public GameState execute(GameState state) {
 
+        Element item = Data.get(itemId);
+        String name = item.getName();
+
         GatherQuestContext gatherQuestContext = new GatherQuestContext(this.itemId);
-        QuestInfo locateItem = new QuestInfo("Locate " + this.itemId + " for "
-                + this.targetName, this.targetName + " has requested " + this.itemId,
+        QuestInfo locateItem = new QuestInfo("Locate [" + name + "] for "
+                + this.targetName, this.targetName + " has\nrequested [" + name + "]",
                 gatherQuestContext);
 
         FetchQuestContext fetchCtx = new FetchQuestContext(gatherQuestContext, this.itemId, this.targetName);
-        QuestInfo fetchQuest = new QuestInfo(this.targetName + " has requested " + this.itemId,
-                "Seek out " + this.itemId + " and provided it to " + this.targetName,
+        QuestInfo fetchQuest = new QuestInfo(this.targetName + " has requested [" + name + "]",
+                "Seek out\n[" + name + "] and provided it to " + this.targetName,
                 fetchCtx, List.of(locateItem));
 
         CharacterSheet sheet = state.getWorld().getPlayer().add(fetchQuest);

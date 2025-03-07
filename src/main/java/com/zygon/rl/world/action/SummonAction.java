@@ -15,6 +15,7 @@ import com.zygon.rl.data.context.Data;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.util.dialog.Dialog;
 import com.zygon.rl.util.dialog.DialogChoice;
+import com.zygon.rl.world.CommonAttributes;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
 import com.zygon.rl.world.character.CharacterSheet;
@@ -104,26 +105,32 @@ public class SummonAction extends Action {
                 .map(e -> new StatusEffect(e, state.getTurnCount()))
                 .collect(Collectors.toSet());
 
-        Dialog start = Dialog.create("Greetings traveller. Pick a world..");
-        Dialog darkness = Dialog.create("Ah Darkness is excellent..", Optional.empty());
-//                Dialog darkness2 = Dialog.create("Yess.. the darkness binds us.. ", Optional.empty());
-        Dialog light = Dialog.create("I see. Light it is..", Optional.empty());
+        final String name;
+        final Dialog dialog;
 
-        DialogChoice leafDark = DialogChoice.create("I pick the world of darkness", Optional.empty(), Optional.of(darkness));
-        DialogChoice leafDark2 = DialogChoice.create("I serve the darkness.. goodbye..", Optional.empty(), Optional.empty());
-        DialogChoice leafLight = DialogChoice.create("I pick the world of light.", Optional.empty(), Optional.of(light));
-        DialogChoice leafLoop = DialogChoice.create("I pick the world of unending", Optional.empty(), Optional.of(start));
+        if (actor.getSpecies().equals(CommonAttributes.HUMAN.name())) {
+            name = FantasyNameGen.generate();
 
-        darkness = darkness.addChoices(List.of(leafDark2));
-        start = start.addChoices(List.of(leafDark.set(Optional.of(darkness)), leafLight, leafLoop));
+            Dialog start = Dialog.create("Greetings traveller. You look mighty pale today..");
+            // I want them to hostile but don't have enough context here..
+            Dialog demon = Dialog.create("Monster!", Optional.empty());
+            Dialog disguised = Dialog.create("I see.. better health to you.. stay indoors.", Optional.empty());
 
-        String name = FantasyNameGen.generate();
+            DialogChoice yes = DialogChoice.create("But I feel great..", Optional.empty(), Optional.of(demon));
+            DialogChoice no = DialogChoice.create("I am but sick.. goodbye..", Optional.empty(), Optional.of(disguised));
+
+            dialog = start.addChoices(List.of(yes, no));
+        } else {
+            name = actor.getName();
+            dialog = Dialog.create("...");
+        }
+
         CharacterSheet rando = new CharacterSheet(actor,
                 name,
                 new Stats(stats, stats, stats, stats, stats, stats),
                 new Status(stats, actor.getHitPoints(), statusEffects),
                 null, null, Set.of(), Set.of());
         //TODO: proc gen dialog);
-        return rando.set(start);
+        return rando.set(dialog);
     }
 }

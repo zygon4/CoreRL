@@ -44,7 +44,8 @@ public class StatusDamageAction extends DamageAction {
             intensity = 0;
         }
 
-        // TODO: damage based on the status, poisoned vs acid, etc. 
-        return this.statusResolver.resolveStatusDamage(getDamaged(), intensity, DamageType.Bludgeoning);
+        // TODO: damage based on the status, poisoned vs acid, etc.
+        return this.statusResolver.resolveStatusDamage(getDamaged(), intensity,
+                DamageType.Bleeding);
     }
 }

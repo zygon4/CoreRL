@@ -17,10 +17,13 @@ public class DeathAction extends Action {
 
     private final CharacterSheet dead;
     private final Location location;
+    private final String reason;
 
-    public DeathAction(CharacterSheet dead, Location location) {
+    public DeathAction(CharacterSheet dead, Location location,
+            final String reason) {
         this.dead = dead;
         this.location = location;
+        this.reason = reason;
     }
 
     @Override
@@ -30,7 +33,7 @@ public class DeathAction extends Action {
 
     @Override
     public GameState execute(GameState state) {
-        state = state.log(dead.getName() + " died!");
+        state = state.log(dead.getName() + " died due to" + reason);
         state.getWorld().remove(dead, location);
         Item corpse = CorpseItem.create(dead);
         state.getWorld().add(corpse, location);

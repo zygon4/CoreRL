@@ -7,6 +7,7 @@ package com.zygon.rl.world;
 public enum DamageType {
     Slashing(""),
     Piercing(""),
+    Bleeding(""), // I don't love this one.. but I'm not sure what to call it..
     Bludgeoning(""),
     Poison(""),
     Acid(""),

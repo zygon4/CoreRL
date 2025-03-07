@@ -65,19 +65,21 @@ public abstract class DamageAction extends Action {
             // TODO: some should flee..
             updateToHostile(state, updatedDefender, defenderLocation);
         } else {
-            logger.log(System.Logger.Level.TRACE,
-                    "DEAD: " + updatedDefender.getId() + " at " + defenderLocation);
+            final String reason = damage.toString();
+            logger.log(System.Logger.Level.INFO,
+                    "DEAD: " + updatedDefender.getId() + " at " + defenderLocation + " due to " + reason);
 
             Map<CharacterSheet.TriggerType, Action> triggers = updatedDefender.getTriggers();
             if (triggers.containsKey(CharacterSheet.TriggerType.DEATH)) {
+
                 Action action = triggers.get(CharacterSheet.TriggerType.DEATH);
                 if (action.canExecute(state)) {
                     state = action.execute(state);
                 } else {
-                    state = updateToDead(state, updatedDefender);
+                    state = updateToDead(state, updatedDefender, reason);
                 }
             } else {
-                state = updateToDead(state, updatedDefender);
+                state = updateToDead(state, updatedDefender, reason);
             }
         }
 
@@ -85,8 +87,8 @@ public abstract class DamageAction extends Action {
     }
 
     private GameState updateToDead(GameState state,
-            CharacterSheet updatedDefender) {
-        DeathAction deathAction = new DeathAction(updatedDefender, defenderLocation);
+            CharacterSheet updatedDefender, final String reason) {
+        DeathAction deathAction = new DeathAction(updatedDefender, defenderLocation, reason);
         if (deathAction.canExecute(state)) {
             state = deathAction.execute(state);
         }

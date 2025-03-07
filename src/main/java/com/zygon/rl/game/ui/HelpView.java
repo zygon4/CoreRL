@@ -55,26 +55,26 @@ final class HelpView extends BaseView {
         controlsButton.handleMouseEvents(MouseEventType.MOUSE_CLICKED, (p1, p2) -> {
             Panel modalPanel = Components.panel()
                     // Increase the height if you add more lines below
-                    .withSize(Size.create(50, 13))
+                    .withSize(Size.create(80, 16))
                     .withColorTheme(gameView.getTheme())
                     .withAlignmentWithin(titleMenuPanel, ComponentAlignment.CENTER)
                     .withDecorations(org.hexworks.zircon.api.ComponentDecorations.box(BoxType.SINGLE))
                     .build();
             // TODO: these should be pulled from the default input handler as
             // self-organizing help content
-            modalPanel.addComponent(Components.textBox(45)
-                    .addHeader("1,2,3,6,7,8,9 - movement", false)
-                    .addHeader("5             - wait a turn", false)
+            modalPanel.addComponent(Components.textBox(70)
+                    .addHeader("1,2,3,6,7,8,9   - movement", false)
+                    .addHeader("5               - wait a turn", false)
                     .addHeader("a               - view abilities", false)
                     .addHeader("c               - close door", false)
                     .addHeader("g               - get item", false)
                     .addHeader("d               - drop item", false)
                     .addHeader("i               - view inventory", false)
                     .addHeader("e               - examine surroundings", false)
-                    .addHeader("t               - talk to someone", false)
-                    .addHeader("q               - view quest", false)
+                    .addHeader("t               - talk to someone adjacent (use numpad)", false)
+                    .addHeader("q               - view quests", false)
                     .addHeader("x               - scan around using 1-9, ENT to look", false)
-                    .addHeader("F1,F2,F3        - experimental spells", false)
+                    .addHeader("F1,F2,F3        - experimental spells. F3 aims using 1-9 then ENT", false)
                     .addHeader("esc             - game menu", false)
                     .build());
             getScreen().openModal(new Dialog(getScreen().getSize(), modalPanel));

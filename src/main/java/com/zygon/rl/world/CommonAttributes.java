@@ -10,6 +10,7 @@ public enum CommonAttributes {
     DEAD,
     DELETED,
     HEALTH,
+    HUMAN,
     IMPASSABLE,
     LOCKED,
     LIVING,

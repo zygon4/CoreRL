@@ -27,15 +27,14 @@ public class RegisterDialogueQuestAction extends Action {
         return Boolean.TRUE;
     }
 
+    // TODO: notification
     @Override
     public GameState execute(GameState state) {
 
         DialogueQuestContext dialogue = new DialogueQuestContext(this.targetName);
         QuestInfo quest = new QuestInfo("Speak to " + this.targetName,
-                "Seek out and speak with " + this.targetName + " to discuss your vampirism.",
-                dialogue);
+                "Seek out and speak with " + this.targetName, dialogue);
 
-        // TODO: notifications
         CharacterSheet sheet = state.getWorld().getPlayer().add(quest);
         Action setCharacterAction
                 = new SetCharacterAction(state.getWorld().getPlayerLocation(), sheet);
