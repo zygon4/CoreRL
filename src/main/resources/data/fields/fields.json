@@ -25,5 +25,17 @@
         "name": "electricity",
         "description": "Electricity",
         "weight": 0
+    },
+    {
+        "id": "fd_magic_ebb",
+        "type": "FIELD",
+        "symbol": "?",
+        "color": "Blue",
+        "name": "magical ebb",
+        "description": "A magical ebb",
+        "weight": 0,
+        "flags": {
+            "MAGIC": true
+        }
     }
 ]

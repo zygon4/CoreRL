@@ -10,6 +10,7 @@ import com.stewsters.util.shadow.twoDimention.ShadowCaster2d;
 import com.zygon.rl.data.Terrain;
 import com.zygon.rl.data.WorldElement;
 import com.zygon.rl.data.context.Data;
+import com.zygon.rl.data.field.FieldData;
 import com.zygon.rl.game.Game;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.game.TargetingInputHandler;
@@ -134,7 +135,24 @@ public class OuterWorldRenderer implements GameComponentRenderer {
                         gameScreenLayer.draw(targetTile, uiScreenPosition);
                     }
                 } else {
-                    gameScreenLayer.draw(RenderUtil.BLACK_TILE, uiScreenPosition);
+                    // else "if magic" POC - TODO: refactor
+                    WorldElement field = gameState.getWorld()
+                            .getAll(loc, FieldData.getTypeName()).stream()
+                            .map(Tangible::getId)
+                            .map(id -> {
+                                WorldElement we = Data.get(id);
+                                return we;
+                            })
+                            .filter(FieldData::isFieldData)
+                            .filter(f -> f.getId().equals("fd_magic_ebb"))
+                            .findFirst().orElse(null);
+
+                    if (field != null) {
+                        Tile objectTile = toTile(field);
+                        gameScreenLayer.draw(objectTile, uiScreenPosition);
+                    } else {
+                        gameScreenLayer.draw(RenderUtil.BLACK_TILE, uiScreenPosition);
+                    }
                 }
             }
         }

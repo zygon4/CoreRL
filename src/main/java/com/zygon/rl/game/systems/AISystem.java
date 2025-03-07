@@ -1,25 +1,20 @@
 package com.zygon.rl.game.systems;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 import com.zygon.rl.data.Creature;
 import com.zygon.rl.data.Effect;
-import com.zygon.rl.data.field.FieldData;
 import com.zygon.rl.data.monster.Species;
 import com.zygon.rl.game.Behavior;
 import com.zygon.rl.game.GameConfiguration;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.game.GameSystem;
 import com.zygon.rl.world.CommonAttributes;
-import com.zygon.rl.world.Field;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
 import com.zygon.rl.world.action.Action;
-import com.zygon.rl.world.action.FieldInteractionAction;
 import com.zygon.rl.world.action.MeleeAttackAction;
 import com.zygon.rl.world.action.MoveAction;
 import com.zygon.rl.world.character.CharacterSheet;
@@ -80,18 +75,6 @@ public final class AISystem extends GameSystem {
         }
 
         return state;
-    }
-
-    private Collection<Action> getEnvironmentalActions(World world,
-            Location location,
-            CharacterSheet character) {
-
-        // First resolve fields in the air
-        return world.getAll(location, FieldData.getTypeName()).stream()
-                .map(fd -> (Field) fd)
-                .map(field -> new FieldInteractionAction(getGameConfiguration(), character, location, field))
-                .collect(Collectors.toList());
-
     }
 
     private Behavior get(CharacterSheet character, Location characterLocation,

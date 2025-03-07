@@ -51,12 +51,12 @@ public final class FieldEffectSystem extends GameSystem {
     }
 
     private Collection<Action> getEnvironmentalActions(World world,
-            Location location,
-            CharacterSheet character) {
+            Location location, CharacterSheet character) {
 
         // First resolve fields in the air
         return world.getAll(location, FieldData.getTypeName()).stream()
                 .map(fd -> (Field) fd)
+                .filter(fd -> FieldData.isEnvironmental(fd.getId()))
                 .map(field -> new FieldInteractionAction(getGameConfiguration(), character, location, field))
                 .collect(Collectors.toList());
 

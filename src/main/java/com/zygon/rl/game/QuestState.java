@@ -9,9 +9,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.zygon.rl.game.quest.QuestType;
 import com.zygon.rl.util.quest.QuestInfo.QuestContext;
 import com.zygon.rl.world.action.DamageAction;
-import com.zygon.rl.game.quest.QuestType;
 
 /**
  *
@@ -26,7 +26,7 @@ public class QuestState {
 
     public void register(QuestType questType, QuestContext questContext) {
 
-        LOGGER.log(Level.INFO, "Registering quest {0}, {1}",
+        LOGGER.log(Level.DEBUG, "Registering quest {0}, {1}",
                 new Object[]{questType.name(), questContext});
 
         Set<QuestContext> context = this.questContext.computeIfAbsent(

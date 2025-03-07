@@ -41,9 +41,12 @@ public class FieldInteractionAction extends DamageAction {
 
         DamageType type = getDmgByField.get(field.getId());
 
-        // straight strength -> dmg
-        // TODO: this needs to be scaled
-        dmg.set(type, field.getStrength());
+        // Fields don't need to cause damage (e.g. magic ebbs)
+        if (type != null) {
+            // straight strength -> dmg
+            // TODO: this needs to be scaled
+            dmg.set(type, field.getStrength());
+        }
 
         return dmg;
     }

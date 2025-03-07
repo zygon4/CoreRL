@@ -1,5 +1,6 @@
 package com.zygon.rl.game;
 
+import java.lang.System.Logger.Level;
 import java.util.function.BiFunction;
 
 /**
@@ -26,7 +27,7 @@ public final class InputHandler implements BiFunction<GameState, Input, GameStat
         } else {
             String errMessage = "Invalid input";
 
-            logger.log(System.Logger.Level.INFO, errMessage);
+            logger.log(Level.DEBUG, errMessage);
             return handler.handleInvalidInput(state.log(errMessage));
         }
     }

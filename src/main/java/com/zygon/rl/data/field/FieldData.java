@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import com.google.gson.reflect.TypeToken;
 import com.zygon.rl.data.WorldElement;
 import com.zygon.rl.util.StringUtil;
+import com.zygon.rl.world.CommonAttributes;
 
 /**
  *
@@ -54,6 +55,11 @@ public class FieldData extends WorldElement {
 
     public static boolean isFieldData(WorldElement element) {
         return element.getType().equals(TYPE_NAME);
+    }
+
+    public static boolean isEnvironmental(String id) {
+        Boolean magic = get(id).getFlag(CommonAttributes.MAGIC.name());
+        return magic == null || !magic;
     }
 
     public static String getTypeName() {

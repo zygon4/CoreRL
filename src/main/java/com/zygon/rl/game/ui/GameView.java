@@ -137,16 +137,8 @@ final class GameView extends BaseView {
             final Size overlayScreenSize = gameScreenSize.minus(Size.create(20, 20));
             final Position overlayScreenPos = gameScreen.getPosition().plus(Position.create(9, 11));
 
-            Layer overlayLayer = Layer.newBuilder()
-                    .withSize(overlayScreenSize)
-                    .withOffset(overlayScreenPos)
-                    .build();
-            getScreen().addLayer(overlayLayer);
-            componentRenderersByPrompt.put(GameState.InputContextPrompt.OVERLAY,
-                    new OverlayRenderer(gameScreenLayer, game, renderUtil));
-
             Layer abilityLayer = Layer.newBuilder()
-                    .withSize(overlayScreenSize.minus(Size.create(0, 40)))
+                    .withSize(overlayScreenSize.minus(Size.create(0, 37)))
                     .withOffset(overlayScreenPos.plus(Position.create(0, 40)))
                     .build();
             getScreen().addLayer(abilityLayer);
@@ -363,7 +355,7 @@ final class GameView extends BaseView {
         });
 
         for (GameState.InputContext inputCtx : game.getState().getInputContext()) {
-            logger.log(Level.INFO, "Rendering for input context {0}", inputCtx.getName());
+            logger.log(Level.DEBUG, "Rendering for input context {0}", inputCtx.getName());
 
             GameComponentRenderer gameComponentRenderer
                     = componentRenderersByPrompt.get(inputCtx.getPrompt());
