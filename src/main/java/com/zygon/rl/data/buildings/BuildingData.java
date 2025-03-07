@@ -1,8 +1,5 @@
 package com.zygon.rl.data.buildings;
 
-import com.google.gson.reflect.TypeToken;
-import com.zygon.rl.util.StringUtil;
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -14,6 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.google.gson.reflect.TypeToken;
+import com.zygon.rl.util.StringUtil;
 
 /**
  *
@@ -30,7 +30,7 @@ public final class BuildingData extends Building {
 
     private static void load(String path) throws FileNotFoundException, IOException {
 
-        try ( Reader jsonReader = new BufferedReader(new InputStreamReader(
+        try (Reader jsonReader = new BufferedReader(new InputStreamReader(
                 BuildingData.class.getResourceAsStream(HOUSE_PATH)))) {
             List<BuildingData> data = StringUtil.JSON.fromJson(jsonReader, TYPE);
 

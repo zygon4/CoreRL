@@ -137,7 +137,6 @@ final class GameView extends BaseView {
             final Size overlayScreenSize = gameScreenSize.minus(Size.create(20, 20));
             final Position overlayScreenPos = gameScreen.getPosition().plus(Position.create(9, 11));
 
-            // TODO: not used - fix or remove.
             Layer overlayLayer = Layer.newBuilder()
                     .withSize(overlayScreenSize)
                     .withOffset(overlayScreenPos)

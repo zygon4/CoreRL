@@ -1,9 +1,5 @@
 package com.zygon.rl.data.items;
 
-import com.google.gson.reflect.TypeToken;
-import com.zygon.rl.data.ItemClass;
-import com.zygon.rl.util.StringUtil;
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -15,6 +11,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.google.gson.reflect.TypeToken;
+import com.zygon.rl.data.ItemClass;
+import com.zygon.rl.util.StringUtil;
 
 /**
  *
@@ -30,7 +30,7 @@ public class Melee extends ItemClass {
 
     public static void load() throws FileNotFoundException, IOException {
 
-        try ( Reader jsonReader = new BufferedReader(new InputStreamReader(
+        try (Reader jsonReader = new BufferedReader(new InputStreamReader(
                 Melee.class.getResourceAsStream(MELEE_PATH)))) {
             List<Melee> melee = StringUtil.JSON.fromJson(jsonReader, TYPE);
 
@@ -66,5 +66,21 @@ public class Melee extends ItemClass {
 
     public int getToDamage() {
         return toDamage;
+    }
+
+    public void setDamage(int damage) {
+        this.damage = damage;
+    }
+
+    public void setDice(int dice) {
+        this.dice = dice;
+    }
+
+    public void setToHit(int toHit) {
+        this.toHit = toHit;
+    }
+
+    public void setToDamage(int toDamage) {
+        this.toDamage = toDamage;
     }
 }

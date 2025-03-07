@@ -1,8 +1,5 @@
 package com.zygon.rl.data;
 
-import com.google.gson.reflect.TypeToken;
-import com.zygon.rl.util.StringUtil;
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -15,63 +12,66 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.google.gson.reflect.TypeToken;
+import com.zygon.rl.util.StringUtil;
+
 /**
  *
  */
 public class Terrain extends WorldElement {
 
-  // A lot of these should be items
-  public static enum Ids {
+    // A lot of these should be items
+    public static enum Ids {
 
-    DIRT("t_dirt"),
-    GRASS("t_grass"),
-    TALL_GRASS("t_tall_grass"),
-    DEEP_WATER("t_deep_water"),
-    PUDDLE("t_puddle"),
-    TREE("t_tree"),
-    WALL("t_wall");
+        DIRT("t_dirt"),
+        GRASS("t_grass"),
+        TALL_GRASS("t_tall_grass"),
+        DEEP_WATER("t_deep_water"),
+        PUDDLE("t_puddle"),
+        TREE("t_tree"),
+        WALL("t_wall");
 
-    private final String id;
+        private final String id;
 
-    private Ids(String id) {
-      this.id = id;
+        private Ids(String id) {
+            this.id = id;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public Terrain get() {
+            return Terrain.get(id);
+        }
     }
 
-    public String getId() {
-      return id;
+    private static final Map<String, Terrain> BY_ID = new HashMap<>();
+
+    private static final Type TYPE = new TypeToken<List<Terrain>>() {
+    }.getType();
+
+    private static final String PATH = "/data/terrain.json";
+
+    public static void load(String path) throws FileNotFoundException, IOException {
+        try (Reader jsonReader = new BufferedReader(new InputStreamReader(
+                Terrain.class.getResourceAsStream(PATH)))) {
+            List<Terrain> melee = StringUtil.JSON.fromJson(jsonReader, TYPE);
+
+            BY_ID.putAll(melee.stream()
+                    .collect(Collectors.toMap(m -> m.getId(), m -> m)));
+        }
     }
 
-    public Terrain get() {
-      return Terrain.get(id);
+    public static void load() throws FileNotFoundException, IOException {
+        load(PATH);
     }
-  }
 
-  private static final Map<String, Terrain> BY_ID = new HashMap<>();
-
-  private static final Type TYPE = new TypeToken<List<Terrain>>() {
-  }.getType();
-
-  private static final String PATH = "/data/terrain.json";
-
-  public static void load(String path) throws FileNotFoundException, IOException {
-    try ( Reader jsonReader = new BufferedReader(new InputStreamReader(
-            Terrain.class.getResourceAsStream(PATH)))) {
-      List<Terrain> melee = StringUtil.JSON.fromJson(jsonReader, TYPE);
-
-      BY_ID.putAll(melee.stream()
-              .collect(Collectors.toMap(m -> m.getId(), m -> m)));
+    public static Terrain get(String id) {
+        return BY_ID.get(id);
     }
-  }
 
-  public static void load() throws FileNotFoundException, IOException {
-    load(PATH);
-  }
-
-  public static Terrain get(String id) {
-    return BY_ID.get(id);
-  }
-
-  public static Set<String> getAllIds() {
-    return BY_ID.keySet();
-  }
+    public static Set<String> getAllIds() {
+        return BY_ID.keySet();
+    }
 }

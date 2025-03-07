@@ -71,7 +71,9 @@ final class HelpView extends BaseView {
                     .addHeader("d               - drop item", false)
                     .addHeader("i               - view inventory", false)
                     .addHeader("e               - examine surroundings", false)
-                    .addHeader("x               - look around", false)
+                    .addHeader("t               - talk to someone", false)
+                    .addHeader("q               - view quest", false)
+                    .addHeader("x               - scan around using 1-9, ENT to look", false)
                     .addHeader("F1,F2,F3        - experimental spells", false)
                     .addHeader("esc             - game menu", false)
                     .build());

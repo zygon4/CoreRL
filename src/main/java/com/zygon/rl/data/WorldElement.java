@@ -9,9 +9,9 @@ import java.util.Map;
 public class WorldElement extends Element {
 
     // no volume yet
-    private final int weight;
+    private int weight;
 
-    protected WorldElement() {
+    public WorldElement() {
         super();
         this.weight = 0;
     }
@@ -37,8 +37,7 @@ public class WorldElement extends Element {
         return weight;
     }
 
-    public final WorldElement setWeight(int weight) {
-        return new WorldElement(getId(), getType(), getSymbol(), getColor(),
-                getName(), getDescription(), getFlags(), weight);
+    public void setWeight(int weight) {
+        this.weight = weight;
     }
 }

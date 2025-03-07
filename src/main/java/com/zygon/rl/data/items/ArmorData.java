@@ -1,9 +1,5 @@
 package com.zygon.rl.data.items;
 
-import com.google.gson.reflect.TypeToken;
-import com.zygon.rl.data.ItemClass;
-import com.zygon.rl.util.StringUtil;
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -15,6 +11,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.google.gson.reflect.TypeToken;
+import com.zygon.rl.data.ItemClass;
+import com.zygon.rl.util.StringUtil;
 
 /**
  *
@@ -32,7 +32,7 @@ public class ArmorData extends ItemClass {
     private static final String ARMOR_FEET_PATH = "/data/items/armor_feet.json";
 
     private static void load(String path) throws FileNotFoundException, IOException {
-        try ( Reader jsonReader = new BufferedReader(new InputStreamReader(
+        try (Reader jsonReader = new BufferedReader(new InputStreamReader(
                 ArmorData.class.getResourceAsStream(path)))) {
             List<ArmorData> items = StringUtil.JSON.fromJson(jsonReader, TYPE);
 
@@ -61,5 +61,9 @@ public class ArmorData extends ItemClass {
 
     public List<String> getSlots() {
         return slots;
+    }
+
+    public void setSlots(List<String> slots) {
+        this.slots = slots;
     }
 }

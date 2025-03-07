@@ -6,4 +6,6 @@ package com.zygon.rl.data;
  */
 public class ItemClass extends WorldElement {
 
+    public ItemClass() {
+    }
 }

@@ -13,4 +13,8 @@ public class Building extends Element {
     public Layout getLayout() {
         return layout;
     }
+
+    public void setLayout(Layout layout) {
+        this.layout = layout;
+    }
 }

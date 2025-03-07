@@ -1,8 +1,8 @@
 package com.zygon.rl.data;
 
-import com.zygon.rl.util.StringUtil;
-
 import java.util.Map;
+
+import com.zygon.rl.util.StringUtil;
 
 /**
  *
@@ -87,24 +87,24 @@ public class Element implements Identifable {
         this.type = type;
     }
 
-    public final Element setSymbol(String symbol) {
-        return new Element(id, type, symbol, color, name, description, flags);
+    public final void setSymbol(String symbol) {
+        this.symbol = symbol;
     }
 
-    public final Element setColor(String color) {
-        return new Element(id, type, symbol, color, name, description, flags);
+    public final void setColor(String color) {
+        this.color = color;
     }
 
-    public final Element setName(String name) {
-        return new Element(id, type, symbol, color, name, description, flags);
+    public final void setName(String name) {
+        this.name = name;
     }
 
-    public final Element setDescription(String description) {
-        return new Element(id, type, symbol, color, name, description, flags);
+    public final void setDescription(String description) {
+        this.description = description;
     }
 
-    public final Element setFlags(Map<String, Object> flags) {
-        return new Element(id, type, symbol, color, name, description, flags);
+    public final void setFlags(Map<String, Object> flags) {
+        this.flags = flags;
     }
 
     @Override

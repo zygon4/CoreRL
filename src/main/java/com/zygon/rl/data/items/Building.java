@@ -1,9 +1,5 @@
 package com.zygon.rl.data.items;
 
-import com.google.gson.reflect.TypeToken;
-import com.zygon.rl.data.ItemClass;
-import com.zygon.rl.util.StringUtil;
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -15,6 +11,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.google.gson.reflect.TypeToken;
+import com.zygon.rl.data.ItemClass;
+import com.zygon.rl.util.StringUtil;
 
 /**
  *
@@ -35,7 +35,7 @@ public class Building extends ItemClass {
     public static void load() throws FileNotFoundException, IOException {
 
         List<Building> element = null;
-        try ( Reader jsonReader = new BufferedReader(new InputStreamReader(
+        try (Reader jsonReader = new BufferedReader(new InputStreamReader(
                 Building.class.getResourceAsStream(PATH)))) {
             element = StringUtil.JSON.fromJson(jsonReader, TYPE);
         }

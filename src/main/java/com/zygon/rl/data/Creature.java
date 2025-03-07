@@ -50,4 +50,24 @@ public class Creature extends WorldElement {
     public List<String> getSpawns() {
         return spawns;
     }
+
+    public void setAggression(int aggression) {
+        this.aggression = aggression;
+    }
+
+    public void setHitPoints(int hitPoints) {
+        this.hitPoints = hitPoints;
+    }
+
+    public void setSpawns(List<String> spawns) {
+        this.spawns = spawns;
+    }
+
+    public void setSpecies(String species) {
+        this.species = species;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
+    }
 }

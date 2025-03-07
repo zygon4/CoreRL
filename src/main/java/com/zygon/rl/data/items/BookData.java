@@ -50,10 +50,4 @@ public class BookData extends ItemClass {
     public static Set<String> getAllIds() {
         return BY_ID.keySet();
     }
-
-    private List<String> slots;
-
-    public List<String> getSlots() {
-        return slots;
-    }
 }

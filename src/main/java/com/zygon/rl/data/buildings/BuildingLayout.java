@@ -12,6 +12,9 @@ public class BuildingLayout {
     private List<String> rows;
     private Map<String, String> ids;
 
+    public BuildingLayout() {
+    }
+
     public int getHeight() {
         return rows.size();
     }
@@ -33,5 +36,13 @@ public class BuildingLayout {
         String col = row.substring(y, y + 1);
 
         return col.isBlank() ? null : ids.get(col);
+    }
+
+    public void setIds(Map<String, String> ids) {
+        this.ids = ids;
+    }
+
+    public void setRows(List<String> rows) {
+        this.rows = rows;
     }
 }

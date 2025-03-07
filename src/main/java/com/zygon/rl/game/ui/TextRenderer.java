@@ -46,7 +46,7 @@ public class TextRenderer implements GameComponentRenderer {
         List<String> text = getTextFn.apply(gameState);
 
         if (text != null) {
-            LOGGER.log(Level.INFO, "Rendering text:\n" + text);
+            LOGGER.log(Level.DEBUG, "Rendering text:\n" + text);
 
             int y = 1;
             for (String t : text) {
