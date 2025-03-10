@@ -1,0 +1,38 @@
+[
+    {
+        "id": "item_stone",
+        "type": "STONE",
+        "symbol": "*",
+        "color": "Gray",
+        "name": "A stone",
+        "description": "A simple smooth stone",
+        "weight": 1
+    },
+     {
+        "id": "item_rock",
+        "type": "STONE",
+        "symbol": "*",
+        "color": "Brown",
+        "name": "A rock",
+        "description": "A rock",
+        "weight": 1
+    },
+    {
+        "id": "item_yellow_flower",
+        "type": "FLOWER",
+        "symbol": ",",
+        "color": "Yellow",
+        "name": "A yellow flower",
+        "description": "A colorful yellow flower",
+        "weight": 1
+    },
+    {
+        "id": "item_red_flower",
+        "type": "FLOWER",
+        "symbol": ",",
+        "color": "Red",
+        "name": "A red flower",
+        "description": "A colorful red flower",
+        "weight": 1
+    }
+]

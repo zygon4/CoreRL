@@ -14,6 +14,7 @@ import com.zygon.rl.data.items.BookData;
 import com.zygon.rl.data.items.Building;
 import com.zygon.rl.data.items.Corpse;
 import com.zygon.rl.data.items.Melee;
+import com.zygon.rl.data.items.WorldData;
 import com.zygon.rl.data.monster.Monster;
 import com.zygon.rl.data.npc.Npc;
 
@@ -39,6 +40,7 @@ public class Data {
             Npc.load();
             Corpse.load();
             Terrain.load();
+            WorldData.load();
         } catch (IOException io) {
             io.printStackTrace(System.err);
             System.exit(1);
@@ -90,6 +92,10 @@ public class Data {
 
         for (var v : Terrain.getAllIds()) {
             elementsById.put(v, Terrain.get(v));
+        }
+
+        for (var v : WorldData.getAllIds()) {
+            elementsById.put(v, WorldData.get(v));
         }
     }
 
