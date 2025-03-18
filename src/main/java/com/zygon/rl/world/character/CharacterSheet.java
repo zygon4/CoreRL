@@ -41,6 +41,7 @@ public final class CharacterSheet extends Tangible {
     private final Inventory inventory;
     private final Set<Ability> abilities;
     private final Set<Spell> spells;
+    private final Set<Proficiency> proficiencies;
     private final Dialog dialog;
     private final Map<TriggerType, Action> triggers;
     private final Set<QuestInfo> quests;
@@ -52,8 +53,10 @@ public final class CharacterSheet extends Tangible {
 
     public CharacterSheet(Creature template, String name, Stats stats,
             Status status, Equipment equipment, Inventory inventory,
-            Set<Ability> abilities, Set<Spell> spells, Dialog dialog,
-            Map<TriggerType, Action> triggers, Set<QuestInfo> quests) {
+            Set<Ability> abilities, Set<Spell> spells,
+            Set<Proficiency> proficiencies,
+            Dialog dialog, Map<TriggerType, Action> triggers,
+            Set<QuestInfo> quests) {
         super(template);
 
         this.name = name;
@@ -63,6 +66,7 @@ public final class CharacterSheet extends Tangible {
         this.inventory = inventory != null ? inventory : new Inventory();
         this.abilities = Collections.unmodifiableSet(abilities);
         this.spells = Collections.unmodifiableSet(spells);
+        this.proficiencies = Collections.unmodifiableSet(proficiencies);
         this.dialog = dialog;
         this.triggers = Collections.unmodifiableMap(triggers);
         this.quests = Collections.unmodifiableSet(quests);
@@ -70,9 +74,10 @@ public final class CharacterSheet extends Tangible {
 
     public CharacterSheet(Creature template, String name, Stats stats,
             Status status, Equipment equipment, Inventory inventory,
-            Set<Ability> abilities, Set<Spell> spells) {
+            Set<Ability> abilities, Set<Spell> spells,
+            Set<Proficiency> proficiencies) {
         this(template, name, stats, status, equipment, inventory, abilities,
-                spells, null, Map.of(), Set.of());
+                spells, proficiencies, null, Map.of(), Set.of());
     }
 
     public Equipment getEquipment() {
@@ -169,6 +174,10 @@ public final class CharacterSheet extends Tangible {
         return spells;
     }
 
+    public Set<Proficiency> getProficiencies() {
+        return proficiencies;
+    }
+
     public Dialog getDialog() {
         return dialog;
     }
@@ -238,7 +247,7 @@ public final class CharacterSheet extends Tangible {
             }
 
             return new CharacterSheet(getTemplate(), name, stats, status, newEq,
-                    inventory.remove(item), abilities, spells, dialog, triggers, quests);
+                    inventory.remove(item), abilities, spells, proficiencies, dialog, triggers, quests);
 
         }
 
@@ -247,7 +256,7 @@ public final class CharacterSheet extends Tangible {
 
     public CharacterSheet add(Item item) {
         CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
-                equipment, inventory.add(item), abilities, spells, dialog, triggers, quests);
+                equipment, inventory.add(item), abilities, spells, proficiencies, dialog, triggers, quests);
 
         return copy;
     }
@@ -255,7 +264,7 @@ public final class CharacterSheet extends Tangible {
     public CharacterSheet remove(Item item) {
         // TODO: drop equipped/wielded
         CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
-                equipment, inventory.remove(item), abilities, spells, dialog, triggers, quests);
+                equipment, inventory.remove(item), abilities, spells, proficiencies, dialog, triggers, quests);
 
         return copy;
     }
@@ -263,35 +272,53 @@ public final class CharacterSheet extends Tangible {
     // hopefully not necessary, use the helper functions
     public CharacterSheet set(Equipment equipment) {
         CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
-                equipment, inventory, abilities, spells, dialog, triggers, quests);
+                equipment, inventory, abilities, spells, proficiencies, dialog, triggers, quests);
 
         return copy;
     }
 
     public CharacterSheet set(Status status) {
         CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
-                equipment, inventory, abilities, spells, dialog, triggers, quests);
+                equipment, inventory, abilities, spells, proficiencies, dialog, triggers, quests);
 
         return copy;
     }
 
     public CharacterSheet set(Set<Ability> abilities) {
         CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
-                equipment, inventory, abilities, spells, dialog, triggers, quests);
+                equipment, inventory, abilities, spells, proficiencies, dialog, triggers, quests);
+
+        return copy;
+    }
+
+    public CharacterSheet set(Proficiency proficiency) {
+
+        Set<Proficiency> newProfs = new LinkedHashSet<>();
+        for (var prof : this.proficiencies) {
+            if (prof.getProficiency().getId()
+                    .equals(proficiency.getProficiency().getId())) {
+                newProfs.add(proficiency);
+            } else {
+                newProfs.add(prof);
+            }
+        }
+
+        CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
+                equipment, inventory, abilities, spells, newProfs, dialog, triggers, quests);
 
         return copy;
     }
 
     public CharacterSheet set(Dialog dialog) {
         CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
-                equipment, inventory, abilities, spells, dialog, triggers, quests);
+                equipment, inventory, abilities, spells, proficiencies, dialog, triggers, quests);
 
         return copy;
     }
 
     public CharacterSheet set(Creature creature) {
         CharacterSheet copy = new CharacterSheet(creature, name, stats, status,
-                equipment, inventory, abilities, spells, dialog, triggers, quests);
+                equipment, inventory, abilities, spells, proficiencies, dialog, triggers, quests);
 
         return copy;
     }
@@ -304,7 +331,7 @@ public final class CharacterSheet extends Tangible {
      */
     public CharacterSheet set(Map<TriggerType, Action> triggers) {
         CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
-                equipment, inventory, abilities, spells, dialog, triggers, quests);
+                equipment, inventory, abilities, spells, proficiencies, dialog, triggers, quests);
 
         return copy;
     }
@@ -320,7 +347,7 @@ public final class CharacterSheet extends Tangible {
         allQuests.addAll(this.getQuests());
         allQuests.add(quest);
         CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
-                equipment, inventory, abilities, spells, dialog, triggers, allQuests);
+                equipment, inventory, abilities, spells, proficiencies, dialog, triggers, allQuests);
 
         return copy;
     }
@@ -338,7 +365,7 @@ public final class CharacterSheet extends Tangible {
             }
 
             return new CharacterSheet(getTemplate(), name, stats, status, newEq,
-                    inventory.remove(item), abilities, spells, dialog, triggers, quests);
+                    inventory.remove(item), abilities, spells, proficiencies, dialog, triggers, quests);
 
         }
 

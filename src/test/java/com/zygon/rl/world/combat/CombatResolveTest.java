@@ -43,7 +43,7 @@ public class CombatResolveTest {
                 new Status(20, 10, Set.of()),
                 null,
                 null,
-                Set.of(), Set.of());
+                Set.of(), Set.of(), Set.of());
 
         attacker = attacker.add(weapon).wield(weapon);
 
@@ -55,7 +55,7 @@ public class CombatResolveTest {
                 new Status(20, 10, Set.of()),
                 null,
                 null,
-                Set.of(), Set.of());
+                Set.of(), Set.of(), Set.of());
 
         defender = defender.add(weapon).wield(weapon);
 

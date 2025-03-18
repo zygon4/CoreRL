@@ -129,7 +129,7 @@ public class SummonAction extends Action {
                 name,
                 new Stats(stats, stats, stats, stats, stats, stats),
                 new Status(stats, actor.getHitPoints(), statusEffects),
-                null, null, Set.of(), Set.of());
+                null, null, Set.of(), Set.of(), Set.of());
         //TODO: proc gen dialog);
         return rando.set(dialog);
     }

@@ -8,6 +8,7 @@ import com.zygon.rl.data.Effect;
 import com.zygon.rl.data.Element;
 import com.zygon.rl.data.Terrain;
 import com.zygon.rl.data.buildings.BuildingData;
+import com.zygon.rl.data.character.Proficiencies;
 import com.zygon.rl.data.field.FieldData;
 import com.zygon.rl.data.items.ArmorData;
 import com.zygon.rl.data.items.BookData;
@@ -33,12 +34,13 @@ public class Data {
             BookData.load();
             Building.load(); // building items
             BuildingData.load(); // building templates
+            Corpse.load();
             Effect.load();
             FieldData.load();
             Melee.load();
             Monster.load();
             Npc.load();
-            Corpse.load();
+            Proficiencies.load();
             Terrain.load();
             WorldData.load();
         } catch (IOException io) {
@@ -66,6 +68,10 @@ public class Data {
             elementsById.put(v, BuildingData.get(v));
         }
 
+        for (var v : Corpse.getAllIds()) {
+            elementsById.put(v, Corpse.get(v));
+        }
+
         for (var v : Effect.getAllIds()) {
             elementsById.put(v, Effect.get(v));
         }
@@ -86,8 +92,8 @@ public class Data {
             elementsById.put(v, Npc.get(v));
         }
 
-        for (var v : Corpse.getAllIds()) {
-            elementsById.put(v, Corpse.get(v));
+        for (var v : Proficiencies.getAllIds()) {
+            elementsById.put(v, Proficiencies.get(v));
         }
 
         for (var v : Terrain.getAllIds()) {

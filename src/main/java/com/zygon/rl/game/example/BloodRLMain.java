@@ -215,6 +215,7 @@ public class BloodRLMain {
                 null,
                 null,
                 abilities,
+                Set.of(),
                 Set.of());
 
         ArmorData dataTunic = ArmorData.get("torso_tunic_black");

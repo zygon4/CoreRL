@@ -1,0 +1,86 @@
+[
+    {
+        "id": "illusion",
+        "type": "PROFICIENCY",
+        "name": "Illusion",
+        "description": "Illusion magic manipulates perception and reality itself. Tapping into magical energies to create phantasms, alter appearances, and deceive the senses.",
+        "statMods": [ { "name":"CHA", "amount":1 } ]
+    },
+    {
+        "id": "divination",
+        "type": "PROFICIENCY",
+        "name": "Divination",
+        "description": "TODO",
+        "statMods": [ { "name":"INT", "amount":1 }, { "name":"WIS", "amount":1 } ]
+    },
+    {
+        "id": "charm",
+        "type": "PROFICIENCY",
+        "name": "Charm",
+        "description": "TODO",
+        "statMods": [ { "name":"CHA", "amount":1 } ]
+    },
+    {
+        "id": "alchemy",
+        "type": "PROFICIENCY",
+        "name": "Alchemy",
+        "description": "TODO",
+        "statMods": [ { "name":"INT", "amount":1 }, { "name":"WIS", "amount":1 } ]
+    },
+    {
+        "id": "conjuration",
+        "type": "PROFICIENCY",
+        "name": "Conjuration",
+        "description": "TODO",
+        "statMods": [ { "name":"INT", "amount":1 }, { "name":"WIS", "amount":1 } ]
+    },
+    {
+        "id": "necromancy",
+        "type": "PROFICIENCY",
+        "name": "Necromancy",
+        "description": "TODO",
+        "statMods": [ { "name":"INT", "amount":1 }, { "name":"WIS", "amount":1 } ]
+    },
+    {
+        "id": "arcane",
+        "type": "PROFICIENCY",
+        "name": "Arcane",
+        "description": "TODO",
+        "statMods": [ { "name":"INT", "amount":1 }, { "name":"WIS", "amount":1 } ]
+    },
+    {
+        "id": "enchanting",
+        "type": "PROFICIENCY",
+        "name": "Enchanting",
+        "description": "TODO",
+        "statMods": [ { "name":"INT", "amount":1 }, { "name":"WIS", "amount":1 } ]
+    },
+    {
+        "id": "stealth",
+        "type": "PROFICIENCY",
+        "name": "Stealth",
+        "description": "TODO",
+        "statMods": [ { "name":"WIS", "amount":1 }, { "name":"DEX", "amount":1 } ]
+    },
+    {
+        "id": "melee",
+        "type": "PROFICIENCY",
+        "name": "Melee",
+        "description": "TODO",
+        "statMods": [ { "name":"STR", "amount": 1 }, { "name":"DEX", "amount": 1 } ]
+    },
+    {
+        "id": "ranged",
+        "type": "PROFICIENCY",
+        "name": "Ranged",
+        "description": "",
+        "statMods": [ { "name":"DEX", "amount": 1 }, { "name":"WIS", "amount": 1 } ]
+    },
+    {
+        "id": "anatomy",
+        "type": "PROFICIENCY",
+        "name": "Anatomy",
+        "description": "",
+        "statMods": [ { "name":"INT", "amount": 1 }, { "name":"WIS", "amount": 1 } ]
+    }
+]
