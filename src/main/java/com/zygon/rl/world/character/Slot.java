@@ -14,6 +14,8 @@ public enum Slot {
     RING("Ring"),
     LEG("Leg"),
     FOOT("Foot");
+    // TODO: amulet, brooch, shoulders, brow, upper vs lower
+    // TODO: no single foot/leg
 
     private final String name;
 
