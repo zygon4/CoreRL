@@ -19,6 +19,15 @@ public class Stats {
     private final int wisdom;
     private final int charisma;
 
+    public Stats() {
+        this.strength = 0;
+        this.dexterity = 0;
+        this.constitution = 0;
+        this.intelligence = 0;
+        this.wisdom = 0;
+        this.charisma = 0;
+    }
+
     public Stats(int strength, int dexterity, int constitution,
             int intelligence, int wisdom, int charisma) {
         this.strength = strength;

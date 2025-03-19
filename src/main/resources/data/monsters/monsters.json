@@ -39,7 +39,7 @@
         "species": "MAMMAL",
         "aggression": 16,
         "hitPoints": 40,
-        "speed": 100,
+        "speed": 120,
         "flags": {},
         "weight": 75,
         "spawns": ["FOREST", "TALL_FIELD"]
@@ -53,7 +53,7 @@
         "color": "Black",
         "species": "MAMMAL",
         "aggression": 1,
-        "hitPoints": 8,
+        "hitPoints": 4,
         "speed": 40,
         "flags": {},
         "weight": 2,
@@ -112,7 +112,7 @@
         "symbol": "V",
         "color": "DarkSlateGray",
         "species": "VAMPIRE",
-        "aggression": 100,
+        "aggression": 10,
         "hitPoints": 40,
         "speed": 110,
         "flags": {
@@ -130,7 +130,7 @@
         "symbol": "L",
         "color": "DarkSeaGreen",
         "species": "LICH",
-        "aggression": 100,
+        "aggression": 10,
         "hitPoints": 1000,
         "speed": 80,
         "flags": {
@@ -148,7 +148,7 @@
         "symbol": "z",
         "color": "DarkSeaGreen",
         "species": "ZOMBIE",
-        "aggression": 100,
+        "aggression": 10,
         "hitPoints": 20,
         "speed": 60,
         "flags": {

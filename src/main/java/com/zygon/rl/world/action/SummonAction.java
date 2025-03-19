@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.stewsters.util.name.FantasyNameGen;
@@ -98,9 +99,8 @@ public class SummonAction extends Action {
         return locations;
     }
 
-    // TODO: this is clearly insufficient, maybe stats based on size?
-    private CharacterSheet getRandomCharacter(GameState state, Creature actor) {
-        int stats = random.nextInt(4) + 1;
+    private CharacterSheet getRandomCharacter(GameState state, Creature creature) {
+        final int age = 1 + random.nextInt(4);
         Set<StatusEffect> statusEffects = effects.stream()
                 .map(e -> new StatusEffect(e, state.getTurnCount()))
                 .collect(Collectors.toSet());
@@ -108,7 +108,7 @@ public class SummonAction extends Action {
         final String name;
         final Dialog dialog;
 
-        if (actor.getSpecies().equals(CommonAttributes.HUMAN.name())) {
+        if (creature.getSpecies().equals(CommonAttributes.HUMAN.name())) {
             name = FantasyNameGen.generate();
 
             Dialog start = Dialog.create("Greetings traveller. You look mighty pale today..");
@@ -121,16 +121,33 @@ public class SummonAction extends Action {
 
             dialog = start.addChoices(List.of(yes, no));
         } else {
-            name = actor.getName();
+            name = creature.getName();
             dialog = Dialog.create("...");
         }
 
-        CharacterSheet rando = CharacterSheet.create(actor, name,
-                new Stats(stats, stats, stats, stats, stats, stats),
-                new Status(stats, actor.getHitPoints(), statusEffects))
+        CharacterSheet rando = CharacterSheet.create(creature, name,
+                generate(creature, random),
+                new Status(age, creature.getHitPoints(), statusEffects))
                 .build();
 
         //TODO: proc gen dialog);
         return rando.set(dialog);
+    }
+
+    static Stats generate(Creature creature, Random random) {
+
+        final int baseStat = 8;
+        Supplier<Integer> getStatFn = () -> baseStat + random.nextInt(4);
+
+        final int weight = creature.getWeight();
+        final int weightMod = weight / 100;
+
+        return new Stats()
+                .incCha(getStatFn.get())
+                .incCon(getStatFn.get() + weightMod)
+                .incDex(getStatFn.get())
+                .incInt(getStatFn.get())
+                .incStr(getStatFn.get() + weightMod)
+                .incWis(getStatFn.get());
     }
 }

@@ -3,7 +3,7 @@ package com.zygon.rl.data;
 import java.util.List;
 
 /**
- *
+ * Needs stats?
  */
 public class Creature extends WorldElement {
 
