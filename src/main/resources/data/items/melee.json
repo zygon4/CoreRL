@@ -24,5 +24,18 @@
         "dice": 3,
         "toHit": 1,
         "toDamage": 2
+    },
+    {
+        "id": "sword",
+        "type": "MELEE",
+        "symbol": "|",
+        "color": "Silver",
+        "name": "Sword",
+        "description": "A one handed sword",
+        "weight": 6,
+        "damage": 6,
+        "dice": 2,
+        "toHit": 2,
+        "toDamage": 1
     }
 ]

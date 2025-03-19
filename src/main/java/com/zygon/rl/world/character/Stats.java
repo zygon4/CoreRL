@@ -1,10 +1,10 @@
 package com.zygon.rl.world.character;
 
-import com.zygon.rl.world.Attribute;
-import com.zygon.rl.world.IntegerAttribute;
-
 import java.util.LinkedHashSet;
 import java.util.Set;
+
+import com.zygon.rl.world.Attribute;
+import com.zygon.rl.world.IntegerAttribute;
 
 /**
  *
@@ -51,6 +51,30 @@ public class Stats {
 
     public int getWisdom() {
         return wisdom;
+    }
+
+    public Stats incStr(int ammount) {
+        return new Stats(strength + ammount, dexterity, constitution, intelligence, wisdom, charisma);
+    }
+
+    public Stats incDex(int ammount) {
+        return new Stats(strength, dexterity + ammount, constitution, intelligence, wisdom, charisma);
+    }
+
+    public Stats incCon(int ammount) {
+        return new Stats(strength, dexterity, constitution + ammount, intelligence, wisdom, charisma);
+    }
+
+    public Stats incInt(int ammount) {
+        return new Stats(strength, dexterity, constitution, intelligence + ammount, wisdom, charisma);
+    }
+
+    public Stats incWis(int ammount) {
+        return new Stats(strength, dexterity, constitution, intelligence, wisdom + ammount, charisma);
+    }
+
+    public Stats incCha(int ammount) {
+        return new Stats(strength, dexterity, constitution, intelligence, wisdom, charisma + ammount);
     }
 
     public Set<Attribute> getAttributes() {
