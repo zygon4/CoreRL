@@ -116,7 +116,8 @@
         "hitPoints": 40,
         "speed": 110,
         "flags": {
-            "MAGIC": 2
+            "MAGIC": 2,
+            "UNDEAD": true
         },
         "weight": 180,
         "spawns": []
@@ -133,7 +134,25 @@
         "hitPoints": 1000,
         "speed": 80,
         "flags": {
-            "MAGIC": 4
+            "MAGIC": 4,
+            "UNDEAD": true
+        },
+        "weight": 120,
+        "spawns": []
+    },
+    {
+        "id": "mon_zombie",
+        "type": "MONSTER",
+        "name": "Zombie",
+        "description": "An decrepit zombie",
+        "symbol": "z",
+        "color": "DarkSeaGreen",
+        "species": "ZOMBIE",
+        "aggression": 100,
+        "hitPoints": 20,
+        "speed": 60,
+        "flags": {
+            "UNDEAD": true
         },
         "weight": 120,
         "spawns": []
