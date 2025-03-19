@@ -69,6 +69,8 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
         defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_G.getCode()));
         // 'q' for quests
         defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_Q.getCode()));
+        // 'p' for player
+        defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_P.getCode()));
 
         // These are for testing spells out and how fields will act.. not permanent
         // However, i can see a hotkeys being assigned..
@@ -279,6 +281,15 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                                 .setName("INVENTORY")
                                 .setHandler(inventoryHandler)
                                 .setPrompt(GameState.InputContextPrompt.INVENTORY)
+                                .build());
+            }
+            // PLAYER
+            case KEY_P -> {
+                copy.addInputContext(
+                        GameState.InputContext.builder()
+                                .setName("PLAYER")
+                                .setHandler(ContinueInputHandler.create(getGameConfiguration()))
+                                .setPrompt(GameState.InputContextPrompt.PLAYER)
                                 .build());
             }
             // TALK / could be E?

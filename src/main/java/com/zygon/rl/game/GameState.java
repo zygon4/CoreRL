@@ -36,6 +36,7 @@ public class GameState {
         INVENTORY,
         NOTIFICATION,
         OVERLAY,
+        PLAYER,
         PRIMARY,
         QUESTS
     }

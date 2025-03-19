@@ -2,9 +2,13 @@ package com.zygon.rl.world.character;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.zygon.rl.data.Effect;
+import com.zygon.rl.world.Attribute;
 
 /**
  *
@@ -20,7 +24,8 @@ public final class Status {
     private final int energy;
     private final Map<String, StatusEffect> effects;
 
-    private Status(int age, int hitPoints, int energy, Map<String, StatusEffect> effects) {
+    private Status(int age, int hitPoints, int energy,
+            Map<String, StatusEffect> effects) {
         this.age = age;
         this.hitPoints = hitPoints;
         this.energy = energy;
@@ -89,5 +94,20 @@ public final class Status {
 
     /*pkg*/ Status resetEnergy() {
         return new Status(age, hitPoints, energy - MIN_ENERGY, effects);
+    }
+
+    public Set<Attribute> getEffectAttributes() {
+        Set<Attribute> effectAttrs = new HashSet<>();
+
+        for (String key : effects.keySet()) {
+            Effect effect = effects.get(key).getEffect();
+            effectAttrs.add(Attribute.builder()
+                    .setName(effect.getName())
+                    .setDescription(effect.getDescription())
+                    .setValue("")
+                    .build());
+        }
+
+        return effectAttrs;
     }
 }

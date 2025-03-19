@@ -162,6 +162,14 @@ final class GameView extends BaseView {
                     new TextRenderer(notificationLayer, renderUtil,
                             (gs) -> gs.getNotification() != null ? List.of(gs.getNotification().note()) : null));
 
+            Layer playerLayer = Layer.newBuilder()
+                    .withSize(overlayScreenSize)
+                    .withOffset(overlayScreenPos)
+                    .build();
+            getScreen().addLayer(playerLayer);
+            componentRenderersByPrompt.put(GameState.InputContextPrompt.PLAYER,
+                    new PlayerRenderer(playerLayer, renderUtil));
+
             Layer dialogLayer = Layer.newBuilder()
                     .withSize(overlayScreenSize)
                     .withOffset(overlayScreenPos)

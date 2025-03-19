@@ -73,8 +73,9 @@ final class HelpView extends BaseView {
                     .addHeader("e               - examine surroundings", false)
                     .addHeader("t               - talk to someone adjacent (use numpad)", false)
                     .addHeader("q               - view quests", false)
-                    .addHeader("x               - scan around using 1-9, ENT to look", false)
-                    .addHeader("F1,F2,F3        - experimental spells. F3 aims using 1-9 then ENT", false)
+                    .addHeader("p               - view player", false)
+                    .addHeader("x               - scan around using 1-9, ENTER or '5' to look", false)
+                    .addHeader("F1,F2,F3        - experimental spells. F3 aims using 1-9 then ENTER", false)
                     .addHeader("esc             - game menu", false)
                     .build());
             getScreen().openModal(new Dialog(getScreen().getSize(), modalPanel));

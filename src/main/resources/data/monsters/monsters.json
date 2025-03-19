@@ -130,9 +130,9 @@
         "symbol": "L",
         "color": "DarkSeaGreen",
         "species": "LICH",
-        "aggression": 10,
+        "aggression": 1,
         "hitPoints": 1000,
-        "speed": 80,
+        "speed": 60,
         "flags": {
             "MAGIC": 4,
             "UNDEAD": true
@@ -144,7 +144,7 @@
         "id": "mon_zombie",
         "type": "MONSTER",
         "name": "Zombie",
-        "description": "An decrepit zombie",
+        "description": "A decrepit zombie",
         "symbol": "z",
         "color": "DarkSeaGreen",
         "species": "ZOMBIE",
