@@ -125,11 +125,11 @@ public class SummonAction extends Action {
             dialog = Dialog.create("...");
         }
 
-        CharacterSheet rando = new CharacterSheet(actor,
-                name,
+        CharacterSheet rando = CharacterSheet.create(actor, name,
                 new Stats(stats, stats, stats, stats, stats, stats),
-                new Status(stats, actor.getHitPoints(), statusEffects),
-                null, null, Set.of(), Set.of(), Set.of());
+                new Status(stats, actor.getHitPoints(), statusEffects))
+                .build();
+
         //TODO: proc gen dialog);
         return rando.set(dialog);
     }

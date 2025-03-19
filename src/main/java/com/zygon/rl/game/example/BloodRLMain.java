@@ -207,16 +207,13 @@ public class BloodRLMain {
 //        StatusEffect statusEffect = new StatusEffect(effect);
 //
         WorldElement eleTemplate = new WorldElement("player", "player", "@", "PaleVioletRed", "Alucard", "He's cool but moody", Map.of(), 150);
-        CharacterSheet pc = new CharacterSheet(
-                new Creature(eleTemplate, Species.MAMMAL.name(), 100, 120, 100),
-                "Alucard",
-                new Stats(16, 16, 14, 12, 12, 16),
-                new Status(19, 100, Set.of()),
-                null,
-                null,
-                abilities,
-                Set.of(),
-                Set.of());
+        Creature species = new Creature(eleTemplate, Species.HUMAN.name(), 100, 120, 100);
+        CharacterSheet pc = CharacterSheet
+                .create(species,
+                        "Alucard",
+                        new Stats(16, 16, 14, 12, 12, 16),
+                        new Status(19, 20, Set.of()))
+                .build();
 
         ArmorData dataTunic = ArmorData.get("torso_tunic_black");
         ArmorData dataBoots = ArmorData.get("boots_leather");

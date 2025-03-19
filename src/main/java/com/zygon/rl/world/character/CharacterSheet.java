@@ -51,33 +51,19 @@ public final class CharacterSheet extends Tangible {
         DEATH
     }
 
-    public CharacterSheet(Creature template, String name, Stats stats,
-            Status status, Equipment equipment, Inventory inventory,
-            Set<Ability> abilities, Set<Spell> spells,
-            Set<Proficiency> proficiencies,
-            Dialog dialog, Map<TriggerType, Action> triggers,
-            Set<QuestInfo> quests) {
-        super(template);
-
-        this.name = name;
-        this.stats = stats;
-        this.status = status;
-        this.equipment = equipment != null ? equipment : STANDARD_EQ;
-        this.inventory = inventory != null ? inventory : new Inventory();
-        this.abilities = Collections.unmodifiableSet(abilities);
-        this.spells = Collections.unmodifiableSet(spells);
-        this.proficiencies = Collections.unmodifiableSet(proficiencies);
-        this.dialog = dialog;
-        this.triggers = Collections.unmodifiableMap(triggers);
-        this.quests = Collections.unmodifiableSet(quests);
-    }
-
-    public CharacterSheet(Creature template, String name, Stats stats,
-            Status status, Equipment equipment, Inventory inventory,
-            Set<Ability> abilities, Set<Spell> spells,
-            Set<Proficiency> proficiencies) {
-        this(template, name, stats, status, equipment, inventory, abilities,
-                spells, proficiencies, null, Map.of(), Set.of());
+    private CharacterSheet(Builder builder) {
+        super(builder.template);
+        this.name = builder.name;
+        this.stats = builder.stats;
+        this.status = builder.status;
+        this.equipment = builder.equipment != null ? builder.equipment : STANDARD_EQ;
+        this.inventory = builder.inventory != null ? builder.inventory : new Inventory();
+        this.abilities = builder.abilities != null ? Collections.unmodifiableSet(builder.abilities) : Collections.emptySet();
+        this.spells = builder.spells != null ? Collections.unmodifiableSet(builder.spells) : Collections.emptySet();
+        this.proficiencies = builder.proficiencies != null ? Collections.unmodifiableSet(builder.proficiencies) : Collections.emptySet();
+        this.dialog = builder.dialog;
+        this.triggers = builder.triggers != null ? Collections.unmodifiableMap(builder.triggers) : Collections.emptyMap();
+        this.quests = builder.quests != null ? Collections.unmodifiableSet(builder.quests) : Collections.emptySet();
     }
 
     public Equipment getEquipment() {
@@ -246,49 +232,45 @@ public final class CharacterSheet extends Tangible {
                 newEq = equipment.wear(armor);
             }
 
-            return new CharacterSheet(getTemplate(), name, stats, status, newEq,
-                    inventory.remove(item), abilities, spells, proficiencies, dialog, triggers, quests);
-
+            return copy()
+                    .equipment(newEq)
+                    .inventory(inventory.remove(item))
+                    .build();
         }
 
         return null;
     }
 
     public CharacterSheet add(Item item) {
-        CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
-                equipment, inventory.add(item), abilities, spells, proficiencies, dialog, triggers, quests);
-
-        return copy;
+        return copy()
+                .inventory(inventory.add(item))
+                .build();
     }
 
     public CharacterSheet remove(Item item) {
+        return copy()
+                .inventory(inventory.remove(item))
+                .build();
         // TODO: drop equipped/wielded
-        CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
-                equipment, inventory.remove(item), abilities, spells, proficiencies, dialog, triggers, quests);
-
-        return copy;
     }
 
     // hopefully not necessary, use the helper functions
     public CharacterSheet set(Equipment equipment) {
-        CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
-                equipment, inventory, abilities, spells, proficiencies, dialog, triggers, quests);
-
-        return copy;
+        return copy()
+                .equipment(equipment)
+                .build();
     }
 
     public CharacterSheet set(Status status) {
-        CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
-                equipment, inventory, abilities, spells, proficiencies, dialog, triggers, quests);
-
-        return copy;
+        return copy()
+                .status(status)
+                .build();
     }
 
     public CharacterSheet set(Set<Ability> abilities) {
-        CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
-                equipment, inventory, abilities, spells, proficiencies, dialog, triggers, quests);
-
-        return copy;
+        return copy()
+                .abilties(abilities)
+                .build();
     }
 
     public CharacterSheet set(Proficiency proficiency) {
@@ -303,24 +285,21 @@ public final class CharacterSheet extends Tangible {
             }
         }
 
-        CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
-                equipment, inventory, abilities, spells, newProfs, dialog, triggers, quests);
-
-        return copy;
+        return copy()
+                .proficiencies(newProfs)
+                .build();
     }
 
     public CharacterSheet set(Dialog dialog) {
-        CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
-                equipment, inventory, abilities, spells, proficiencies, dialog, triggers, quests);
-
-        return copy;
+        return copy()
+                .dialog(dialog)
+                .build();
     }
 
     public CharacterSheet set(Creature creature) {
-        CharacterSheet copy = new CharacterSheet(creature, name, stats, status,
-                equipment, inventory, abilities, spells, proficiencies, dialog, triggers, quests);
-
-        return copy;
+        return copy()
+                .template(creature)
+                .build();
     }
 
     /**
@@ -330,10 +309,9 @@ public final class CharacterSheet extends Tangible {
      * @return
      */
     public CharacterSheet set(Map<TriggerType, Action> triggers) {
-        CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
-                equipment, inventory, abilities, spells, proficiencies, dialog, triggers, quests);
-
-        return copy;
+        return copy()
+                .triggers(triggers)
+                .build();
     }
 
     /**
@@ -346,10 +324,10 @@ public final class CharacterSheet extends Tangible {
         Set<QuestInfo> allQuests = new LinkedHashSet<>();
         allQuests.addAll(this.getQuests());
         allQuests.add(quest);
-        CharacterSheet copy = new CharacterSheet(getTemplate(), name, stats, status,
-                equipment, inventory, abilities, spells, proficiencies, dialog, triggers, allQuests);
 
-        return copy;
+        return copy()
+                .quests(allQuests)
+                .build();
     }
 
     public CharacterSheet wield(Weapon weapon) {
@@ -364,11 +342,124 @@ public final class CharacterSheet extends Tangible {
                 return null;
             }
 
-            return new CharacterSheet(getTemplate(), name, stats, status, newEq,
-                    inventory.remove(item), abilities, spells, proficiencies, dialog, triggers, quests);
-
+            return copy()
+                    .equipment(newEq)
+                    .inventory(inventory.remove(item))
+                    .build();
         }
 
         return null;
+    }
+
+    public static Builder create(final Creature template, final String name,
+            final Stats stats, final Status status) {
+        return new Builder()
+                .template(template)
+                .name(name)
+                .stats(stats)
+                .status(status);
+    }
+
+    public Builder copy() {
+        return new Builder(this);
+    }
+
+    public static class Builder {
+
+        private Creature template;
+        private String name;
+        private Stats stats;
+        private Status status;
+        private Equipment equipment;
+        private Inventory inventory;
+        private Set<Ability> abilities;
+        private Set<Spell> spells;
+        private Set<Proficiency> proficiencies;
+        private Dialog dialog;
+        private Map<TriggerType, Action> triggers;
+        private Set<QuestInfo> quests;
+
+        private Builder(CharacterSheet sheet) {
+            this.template = sheet.getTemplate();
+            this.name = sheet.getName();
+            this.stats = sheet.getStats();
+            this.status = sheet.getStatus();
+            this.equipment = sheet.getEquipment();
+            this.inventory = sheet.getInventory();
+            this.abilities = sheet.getAbilities();
+            this.spells = sheet.getSpells();
+            this.proficiencies = sheet.getProficiencies();
+            this.dialog = sheet.getDialog();
+            this.triggers = sheet.getTriggers();
+            this.quests = sheet.getQuests();
+        }
+
+        private Builder() {
+
+        }
+
+        public Builder template(Creature template) {
+            this.template = template;
+            return this;
+        }
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder stats(Stats stats) {
+            this.stats = stats;
+            return this;
+        }
+
+        public Builder status(Status status) {
+            this.status = status;
+            return this;
+        }
+
+        public Builder equipment(Equipment equipment) {
+            this.equipment = equipment;
+            return this;
+        }
+
+        public Builder inventory(Inventory inventory) {
+            this.inventory = inventory;
+            return this;
+        }
+
+        public Builder abilties(Set<Ability> abilities) {
+            this.abilities = abilities;
+            return this;
+        }
+
+        public Builder spells(Set<Spell> spells) {
+            this.spells = spells;
+            return this;
+        }
+
+        public Builder proficiencies(Set<Proficiency> proficiencies) {
+            this.proficiencies = proficiencies;
+            return this;
+        }
+
+        public Builder dialog(Dialog dialog) {
+            this.dialog = dialog;
+            return this;
+        }
+
+        public Builder triggers(Map<TriggerType, Action> triggers) {
+            this.triggers = triggers;
+            return this;
+        }
+
+        public Builder quests(Set<QuestInfo> quests) {
+            this.quests = quests;
+            return this;
+        }
+
+        public CharacterSheet build() {
+            return new CharacterSheet(this);
+        }
     }
 }
