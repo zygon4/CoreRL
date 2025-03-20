@@ -9,6 +9,7 @@ public enum CommonAttributes {
     CLOSED,
     DEAD,
     DELETED,
+    ENHANCED_SPEED,
     HEALTH,
     HUMAN,
     IMPASSABLE,
@@ -19,5 +20,7 @@ public enum CommonAttributes {
     NPC,
     TEMPERMENT,
     TERRAIN_DIFFICULTY,
-    VIEW_BLOCK
+    UNDEAD,
+    VIEW_BLOCK,
+    WEAK_TO_SUN
 }

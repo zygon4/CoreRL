@@ -4,14 +4,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.zygon.rl.data.Effect;
 import com.zygon.rl.data.Effect.EffectNames;
 import com.zygon.rl.game.GameConfiguration;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.game.GameSystem;
+import com.zygon.rl.world.CommonAttributes;
 import com.zygon.rl.world.Location;
+import com.zygon.rl.world.Weather;
 import com.zygon.rl.world.action.Action;
+import com.zygon.rl.world.action.SetCharacterAction;
 import com.zygon.rl.world.action.StatusDamageAction;
 import com.zygon.rl.world.character.CharacterSheet;
 import com.zygon.rl.world.character.StatusEffect;
@@ -43,9 +48,76 @@ public class StatusEffectSystem extends GameSystem {
                     return new StatusDamageAction(getGameConfiguration(), effect, sheet, location);
                 }
                 return null;
+            // sun damage if weakened?
             default:
                 return null;
         }
+    }
+
+    private static final Set<String> STATUS_FLAGS = Set.of(
+            CommonAttributes.WEAK_TO_SUN.name(),
+            CommonAttributes.ENHANCED_SPEED.name()
+    );
+
+    private Collection<Action> auditStatusEffects(GameState state,
+            CharacterSheet character, Location location) {
+
+        Collection<Action> actions = new ArrayList<>();
+
+        for (String flag : STATUS_FLAGS) {
+            Boolean statusFlag = character.getTemplate().getFlag(flag);
+
+            // Only look at the flags that this character is effected by
+            if (Objects.isNull(statusFlag) || !statusFlag) {
+                continue;
+            }
+
+            // can't use the CommonAttributes becaue it's not a constant expression :(
+            switch (flag) {
+                case "WEAK_TO_SUN" -> {
+                    final String sunFeverMinorId = Effect.EffectNames.SUN_FEVER_MINOR.getId();
+
+                    // is it sunny here?
+                    if (state.getWorld().getWeather() == Weather.CLEAR) { // TODO: and outdoors
+                        // are we effected by the sun?
+                        if (!character.getStatus().getEffects().containsKey(sunFeverMinorId)) {
+
+                            // TODO: common utility in this class to set effects..
+                            SetCharacterAction setSunFever = new SetCharacterAction(location,
+                                    character.set(character.getStatus()
+                                            .addEffect(new StatusEffect(
+                                                    Effect.get(sunFeverMinorId),
+                                                    state.getTurnCount()))));
+                            actions.add(setSunFever);
+                        }
+                    } else {
+                        if (character.getStatus().getEffects()
+                                .containsKey(sunFeverMinorId)) {
+                            SetCharacterAction removeSunFever = new SetCharacterAction(location,
+                                    character.set(character.getStatus().removeEffect(sunFeverMinorId)));
+                            actions.add(removeSunFever);
+                        }
+                    }
+                }
+                case "ENHANCED_SPEED" -> {
+                    final String enhancedSpeedId = Effect.EffectNames.ENHANCED_SPEED.getId();
+                    if (character.getStatus().getEffects().containsKey(enhancedSpeedId)) {
+                        final StatusEffect speedEffect = character.getStatus().getEffects().get(enhancedSpeedId);
+                        int currentTurn = state.getTurnCount();
+                        int inceptionTurn = speedEffect.getTurn();
+                        if (currentTurn - inceptionTurn > 10) {
+                            SetCharacterAction removeSpeed = new SetCharacterAction(location,
+                                    character.set(character.getStatus().removeEffect(enhancedSpeedId)));
+                            actions.add(removeSpeed);
+                        }
+
+                        // TODO: "slow down" sound effect
+                    }
+                }
+            }
+        }
+
+        return actions;
     }
 
     Collection<Action> getStatusEffectActions(GameState state,
@@ -66,10 +138,12 @@ public class StatusEffectSystem extends GameSystem {
         Collection<Action> actions = new ArrayList<>();
 
         for (var npc : closeCharacters.entrySet()) {
+            actions.addAll(auditStatusEffects(state, npc.getValue(), npc.getKey()));
             actions.addAll(getStatusEffectActions(state, npc.getValue(), npc.getKey()));
         }
 
         CharacterSheet player = state.getWorld().getPlayer();
+        actions.addAll(auditStatusEffects(state, player, state.getWorld().getPlayerLocation()));
         actions.addAll(getStatusEffectActions(state, player, state.getWorld().getPlayerLocation()));
 
         for (Action action : actions) {

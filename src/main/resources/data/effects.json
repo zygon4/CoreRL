@@ -43,5 +43,12 @@
         "description": "You are possessed with enhanced speed",
         "maxDuration": 10,
         "statMods": [ { "name":"SPD", "amount": 100 } ]
+    },
+    {
+        "id": "effect_sun_fever_minor",
+        "type": "EFFECT",
+        "name": "Weakend by sunlight",
+        "description": "You're weakened by natural sunlight",
+        "statMods": [ { "name":"STR", "amount":-4 }, { "name":"DEX", "amount":-4 }, { "name":"CON", "amount":-4 }, { "name":"INT", "amount":-4 }, { "name":"WIS", "amount":-4 }, { "name":"CHA", "amount":-4 } ]
     }
 ]

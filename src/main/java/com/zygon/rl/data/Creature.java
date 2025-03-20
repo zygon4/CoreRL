@@ -31,6 +31,10 @@ public class Creature extends WorldElement {
         this(template, species, aggression, hitPoints, speed, null);
     }
 
+    public Creature copy(WorldElement template) {
+        return new Creature(template, species, aggression, hitPoints, speed, spawns);
+    }
+
     public String getSpecies() {
         return species;
     }

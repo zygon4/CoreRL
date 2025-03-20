@@ -117,7 +117,8 @@
         "speed": 110,
         "flags": {
             "MAGIC": 2,
-            "UNDEAD": true
+            "UNDEAD": true,
+            "WEAK_TO_SUN": true
         },
         "weight": 180,
         "spawns": []
