@@ -40,7 +40,7 @@ public class StatusEffectSystem extends GameSystem {
     private Action translate(GameState state, CharacterSheet sheet,
             Location location, StatusEffect effect) {
         switch (EffectNames.getInstance(effect.getEffect().getId())) {
-            case BLEEDING_MAJOR:
+            case BLEEDING_MAJOR -> {
                 // Doing this "every X turns" should be a utility..
                 int currentTurn = state.getTurnCount();
                 int inceptionTurn = effect.getTurn();
@@ -48,10 +48,23 @@ public class StatusEffectSystem extends GameSystem {
                     return new StatusDamageAction(getGameConfiguration(), effect, sheet, location);
                 }
                 return null;
-            // sun damage if weakened?
-            default:
+            }
+            case ENHANCED_SPEED -> {
+                // Doing this "every X turns" should be a utility..
+                int currentTurn = state.getTurnCount();
+                int inceptionTurn = effect.getTurn();
+                if ((currentTurn - inceptionTurn) > 10) {
+                    final String enhancedSpeedId = Effect.EffectNames.ENHANCED_SPEED.getId();
+                    return new SetCharacterAction(location,
+                            sheet.set(sheet.getStatus().removeEffect(enhancedSpeedId)));
+                }
                 return null;
+            }
+            default -> {
+                return null;
+            }
         }
+        // sun damage if weakened?
     }
 
     private static final Set<String> STATUS_FLAGS = Set.of(
@@ -97,21 +110,6 @@ public class StatusEffectSystem extends GameSystem {
                                     character.set(character.getStatus().removeEffect(sunFeverMinorId)));
                             actions.add(removeSunFever);
                         }
-                    }
-                }
-                case "ENHANCED_SPEED" -> {
-                    final String enhancedSpeedId = Effect.EffectNames.ENHANCED_SPEED.getId();
-                    if (character.getStatus().getEffects().containsKey(enhancedSpeedId)) {
-                        final StatusEffect speedEffect = character.getStatus().getEffects().get(enhancedSpeedId);
-                        int currentTurn = state.getTurnCount();
-                        int inceptionTurn = speedEffect.getTurn();
-                        if (currentTurn - inceptionTurn > 10) {
-                            SetCharacterAction removeSpeed = new SetCharacterAction(location,
-                                    character.set(character.getStatus().removeEffect(enhancedSpeedId)));
-                            actions.add(removeSpeed);
-                        }
-
-                        // TODO: "slow down" sound effect
                     }
                 }
             }

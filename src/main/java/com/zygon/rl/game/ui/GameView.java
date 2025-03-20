@@ -311,7 +311,7 @@ final class GameView extends BaseView {
 
         // Gathering these attributes could be expensive.. should only
         // update when needed..
-        Set<Attribute> stats = playerSheet.getStats().getAttributes();
+        Set<Attribute> stats = playerSheet.getModifiedStats().getAttributes();
         StringBuilder statsBuilder = new StringBuilder();
 
         int perRow = 1;

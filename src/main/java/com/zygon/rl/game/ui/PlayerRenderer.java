@@ -57,7 +57,7 @@ public class PlayerRenderer implements GameComponentRenderer {
         int xOffset = 0;
         int yOffset = 1;
 
-        for (Renderable renderable : getStatsText(xOffset, yOffset, player.getStats())) {
+        for (Renderable renderable : getStatsText(xOffset, yOffset, player.getModifiedStats())) {
             renderUtil.render(layer, Position.create(renderable.x(), renderable.y()),
                     renderable.content(), renderable.color());
         }

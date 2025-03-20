@@ -61,11 +61,11 @@ public class CombatResolver {
         if (critical) {
             dmg = weapon != null
                     ? weapon.calculateCrit(dice)
-                    : 1 + attacker.getStats().getStrength();
+                    : 1 + attacker.getModifiedStats().getStrength();
         } else {
             if (!fail) {
                 // regular hit
-                int toHitModifier = attackRoll + attacker.getStats().getStrength();
+                int toHitModifier = attackRoll + attacker.getModifiedStats().getStrength();
                 if (weapon != null) {
                     toHitModifier += weapon.getToHit();
                 }
@@ -73,7 +73,7 @@ public class CombatResolver {
                     miss = false;
                     dmg = weapon != null
                             ? weapon.calculateHit(dice)
-                            : 1 + attacker.getStats().getStrength();
+                            : 1 + attacker.getModifiedStats().getStrength();
                 }
             }
         }

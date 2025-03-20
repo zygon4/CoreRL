@@ -99,9 +99,8 @@ public final class CharacterSheet extends Tangible {
         return baseSpeed;
     }
 
-    public Stats getStats() {
-
-        Stats baseStats = stats;
+    public Stats getModifiedStats() {
+        Stats baseStats = getStats();
 
         int strMod = 0;
         int dexMod = 0;
@@ -141,6 +140,10 @@ public final class CharacterSheet extends Tangible {
         }
 
         return baseStats;
+    }
+
+    public Stats getStats() {
+        return stats;
     }
 
     public Status getStatus() {
