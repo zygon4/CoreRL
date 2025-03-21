@@ -156,6 +156,6 @@
             "UNDEAD": true
         },
         "weight": 120,
-        "spawns": []
+        "spawns": ["FOREST"]
     }
 ]

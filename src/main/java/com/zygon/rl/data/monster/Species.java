@@ -10,5 +10,6 @@ public enum Species {
     HUMAN,
     LICH,
     MAMMAL,
-    VAMPIRE;
+    VAMPIRE,
+    ZOMBIE;
 }
