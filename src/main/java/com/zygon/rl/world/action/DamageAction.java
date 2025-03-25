@@ -56,8 +56,8 @@ public abstract class DamageAction extends Action {
         // effects (wounds, etc).
         CharacterSheet updatedDefender = damaged.loseHitPoints(damage.getTotalDamage());
 
-        logger.log(System.Logger.Level.TRACE,
-                "DAMAGE: " + updatedDefender.getId() + " at " + defenderLocation);
+        logger.log(System.Logger.Level.INFO,
+                "DAMAGE: " + updatedDefender.getId() + " at " + defenderLocation + " from " + damage);
 
         if (!updatedDefender.isDead()) {
             state.getWorld().add(updatedDefender, defenderLocation);

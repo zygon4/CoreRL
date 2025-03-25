@@ -1,4 +1,4 @@
-package com.zygon.rl.game.ui;
+package com.zygon.rl.game.ui.render;
 
 import java.awt.Color;
 import java.util.ArrayList;

@@ -105,7 +105,7 @@ public class SpawnContext {
                 SpawnContext::getItemSpawnAction),
         Living(30,
                 center -> {
-                    int freq = 30;
+                    int freq = 50;
                     Set<Location> spawnLocations = new HashSet<>();
 
                     Location roundedCenter = Location.create((int) (freq * (Math.round(center.getX() / freq))),

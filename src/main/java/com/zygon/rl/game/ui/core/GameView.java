@@ -1,4 +1,13 @@
-package com.zygon.rl.game.ui;
+package com.zygon.rl.game.ui.core;
+
+import com.zygon.rl.game.ui.render.TextRenderer;
+import com.zygon.rl.game.ui.render.AbilityRenderer;
+import com.zygon.rl.game.ui.render.InventoryRenderer;
+import com.zygon.rl.game.ui.render.OuterWorldRenderer;
+import com.zygon.rl.game.ui.render.GameComponentRenderer;
+import com.zygon.rl.game.ui.render.RenderUtil;
+import com.zygon.rl.game.ui.render.QuestRenderer;
+import com.zygon.rl.game.ui.render.PlayerRenderer;
 
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;

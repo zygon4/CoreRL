@@ -21,6 +21,11 @@ public final class NoiseUtil {
         this(seed, null, null);
     }
 
+    public double round(double val) {
+        double roundOff = Math.round(val * 100.0) / 100.0;
+        return roundOff;
+    }
+
     // Returns a scaled noise value between 0.0 inclusive and 1.0 exclusive.
     public double getScaledValue(int x, int y) {
         double noiseVal = getValue(x, y);
@@ -42,5 +47,10 @@ public final class NoiseUtil {
         // TBD smoothing if desired
 //        terrainVal = Math.pow(terrainVal, 2.00);
         return terrainVal;
+    }
+
+    public static double scale(final double valueIn, final double baseMin,
+            final double baseMax, final double limitMin, final double limitMax) {
+        return ((limitMax - limitMin) * (valueIn - baseMin) / (baseMax - baseMin)) + limitMin;
     }
 }

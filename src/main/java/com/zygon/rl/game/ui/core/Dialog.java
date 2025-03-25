@@ -1,4 +1,4 @@
-package com.zygon.rl.game.ui;
+package com.zygon.rl.game.ui.core;
 
 import org.hexworks.zircon.api.CP437TilesetResources;
 import org.hexworks.zircon.api.builder.component.ModalBuilder;

@@ -1,7 +1,7 @@
 /*
  * Copyright Liminal Data Systems 2025
  */
-package com.zygon.rl.game.ui;
+package com.zygon.rl.game.ui.render;
 
 import java.awt.Color;
 import java.lang.System.Logger.Level;

@@ -57,7 +57,7 @@ public class World {
 
     // this is fresh world only
     public World() {
-        this(new Calendar(20).addTime(TimeUnit.DAYS.toSeconds(1000)), Weather.CLEAR);
+        this(new Calendar(24).addTime(TimeUnit.DAYS.toSeconds(1)), Weather.CLEAR);
     }
 
     public void add(Tangible thing, Location location) {
@@ -254,29 +254,55 @@ public class World {
     private static final NoiseUtil npcNoise = new NoiseUtil(new Random().nextInt(), 1.0, 1.0);
 
     public WorldRegion getRegion(Location location) {
-        double terrainVal = terrainNoise.getScaledValue(location.getX(), location.getY());
+        double terrainVal = terrainNoise.getValue(location.getX(), location.getY());
+        terrainVal = NoiseUtil.scale(terrainVal, -0.88, 0.88, 0.0, 100.0);
+        terrainVal = terrainNoise.round(terrainVal);
 
-        ByteBuffer.wrap(NOISE_BYTES).putDouble(terrainVal);
-        int noiseFactor = ByteBuffer.wrap(NOISE_BYTES).getInt(4);
-        int noise = Math.abs(noiseFactor % 9);
-
-        if (terrainVal < .2) {
+//        ByteBuffer.wrap(NOISE_BYTES).putDouble(terrainVal);
+//        int noiseFactor = ByteBuffer.wrap(NOISE_BYTES).getInt(4);
+//        int noise = Math.abs(noiseFactor % 9);
+//        System.out.println(terrainVal);
+        if (terrainVal < 35) {
             return WorldRegion.DEEP_WATER;
-        } else if (terrainVal < .4) {
+        } else if (terrainVal < 45) {
             return WorldRegion.SHALLOW_WATER;
-        } else if (terrainVal < .5) {
+        } else if (terrainVal < 50) {
             return WorldRegion.SHORE;
-        } else if (terrainVal < .6) {
+        } else if (terrainVal < 60) {
             return WorldRegion.SHORT_FIELD;
-        } else if (terrainVal < .7) {
+        } else if (terrainVal < 70) {
             return WorldRegion.TALL_FIELD;
-        } else if (terrainVal < .925) {
+        } else if (terrainVal < 80) {
             return WorldRegion.FOREST;
-        } else if (terrainVal < .99) {
+        } else if (terrainVal < 85) {
+            return WorldRegion.SHORT_FIELD;
+        } else if (terrainVal < 90) {
             return WorldRegion.TOWN_OUTER;
         } else {
+            System.out.println(terrainVal);
             return WorldRegion.TOWN_RESIDENCE;
         }
+
+//        if (terrainVal < .15) {
+//            return WorldRegion.DEEP_WATER;
+//        } else if (terrainVal < .25) {
+//            return WorldRegion.SHALLOW_WATER;
+//        } else if (terrainVal < .35) {
+//            return WorldRegion.SHORE;
+//        } else if (terrainVal < .45) {
+//            return WorldRegion.SHORT_FIELD;
+//        } else if (terrainVal < .55) {
+//            return WorldRegion.TALL_FIELD;
+//        } else if (terrainVal < .65) {
+//            return WorldRegion.FOREST;
+//        } else if (terrainVal < .75) {
+//            return WorldRegion.SHORT_FIELD;
+//        } else if (terrainVal < .85) {
+//            return WorldRegion.TOWN_OUTER;
+//        } else {
+//            System.out.println(terrainVal);
+//            return WorldRegion.TOWN_RESIDENCE;
+//        }
     }
 
     // Intended for use as consistent random

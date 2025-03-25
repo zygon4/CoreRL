@@ -1,4 +1,4 @@
-package com.zygon.rl.game.ui;
+package com.zygon.rl.game.ui.core;
 
 import com.zygon.rl.game.Game;
 

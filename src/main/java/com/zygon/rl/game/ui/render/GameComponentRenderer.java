@@ -1,7 +1,7 @@
 /*
  *
  */
-package com.zygon.rl.game.ui;
+package com.zygon.rl.game.ui.render;
 
 import com.zygon.rl.game.GameState;
 
