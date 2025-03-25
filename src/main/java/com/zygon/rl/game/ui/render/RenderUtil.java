@@ -5,8 +5,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
 import org.hexworks.zircon.api.color.ANSITileColor;
@@ -37,10 +38,16 @@ public class RenderUtil {
 
     private final Map<Integer, CharacterTile> tileCache = new HashMap<>();
 
-    private final LoadingCache<Color, TileColor> colorCache;
+    private final LoadingCache<Color, TileColor> colorCache = CacheBuilder.newBuilder()
+            .maximumSize(100)
+            .build(new CacheLoader<Color, TileColor>() {
+                @Override
+                public TileColor load(Color key) {
+                    return RenderUtil.convert(key);
+                }
+            });
 
-    public RenderUtil(LoadingCache<Color, TileColor> colorCache) {
-        this.colorCache = Objects.requireNonNull(colorCache);
+    public RenderUtil() {
     }
 
     public void fill(Layer layer) {
@@ -54,6 +61,10 @@ public class RenderUtil {
             Position pos = Position.create(offset.getX() + x, offset.getY());
             layer.draw(fooBar.get(i), pos);
         }
+    }
+
+    public TileColor getTileColor(Color color) {
+        return colorCache.getUnchecked(color);
     }
 
     public static TileColor convert(Color color) {
@@ -70,7 +81,7 @@ public class RenderUtil {
         }
 
         CharacterTile tile = Tile.newBuilder()
-                .withForegroundColor(colorCache.getUnchecked(color))
+                .withForegroundColor(getTileColor(color))
                 .withCharacter(symbol)
                 .buildCharacterTile();
 

@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.zygon.rl.data.Terrain;
 import com.zygon.rl.data.context.Data;
 import com.zygon.rl.game.AbilityInputHandler;
 import com.zygon.rl.game.DialogInputHandler;
@@ -35,9 +34,7 @@ import com.zygon.rl.game.ui.render.QuestRenderer;
 import com.zygon.rl.game.ui.render.RenderUtil;
 import com.zygon.rl.game.ui.render.TextRenderer;
 import com.zygon.rl.util.Audio;
-import com.zygon.rl.util.ColorUtil;
 import com.zygon.rl.world.Attribute;
-import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
 import com.zygon.rl.world.character.CharacterSheet;
 
@@ -134,7 +131,7 @@ final class GameView extends BaseView {
                     .build();
             getScreen().addLayer(miniMapLayer);
 
-            RenderUtil renderUtil = new RenderUtil(colorCache);
+            RenderUtil renderUtil = new RenderUtil();
 
             Layer gameScreenLayer = Layer.newBuilder()
                     .withSize(gameScreenSize)
@@ -204,7 +201,7 @@ final class GameView extends BaseView {
                     new QuestRenderer(questLayer, renderUtil));
 
             updateSideBar(sideBar, game);
-            updateMiniMap(miniMapLayer, game);
+            MapRenderer.updateMiniMap(miniMapLayer, game.getState(), renderUtil);
             updateGameScreen(game);
 
             // At bottom of screen
@@ -258,33 +255,11 @@ final class GameView extends BaseView {
                         updateSideBar(sideBar, game);
                         // I didn't intend to leave this "delay" in here, but it's not a terrible idea..
                         if (game.getState().getTurnCount() % 10 == 0) {
-                            updateMiniMap(miniMapLayer, game);
+                            MapRenderer.updateMiniMap(miniMapLayer, game.getState(), renderUtil);
                         }
                     }));
             initialized = true;
         }
-    }
-
-    private Map<Location, Color> createMiniMap(World world, Location center) {
-
-        // round
-        Location rounded = Location.create(25 * (Math.round(center.getX() / 25)),
-                25 * (Math.round(center.getY() / 25)));
-
-        // PERF: could be passed in for performance
-        Map<Location, Color> colorsByLocation = new HashMap<>();
-
-        for (int y = rounded.getY() + 200, realY = 0; y > rounded.getY() - 200; y -= 25, realY++) {
-            for (int x = rounded.getX() - 200, realX = 0; x < rounded.getX() + 200; x += 25, realX++) {
-
-                Location location = Location.create(x, y);
-                Terrain terrain = world.getTerrain(location);
-                Color color = ColorUtil.get(terrain.getColor());
-                colorsByLocation.put(Location.create(realX, realY), color);
-            }
-        }
-
-        return colorsByLocation;
     }
 
     private SideBar createSideBar(Position position, Game game) {
@@ -310,10 +285,6 @@ final class GameView extends BaseView {
 
     private CharacterSheet getPlayer(Game game) {
         return game.getState().getWorld().getPlayer();
-    }
-
-    private Location getPlayerLocation(Game game) {
-        return game.getState().getWorld().getPlayerLocation();
     }
 
     private void updateSideBar(SideBar sideBar, Game game) {
@@ -387,20 +358,6 @@ final class GameView extends BaseView {
             if (gameComponentRenderer != null) {
                 gameComponentRenderer.render(game.getState());
             }
-        }
-    }
-
-    private void updateMiniMap(Layer miniMap, Game game) {
-        Map<Location, Color> miniMapLocations = createMiniMap(
-                game.getState().getWorld(), getPlayerLocation(game));
-        for (Location loc : miniMapLocations.keySet()) {
-            Color color = miniMapLocations.get(loc);
-            TileColor tileColor = colorCache.getUnchecked(color);
-            Tile tile = BLACK_TILE.createCopy().withBackgroundColor(tileColor)
-                    .withForegroundColor(ANSITileColor.BRIGHT_CYAN);
-            Position offset = Position.create(loc.getX(), loc.getY());
-
-            miniMap.draw(tile, offset);
         }
     }
 }
