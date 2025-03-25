@@ -10,6 +10,7 @@ import com.zygon.rl.world.character.CharacterSheet;
 import com.zygon.rl.world.character.Weapon;
 
 /**
+ * TODO: Full features (armor, etc).
  *
  * @author zygon
  */
