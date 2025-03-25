@@ -28,6 +28,7 @@ public class Terrain extends WorldElement {
         TALL_GRASS("t_tall_grass"),
         DEEP_WATER("t_deep_water"),
         PUDDLE("t_puddle"),
+        SAND("t_sand"),
         TREE("t_tree"),
         WALL("t_wall");
 

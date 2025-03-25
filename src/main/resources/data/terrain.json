@@ -13,7 +13,7 @@
         "name": "Grass",
         "description": "Some grass",
         "symbol": ".",
-        "color": "Green"
+        "color": "ForestGreen"
     },
     {
         "id": "t_tall_grass",
@@ -21,7 +21,7 @@
         "name": "Tall grass",
         "description": "Patches of tall grass",
         "symbol": "\"",
-        "color": "Green",
+        "color": "ForestGreen",
         "flags": {
             "TERRAIN_DIFFICULTY": 0.1,
             "VIEW_BLOCK": 0.20
@@ -44,7 +44,7 @@
         "name": "Puddle",
         "description": "A shallow puddle of dirty water",
         "symbol": "~",
-        "color": "Blue",
+        "color": "RoyalBlue",
         "flags": {
             "TERRAIN_DIFFICULTY": 0.25
         }
@@ -55,11 +55,19 @@
         "name": "Tree",
         "description": "A tall tree",
         "symbol": "4",
-        "color": "Green",
+        "color": "DarkGreen",
         "flags": {
             "IMPASSABLE": true,
             "VIEW_BLOCK": 1.0
         }
+    },
+    {
+        "id": "t_sand",
+        "type": "TERRAIN",
+        "name": "Sand",
+        "description": "Loose sand",
+        "symbol": ".",
+        "color": "SandyBrown"
     },
     {
         "id": "t_wall",
@@ -67,7 +75,7 @@
         "name": "Wall",
         "description": "Solid rock wall",
         "symbol": "#",
-        "color": "Gray",
+        "color": "DarkGray",
         "flags": {
             "IMPASSABLE": true,
             "VIEW_BLOCK": 1.0

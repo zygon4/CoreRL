@@ -44,6 +44,7 @@ import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_8;
 import static org.hexworks.zircon.api.uievent.KeyCode.DIGIT_9;
 import static org.hexworks.zircon.api.uievent.KeyCode.ESCAPE;
 import static org.hexworks.zircon.api.uievent.KeyCode.KEY_I;
+import static org.hexworks.zircon.api.uievent.KeyCode.KEY_P;
 
 public final class DefaultOuterInputHandler extends BaseInputHandler {
 
@@ -55,31 +56,32 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
         defaultKeyCodes.addAll(INPUTS_1_9);
         // 'a' for abilities
         defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_A.getCode()));
-        // 'e' for examine adjacent
-        defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_E.getCode()));
         // 'c' for close adjacent
         defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_C.getCode()));
         // 'd' for drop
         defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_D.getCode()));
-        // 'i' for inventory
-        defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_I.getCode()));
-        // 't' for talk
-        defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_T.getCode()));
+        // 'e' for examine adjacent
+        defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_E.getCode()));
         // 'g' for get
         defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_G.getCode()));
-        // 'q' for quests
-        defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_Q.getCode()));
+        // 'i' for inventory
+        defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_I.getCode()));
+        // 'm' for map
+        defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_M.getCode()));
         // 'p' for player
         defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_P.getCode()));
+        // 't' for talk
+        defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_T.getCode()));
+        // 'q' for quests
+        defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_Q.getCode()));
+        // 'x' look around
+        defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_X.getCode()));
 
         // These are for testing spells out and how fields will act.. not permanent
         // However, i can see a hotkeys being assigned..
         defaultKeyCodes.add(Input.valueOf(KeyCode.F1.getCode()));
         defaultKeyCodes.add(Input.valueOf(KeyCode.F2.getCode()));
         defaultKeyCodes.add(Input.valueOf(KeyCode.F3.getCode()));
-
-        // 'x' look around
-        defaultKeyCodes.add(Input.valueOf(KeyCode.KEY_X.getCode()));
 
         // ESC for game menu
         defaultKeyCodes.add(Input.valueOf(KeyCode.ESCAPE.getCode()));
@@ -281,6 +283,15 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                                 .setName("INVENTORY")
                                 .setHandler(inventoryHandler)
                                 .setPrompt(GameState.InputContextPrompt.INVENTORY)
+                                .build());
+            }
+            // MAP
+            case KEY_M -> {
+                copy.addInputContext(
+                        GameState.InputContext.builder()
+                                .setName("MAP")
+                                .setHandler(ContinueInputHandler.create(getGameConfiguration()))
+                                .setPrompt(GameState.InputContextPrompt.MAP)
                                 .build());
             }
             // PLAYER

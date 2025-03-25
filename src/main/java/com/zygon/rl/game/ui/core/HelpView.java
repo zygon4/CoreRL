@@ -55,7 +55,7 @@ final class HelpView extends BaseView {
         controlsButton.handleMouseEvents(MouseEventType.MOUSE_CLICKED, (p1, p2) -> {
             Panel modalPanel = Components.panel()
                     // Increase the height if you add more lines below
-                    .withSize(Size.create(80, 16))
+                    .withSize(Size.create(80, 17))
                     .withColorTheme(gameView.getTheme())
                     .withAlignmentWithin(titleMenuPanel, ComponentAlignment.CENTER)
                     .withDecorations(org.hexworks.zircon.api.ComponentDecorations.box(BoxType.SINGLE))
@@ -70,6 +70,7 @@ final class HelpView extends BaseView {
                     .addHeader("g               - get item", false)
                     .addHeader("d               - drop item", false)
                     .addHeader("i               - view inventory", false)
+                    .addHeader("m               - view map", false)
                     .addHeader("e               - examine surroundings", false)
                     .addHeader("t               - talk to someone adjacent (use numpad)", false)
                     .addHeader("q               - view quests", false)

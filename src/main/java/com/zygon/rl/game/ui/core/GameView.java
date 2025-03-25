@@ -1,14 +1,5 @@
 package com.zygon.rl.game.ui.core;
 
-import com.zygon.rl.game.ui.render.TextRenderer;
-import com.zygon.rl.game.ui.render.AbilityRenderer;
-import com.zygon.rl.game.ui.render.InventoryRenderer;
-import com.zygon.rl.game.ui.render.OuterWorldRenderer;
-import com.zygon.rl.game.ui.render.GameComponentRenderer;
-import com.zygon.rl.game.ui.render.RenderUtil;
-import com.zygon.rl.game.ui.render.QuestRenderer;
-import com.zygon.rl.game.ui.render.PlayerRenderer;
-
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
@@ -34,6 +25,15 @@ import com.zygon.rl.game.DialogInputHandler;
 import com.zygon.rl.game.Game;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.game.Input;
+import com.zygon.rl.game.ui.render.AbilityRenderer;
+import com.zygon.rl.game.ui.render.GameComponentRenderer;
+import com.zygon.rl.game.ui.render.InventoryRenderer;
+import com.zygon.rl.game.ui.render.MapRenderer;
+import com.zygon.rl.game.ui.render.OuterWorldRenderer;
+import com.zygon.rl.game.ui.render.PlayerRenderer;
+import com.zygon.rl.game.ui.render.QuestRenderer;
+import com.zygon.rl.game.ui.render.RenderUtil;
+import com.zygon.rl.game.ui.render.TextRenderer;
 import com.zygon.rl.util.Audio;
 import com.zygon.rl.util.ColorUtil;
 import com.zygon.rl.world.Attribute;
@@ -80,7 +80,7 @@ final class GameView extends BaseView {
             .build(new CacheLoader<Color, TileColor>() {
                 @Override
                 public TileColor load(Color key) {
-                    return GameUI.convert(key);
+                    return RenderUtil.convert(key);
                 }
             });
 
@@ -161,6 +161,14 @@ final class GameView extends BaseView {
             getScreen().addLayer(inventoryLayer);
             componentRenderersByPrompt.put(GameState.InputContextPrompt.INVENTORY,
                     new InventoryRenderer(inventoryLayer, renderUtil));
+
+            Layer mapLayer = Layer.newBuilder()
+                    .withSize(overlayScreenSize)
+                    .withOffset(overlayScreenPos)
+                    .build();
+            getScreen().addLayer(mapLayer);
+            componentRenderersByPrompt.put(GameState.InputContextPrompt.MAP,
+                    new MapRenderer(mapLayer, renderUtil));
 
             Layer notificationLayer = Layer.newBuilder()
                     .withSize(overlayScreenSize)

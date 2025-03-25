@@ -20,6 +20,7 @@ import com.zygon.rl.data.buildings.BuildingData;
 import com.zygon.rl.data.buildings.Layout;
 import com.zygon.rl.data.context.Data;
 import com.zygon.rl.util.NoiseUtil;
+import static com.zygon.rl.world.WorldRegion.TOWN_OUTER;
 import com.zygon.rl.world.character.CharacterSheet;
 
 /**
@@ -262,24 +263,24 @@ public class World {
 //        int noiseFactor = ByteBuffer.wrap(NOISE_BYTES).getInt(4);
 //        int noise = Math.abs(noiseFactor % 9);
 //        System.out.println(terrainVal);
-        if (terrainVal < 35) {
+        if (terrainVal < 30) {
             return WorldRegion.DEEP_WATER;
-        } else if (terrainVal < 45) {
+        } else if (terrainVal < 40) {
             return WorldRegion.SHALLOW_WATER;
-        } else if (terrainVal < 50) {
+        } else if (terrainVal < 45) {
             return WorldRegion.SHORE;
-        } else if (terrainVal < 60) {
+        } else if (terrainVal < 55) {
             return WorldRegion.SHORT_FIELD;
-        } else if (terrainVal < 70) {
+        } else if (terrainVal < 65) {
             return WorldRegion.TALL_FIELD;
-        } else if (terrainVal < 80) {
+        } else if (terrainVal < 75) {
             return WorldRegion.FOREST;
-        } else if (terrainVal < 85) {
+        } else if (terrainVal < 80) {
             return WorldRegion.SHORT_FIELD;
-        } else if (terrainVal < 90) {
+        } else if (terrainVal < 85) {
             return WorldRegion.TOWN_OUTER;
         } else {
-            System.out.println(terrainVal);
+//            System.out.println(terrainVal + " -> " + location);
             return WorldRegion.TOWN_RESIDENCE;
         }
 
@@ -321,12 +322,12 @@ public class World {
 
         switch (getRegion(location)) {
             case DEEP_WATER: // todo deep water, dirt to show where it would be..
-                return Terrain.Ids.DEEP_WATER.get();
+                return WorldRegion.DEEP_WATER.getDefaultTerrain();
             case SHALLOW_WATER:
-                return Terrain.Ids.PUDDLE.get();
+                return WorldRegion.SHALLOW_WATER.getDefaultTerrain();
             case SHORE:
                 if (noise > 3) {
-                    return Terrain.Ids.DIRT.get();
+                    return WorldRegion.SHORE.getDefaultTerrain();
                 } else {
                     return Terrain.Ids.GRASS.get();
                 }
@@ -336,24 +337,23 @@ public class World {
                 } else if (noise > 3) {
                     return Terrain.Ids.TREE.get();
                 } else {
-                    return Terrain.Ids.GRASS.get();
+                    return WorldRegion.SHORT_FIELD.getDefaultTerrain();
                 }
             case TALL_FIELD:
                 if (noise > 3) {
                     return Terrain.Ids.GRASS.get();
                 } else {
-                    return Terrain.Ids.TALL_GRASS.get();
+                    return WorldRegion.TALL_FIELD.getDefaultTerrain();
                 }
             case FOREST:
                 if (noise > 6) {
-                    return Terrain.Ids.TREE.get();
+                    return WorldRegion.FOREST.getDefaultTerrain();
                 } else {
                     return Terrain.Ids.DIRT.get();
                 }
             case TOWN_OUTER:
-
                 if (noise > 6) {
-                    return Terrain.Ids.GRASS.get();
+                    return WorldRegion.TOWN_OUTER.getDefaultTerrain();
                 } else {
                     return Terrain.Ids.DIRT.get();
                 }

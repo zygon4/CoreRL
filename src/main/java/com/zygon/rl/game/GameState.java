@@ -34,6 +34,7 @@ public class GameState {
         ABILITIES,
         DIALOG,
         INVENTORY,
+        MAP,
         NOTIFICATION,
         OVERLAY,
         PLAYER,

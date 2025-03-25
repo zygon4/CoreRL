@@ -56,6 +56,10 @@ public class RenderUtil {
         }
     }
 
+    public static TileColor convert(Color color) {
+        return TileColor.create(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+    }
+
     public CharacterTile toTile(Color color, char symbol) {
         //Assuming generating this hash is faster than creating a tile, GC'ing it.
         int hashCode = com.google.common.base.Objects.hashCode(color, symbol);
