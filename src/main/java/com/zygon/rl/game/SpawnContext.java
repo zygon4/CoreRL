@@ -18,7 +18,6 @@ import com.zygon.rl.data.buildings.BuildingData;
 import com.zygon.rl.data.buildings.BuildingLayout;
 import com.zygon.rl.data.buildings.Layout;
 import com.zygon.rl.data.context.Data;
-import com.zygon.rl.data.items.ArmorData;
 import com.zygon.rl.data.items.WorldData;
 import com.zygon.rl.data.monster.Monster;
 import com.zygon.rl.data.npc.Npc;
@@ -34,7 +33,6 @@ import static com.zygon.rl.world.WorldRegion.TOWN_RESIDENCE;
 import com.zygon.rl.world.action.Action;
 import com.zygon.rl.world.action.SetItemAction;
 import com.zygon.rl.world.action.SummonAction;
-import com.zygon.rl.world.character.Armor;
 
 /**
  *
@@ -194,6 +192,11 @@ public class SpawnContext {
                 if (canBuild(state.getWorld(), location, building)) {
                     Set<Action> spawnActions = spawnBuilding(location, building);
                     actions.addAll(spawnActions);
+                    // TODO: drive spawns from json data
+
+                    String npcId = getRandomSetElement(Npc.getAllIds(), actionContext.random());
+                    SummonAction summonAction = new SummonAction(location, 1, npcId, actionContext.random());
+                    actions.add(summonAction);
                 }
             }
         }
@@ -309,29 +312,22 @@ public class SpawnContext {
         //  "+1" to account for the center tile itself.
         for (int mapY = center.getY() - heightFromCenter, buildingY = 0; mapY < center.getY() + 1 + heightFromCenter; mapY++, buildingY++) {
             for (int mapX = center.getX() - widthFromCenter, buildingX = 0; mapX < center.getX() + 1 + widthFromCenter; mapX++, buildingX++) {
+                String itemId = layout.getItems().getId(buildingX, buildingY);
+                if (itemId != null) {
+                    Location spawnLocation = Location.create(mapX, mapY);
 
-                // Z: testing
-                // How to prevent partial-building spawn??????
-                if (Location.create(mapX, mapY).equals(center)) {
-                    spawnActions.add(new SetItemAction(new Armor(ArmorData.get("torso_tunic_black")), Location.create(mapX, mapY)));
-                } else {
-                    String itemId = layout.getItems().getId(buildingX, buildingY);
-                    if (itemId != null) {
-                        Location spawnLocation = Location.create(mapX, mapY);
+                    ItemClass item = Data.get(itemId);
+                    spawnActions.add(new SetItemAction(new Item(item), spawnLocation));
+                }
 
-                        ItemClass item = Data.get(itemId);
-                        spawnActions.add(new SetItemAction(new Item(item), spawnLocation));
-                    }
-
-                    //
-                    // TODO: doing both is wasteful, right??
-                    //
-                    String structureId = structure.getId(buildingX, buildingY);
-                    if (structureId != null) {
-                        Location spawnLocation = Location.create(mapX, mapY);
-                        com.zygon.rl.data.items.Building buildingItem = Data.get(structureId);
-                        spawnActions.add(new SetItemAction(new Item(buildingItem), spawnLocation));
-                    }
+                //
+                // TODO: doing both is wasteful, right??
+                //
+                String structureId = structure.getId(buildingX, buildingY);
+                if (structureId != null) {
+                    Location spawnLocation = Location.create(mapX, mapY);
+                    com.zygon.rl.data.items.Building buildingItem = Data.get(structureId);
+                    spawnActions.add(new SetItemAction(new Item(buildingItem), spawnLocation));
                 }
             }
         }
