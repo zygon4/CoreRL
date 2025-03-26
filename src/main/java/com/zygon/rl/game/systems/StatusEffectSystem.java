@@ -49,6 +49,18 @@ public class StatusEffectSystem extends GameSystem {
                 }
                 return null;
             }
+            case CONFUSION -> {
+                // Doing this "every X turns" should be a utility..
+                // TODO: based on character stats/abilities to shake off..
+                int currentTurn = state.getTurnCount();
+                int inceptionTurn = effect.getTurn();
+                if ((currentTurn - inceptionTurn) > 20) {
+                    final String confusionId = Effect.EffectNames.CONFUSION.getId();
+                    return new SetCharacterAction(location,
+                            sheet.set(sheet.getStatus().removeEffect(confusionId)));
+                }
+                return null;
+            }
             case ENHANCED_SPEED -> {
                 // Doing this "every X turns" should be a utility..
                 int currentTurn = state.getTurnCount();

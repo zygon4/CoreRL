@@ -9,11 +9,10 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.zygon.rl.data.character.Proficiencies;
 import com.zygon.rl.game.GameState.InputContext;
 import com.zygon.rl.world.Tangible;
-import com.zygon.rl.world.action.Action;
 import com.zygon.rl.world.character.Ability;
-import com.zygon.rl.world.character.AbilityActionSet;
 
 import org.hexworks.zircon.api.uievent.KeyCode;
 
@@ -74,16 +73,8 @@ public final class AbilityInputHandler extends BaseInputHandler {
             }
             case NONE -> {
                 // no target, use ability and pop context.
-                AbilityActionSet abilityActions = ability.use(state, Optional.empty(), Optional.empty());
-
-                for (Action abilityAction : abilityActions.actions()) {
-                    if (abilityAction.canExecute(state)) {
-                        newState = abilityAction.execute(state);
-                    } else {
-                        // stop if anything can't execute..
-                        break;
-                    }
-                }
+                AbilityResolver abilityResolver = new AbilityResolver(ability);
+                newState = abilityResolver.resolve(state, Optional.empty(), Optional.empty());
 
                 newState = newState.copy()
                         .removeInputContext()
@@ -97,7 +88,8 @@ public final class AbilityInputHandler extends BaseInputHandler {
     @Override
     public String getDisplayText(Input input) {
         Ability ability = abilitiesByKeyCode.get(input);
-        return ability.getName() + " - " + ability.getDescription();
+        Proficiencies prof = Proficiencies.get(ability.getProficiencyId());
+        return ability.getName() + " - " + ability.getDescription() + " (" + prof.getName() + ")";
     }
 
     public static Function<GameState, List<String>> getInputsFn() {

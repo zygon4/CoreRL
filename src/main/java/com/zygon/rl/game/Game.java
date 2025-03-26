@@ -10,6 +10,7 @@ import com.zygon.rl.game.systems.AISystem;
 import com.zygon.rl.game.systems.FieldEffectSystem;
 import com.zygon.rl.game.systems.FieldPropagationSystem;
 import com.zygon.rl.game.systems.NotificationSystem;
+import com.zygon.rl.game.systems.ProgressSystem;
 import com.zygon.rl.game.systems.SpawnSystem;
 import com.zygon.rl.game.systems.StatusEffectSystem;
 import com.zygon.rl.game.systems.WeatherSystem;
@@ -107,6 +108,7 @@ public final class Game {
         private Builder(GameConfiguration gameConfiguration) {
             this.gameSystems.add(new DefaultGameSystem(gameConfiguration));
             this.gameSystems.add(new NotificationSystem(gameConfiguration));
+            this.gameSystems.add(new ProgressSystem(gameConfiguration));
             this.gameSystems.add(new StatusEffectSystem(gameConfiguration));
             this.gameSystems.add(new FieldPropagationSystem(gameConfiguration));
             this.gameSystems.add(new FieldEffectSystem(gameConfiguration));

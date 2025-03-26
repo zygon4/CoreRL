@@ -38,6 +38,13 @@ public interface Ability {
     String getDescription();
 
     /**
+     * Returns the proficiency associated with this ability.
+     *
+     * @return the proficiency associated with this ability.
+     */
+    String getProficiencyId();
+
+    /**
      * Returns the way in which this ability targets.
      *
      * @return the way in which this ability targets.

@@ -24,6 +24,10 @@ public class Proficiency {
                 proficiency.getDescription(), points);
     }
 
+    public Proficiency(Proficiencies proficiency) {
+        this(proficiency, 0);
+    }
+
     public Proficiencies getProficiency() {
         return proficiency;
     }

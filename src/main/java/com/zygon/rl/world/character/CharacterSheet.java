@@ -40,7 +40,7 @@ public final class CharacterSheet extends Tangible {
     private final Equipment equipment;
     private final Inventory inventory;
     private final Set<Ability> abilities;
-    private final Set<Spell> spells;
+    private final Progress progress;
     private final Set<Proficiency> proficiencies;
     private final Dialog dialog;
     private final Map<TriggerType, Action> triggers;
@@ -59,7 +59,7 @@ public final class CharacterSheet extends Tangible {
         this.equipment = builder.equipment != null ? builder.equipment : STANDARD_EQ;
         this.inventory = builder.inventory != null ? builder.inventory : new Inventory();
         this.abilities = builder.abilities != null ? Collections.unmodifiableSet(builder.abilities) : Collections.emptySet();
-        this.spells = builder.spells != null ? Collections.unmodifiableSet(builder.spells) : Collections.emptySet();
+        this.progress = builder.progress != null ? builder.progress : Progress.create();
         this.proficiencies = builder.proficiencies != null ? Collections.unmodifiableSet(builder.proficiencies) : Collections.emptySet();
         this.dialog = builder.dialog;
         this.triggers = builder.triggers != null ? Collections.unmodifiableMap(builder.triggers) : Collections.emptyMap();
@@ -159,8 +159,8 @@ public final class CharacterSheet extends Tangible {
         return name;
     }
 
-    public Set<Spell> getSpells() {
-        return spells;
+    public Progress getProgress() {
+        return progress;
     }
 
     public Set<Proficiency> getProficiencies() {
@@ -376,7 +376,7 @@ public final class CharacterSheet extends Tangible {
         private Equipment equipment;
         private Inventory inventory;
         private Set<Ability> abilities;
-        private Set<Spell> spells;
+        private Progress progress;
         private Set<Proficiency> proficiencies;
         private Dialog dialog;
         private Map<TriggerType, Action> triggers;
@@ -390,7 +390,7 @@ public final class CharacterSheet extends Tangible {
             this.equipment = sheet.getEquipment();
             this.inventory = sheet.getInventory();
             this.abilities = sheet.getAbilities();
-            this.spells = sheet.getSpells();
+            this.progress = sheet.getProgress();
             this.proficiencies = sheet.getProficiencies();
             this.dialog = sheet.getDialog();
             this.triggers = sheet.getTriggers();
@@ -436,8 +436,8 @@ public final class CharacterSheet extends Tangible {
             return this;
         }
 
-        public Builder spells(Set<Spell> spells) {
-            this.spells = spells;
+        public Builder progress(Progress progress) {
+            this.progress = progress;
             return this;
         }
 

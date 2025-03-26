@@ -7,9 +7,7 @@ import java.util.Set;
 
 import com.zygon.rl.data.Identifable;
 import com.zygon.rl.world.Tangible;
-import com.zygon.rl.world.action.Action;
 import com.zygon.rl.world.character.Ability;
-import com.zygon.rl.world.character.AbilityActionSet;
 
 /**
  * Handles ability targets, could be used for spells/other actions in the
@@ -46,15 +44,8 @@ public class AbilityTargetInputHandler extends BaseInputHandler {
         Identifable target = targetsByInput.get(input);
 
         if (target != null) {
-            AbilityActionSet abilityActions = ability.use(state, Optional.of(target), Optional.empty());
-            for (Action abilityAction : abilityActions.actions()) {
-                if (abilityAction.canExecute(state)) {
-                    newState = abilityAction.execute(state);
-                } else {
-                    // stop if anything can't execute..
-                    break;
-                }
-            }
+            AbilityResolver abilityResolver = new AbilityResolver(this.ability);
+            newState = abilityResolver.resolve(state, Optional.of(target), Optional.empty());
         } else {
             invalidInput(input);
         }

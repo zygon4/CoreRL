@@ -6,6 +6,7 @@ package com.zygon.rl.game.ui.render;
 import java.awt.Color;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -14,6 +15,8 @@ import com.zygon.rl.game.GameState;
 import com.zygon.rl.world.Attribute;
 import com.zygon.rl.world.character.CharacterSheet;
 import com.zygon.rl.world.character.Proficiency;
+import com.zygon.rl.world.character.ProficiencyProgress;
+import com.zygon.rl.world.character.Progress;
 import com.zygon.rl.world.character.Stats;
 import com.zygon.rl.world.character.Status;
 
@@ -63,7 +66,8 @@ public class PlayerRenderer implements GameComponentRenderer {
         }
 
         xOffset = 40;
-        for (Renderable renderable : getProficiencyText(xOffset, yOffset, player.getProficiencies())) {
+        for (Renderable renderable : getProficiencyText(xOffset, yOffset,
+                player.getProficiencies(), player.getProgress())) {
             renderUtil.render(layer, Position.create(renderable.x(), renderable.y()),
                     renderable.content(), renderable.color());
         }
@@ -104,21 +108,30 @@ public class PlayerRenderer implements GameComponentRenderer {
     }
 
     Collection<Renderable> getProficiencyText(final int baseX, final int baseY,
-            Set<Proficiency> proficiencies) {
+            Set<Proficiency> proficiencies, Progress progress) {
 
         Set<Renderable> renders = new HashSet<>();
 
         // Attributes are more generic, used for UI/UX
-        Set<Attribute> attributes = proficiencies.stream()
-                .map(Proficiency::getAttribute)
-                .collect(Collectors.toSet());
+        Map<String, Attribute> attributes = proficiencies.stream()
+                .collect(Collectors.toMap(
+                        k -> k.getProficiency().getId(),
+                        v -> v.getAttribute()));
 
         int x = baseX;
         int y = baseY;
 
-        for (var attr : attributes) {
+        for (String key : attributes.keySet()) {
+            Attribute attr = attributes.get(key);
             renders.add(new Renderable(x, y, attr.getName(), Color.GRAY));
             renders.add(new Renderable(x + 15, y, attr.getValue(), Color.RED));
+
+            ProficiencyProgress proficiencyProgress = progress.getProficiencyProgress(key);
+            if (proficiencyProgress != null) {
+                String val = proficiencyProgress.getXp() + "/" + proficiencyProgress.getRequiredXp();
+                renders.add(new Renderable(x + 20, y, val, Color.BLUE));
+            }
+
             y++;
         }
 
