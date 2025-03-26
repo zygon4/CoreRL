@@ -51,9 +51,7 @@ public class MapRenderer implements GameComponentRenderer {
     private Map<Location, Color> createMapTiles(World world, Location center) {
 
         // round
-        Location rounded = Location.create(
-                MAP_ROUND_FACTOR * (Math.round(center.getX() / MAP_ROUND_FACTOR)),
-                MAP_ROUND_FACTOR * (Math.round(center.getY() / MAP_ROUND_FACTOR)));
+        Location rounded = center.round(MAP_ROUND_FACTOR);
 
         // PERF: could be passed in for performance
         Map<Location, Color> colorsByLocation = new HashMap<>();
@@ -104,9 +102,7 @@ public class MapRenderer implements GameComponentRenderer {
             Location center) {
 
         // round
-        Location rounded = Location.create(
-                MINIMAP_ROUND_FACTOR * (Math.round(center.getX() / MINIMAP_ROUND_FACTOR)),
-                MINIMAP_ROUND_FACTOR * (Math.round(center.getY() / MINIMAP_ROUND_FACTOR)));
+        Location rounded = center.round(MINIMAP_ROUND_FACTOR);
 
         // PERF: could be passed in for performance
         Map<Location, Color> colorsByLocation = new HashMap<>();

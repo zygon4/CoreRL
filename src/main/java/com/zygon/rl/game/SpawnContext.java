@@ -15,6 +15,7 @@ import com.zygon.rl.data.ItemClass;
 import com.zygon.rl.data.Terrain;
 import com.zygon.rl.data.buildings.Building;
 import com.zygon.rl.data.buildings.BuildingData;
+import com.zygon.rl.data.buildings.BuildingLayout;
 import com.zygon.rl.data.buildings.Layout;
 import com.zygon.rl.data.context.Data;
 import com.zygon.rl.data.items.ArmorData;
@@ -76,8 +77,7 @@ public class SpawnContext {
                     int freq = 20;
                     Set<Location> spawnLocations = new HashSet<>();
 
-                    Location roundedCenter = Location.create((int) (freq * (Math.round(center.getX() / freq))),
-                            (int) (freq * (Math.round(center.getY() / freq))));
+                    Location roundedCenter = center.round(freq);
 
                     for (int y = roundedCenter.getY() + 200, realY = 0; y > roundedCenter.getY() - 200; y -= freq, realY++) {
                         for (int x = roundedCenter.getX() - 200, realX = 0; x < roundedCenter.getX() + 200; x += freq, realX++) {
@@ -92,8 +92,7 @@ public class SpawnContext {
                     int freq = 20;
                     Set<Location> spawnLocations = new HashSet<>();
 
-                    Location roundedCenter = Location.create((int) (freq * (Math.round(center.getX() / freq))),
-                            (int) (freq * (Math.round(center.getY() / freq))));
+                    Location roundedCenter = center.round(freq);
 
                     for (int y = roundedCenter.getY() + 200, realY = 0; y > roundedCenter.getY() - 200; y -= freq, realY++) {
                         for (int x = roundedCenter.getX() - 200, realX = 0; x < roundedCenter.getX() + 200; x += freq, realX++) {
@@ -108,8 +107,7 @@ public class SpawnContext {
                     int freq = 50;
                     Set<Location> spawnLocations = new HashSet<>();
 
-                    Location roundedCenter = Location.create((int) (freq * (Math.round(center.getX() / freq))),
-                            (int) (freq * (Math.round(center.getY() / freq))));
+                    Location roundedCenter = center.round(freq);
 
                     for (int y = roundedCenter.getY() + 200, realY = 0; y > roundedCenter.getY() - 200; y -= freq, realY++) {
                         for (int x = roundedCenter.getX() - 200, realX = 0; x < roundedCenter.getX() + 200; x += freq, realX++) {
@@ -145,6 +143,28 @@ public class SpawnContext {
         }
     }
 
+    public static boolean canBuild(World world, Location center,
+            Building building) {
+
+        Layout layout = building.getLayout();
+
+        int widthFromCenter = layout.getStructure().getWidthFromCenter();
+        int heightFromCenter = layout.getStructure().getHeightFromCenter();
+
+        //  "+1" to account for the center tile itself.
+        for (int mapY = center.getY() - heightFromCenter, buildingY = 0; mapY < center.getY() + 1 + heightFromCenter; mapY++, buildingY++) {
+            for (int mapX = center.getX() - widthFromCenter, buildingX = 0; mapX < center.getX() + 1 + widthFromCenter; mapX++, buildingX++) {
+                Location buildingLocation = Location.create(mapX, mapY);
+                WorldRegion region = world.getRegion(buildingLocation);
+                if (region != WorldRegion.TOWN_RESIDENCE && region != WorldRegion.TOWN_OUTER) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     private static Location getRandomLocation(Location location,
             int maxRadius, Random rand) {
         int halfRadius = maxRadius / 2;
@@ -171,7 +191,7 @@ public class SpawnContext {
                 Collections.shuffle(buildingIds, World.getNoiseRandom(location));
                 BuildingData building = Data.get(buildingIds.get(0));
 
-                if (World.canBuild(state.getWorld(), location, building)) {
+                if (canBuild(state.getWorld(), location, building)) {
                     Set<Action> spawnActions = spawnBuilding(location, building);
                     actions.addAll(spawnActions);
                 }
@@ -282,8 +302,9 @@ public class SpawnContext {
         Set<Action> spawnActions = new HashSet<>();
         Layout layout = building.getLayout();
 
-        int widthFromCenter = layout.getStructure().getWidthFromCenter();
-        int heightFromCenter = layout.getStructure().getHeightFromCenter();
+        BuildingLayout structure = layout.getStructure();
+        int widthFromCenter = structure.getWidthFromCenter();
+        int heightFromCenter = structure.getHeightFromCenter();
 
         //  "+1" to account for the center tile itself.
         for (int mapY = center.getY() - heightFromCenter, buildingY = 0; mapY < center.getY() + 1 + heightFromCenter; mapY++, buildingY++) {
@@ -301,10 +322,45 @@ public class SpawnContext {
                         ItemClass item = Data.get(itemId);
                         spawnActions.add(new SetItemAction(new Item(item), spawnLocation));
                     }
+
+                    //
+                    // TODO: doing both is wasteful, right??
+                    //
+                    String structureId = structure.getId(buildingX, buildingY);
+                    if (structureId != null) {
+                        Location spawnLocation = Location.create(mapX, mapY);
+                        com.zygon.rl.data.items.Building buildingItem = Data.get(structureId);
+                        spawnActions.add(new SetItemAction(new Item(buildingItem), spawnLocation));
+                    }
                 }
             }
         }
 
         return spawnActions;
     }
+
+//    private Terrain getBuildingTerrain(Building building, int distToCenterX,
+//            int distToCenterY) {
+//
+//        int absX = Math.abs(distToCenterX);
+//        int absY = Math.abs(distToCenterY);
+//
+//        // needs thought: if x/y are within a house's height/width when centered
+//        // on a point, then get the terrain from the layout.
+//        //
+//        Layout layout = building.getLayout();
+//
+//        if (absX <= layout.getStructure().getWidthFromCenter() && absY <= layout.getStructure().getHeightFromCenter()) {
+//            // need to convert the relative distances to the center into x/y in the layout
+//
+//            int layoutX = distToCenterX + layout.getStructure().getWidthFromCenter();
+//            int layoutY = distToCenterY + layout.getStructure().getHeightFromCenter();
+//
+//            String terrainId = layout.getStructure().getId(layoutX, layoutY);
+//
+//            return Terrain.get(terrainId);
+//        }
+//
+//        return getTerrain(TOWN_OUTER, Location.create(distToCenterX, distToCenterY));
+//    }
 }

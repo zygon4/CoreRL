@@ -30,7 +30,7 @@ public class Terrain extends WorldElement {
         PUDDLE("t_puddle"),
         SAND("t_sand"),
         TREE("t_tree"),
-        WALL("t_wall");
+        WALL("t_rock_wall");
 
         private final String id;
 

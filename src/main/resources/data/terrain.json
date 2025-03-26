@@ -20,7 +20,7 @@
         "type": "TERRAIN",
         "name": "Tall grass",
         "description": "Patches of tall grass",
-        "symbol": "\"",
+        "symbol": "'",
         "color": "ForestGreen",
         "flags": {
             "TERRAIN_DIFFICULTY": 0.1,
@@ -32,7 +32,7 @@
         "type": "TERRAIN",
         "name": "Deep water",
         "description": "Deep water",
-        "symbol": "#",
+        "symbol": "~",
         "color": "Blue",
         "flags": {
             "TERRAIN_DIFFICULTY": 1.0
@@ -70,7 +70,7 @@
         "color": "SandyBrown"
     },
     {
-        "id": "t_wall",
+        "id": "t_rock_wall",
         "type": "TERRAIN",
         "name": "Wall",
         "description": "Solid rock wall",
@@ -79,18 +79,6 @@
         "flags": {
             "IMPASSABLE": true,
             "VIEW_BLOCK": 1.0
-        }
-    },
-    {
-        "id": "t_window",
-        "type": "TERRAIN",
-        "name": "Window",
-        "description": "Open window",
-        "symbol": "o",
-        "color": "Yellow",
-        "flags": {
-            "IMPASSABLE": false,
-            "VIEW_BLOCK": 0.5
         }
     }
 ]

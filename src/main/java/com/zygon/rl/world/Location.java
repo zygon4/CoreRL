@@ -1,13 +1,5 @@
 package com.zygon.rl.world;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.stewsters.util.math.Point2i;
-import com.stewsters.util.pathing.twoDimention.heuristic.ManhattanHeuristic2d;
-import com.stewsters.util.pathing.twoDimention.pathfinder.AStarPathFinder2d;
-import com.stewsters.util.pathing.twoDimention.shared.BoundingBox2d;
-import org.apache.commons.math3.util.Pair;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -16,6 +8,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.stewsters.util.math.Point2i;
+import com.stewsters.util.pathing.twoDimention.heuristic.ManhattanHeuristic2d;
+import com.stewsters.util.pathing.twoDimention.pathfinder.AStarPathFinder2d;
+import com.stewsters.util.pathing.twoDimention.shared.BoundingBox2d;
+
+import org.apache.commons.math3.util.Pair;
 
 /**
  * Location
@@ -202,6 +203,12 @@ public class Location {
 
     public int getZ() {
         return z;
+    }
+
+    public Location round(int freq) {
+        return Location.create(
+                (int) (freq * (Math.round(getX() / freq))),
+                (int) (freq * (Math.round(getY() / freq))));
     }
 
     public static Location create(int x, int y, int z) {

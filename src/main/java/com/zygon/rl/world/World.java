@@ -2,7 +2,6 @@ package com.zygon.rl.world;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,12 +14,16 @@ import java.util.stream.Collectors;
 import com.zygon.rl.data.Identifable;
 import com.zygon.rl.data.Terrain;
 import com.zygon.rl.data.WorldElement;
-import com.zygon.rl.data.buildings.Building;
-import com.zygon.rl.data.buildings.BuildingData;
-import com.zygon.rl.data.buildings.Layout;
 import com.zygon.rl.data.context.Data;
 import com.zygon.rl.util.NoiseUtil;
+import static com.zygon.rl.world.WorldRegion.DEEP_WATER;
+import static com.zygon.rl.world.WorldRegion.FOREST;
+import static com.zygon.rl.world.WorldRegion.SHALLOW_WATER;
+import static com.zygon.rl.world.WorldRegion.SHORE;
+import static com.zygon.rl.world.WorldRegion.SHORT_FIELD;
+import static com.zygon.rl.world.WorldRegion.TALL_FIELD;
 import static com.zygon.rl.world.WorldRegion.TOWN_OUTER;
+import static com.zygon.rl.world.WorldRegion.TOWN_RESIDENCE;
 import com.zygon.rl.world.character.CharacterSheet;
 
 /**
@@ -31,8 +34,6 @@ import com.zygon.rl.world.character.CharacterSheet;
 public class World {
 
     private static final System.Logger logger = System.getLogger(World.class.getCanonicalName());
-
-    private static final double CITY_BUILDINGS_DISTANCE = 20.0;
 
     private final Calendar calendar;
     private final Weather weather;
@@ -252,17 +253,12 @@ public class World {
     // Only used in a single thread
     private static final byte[] NOISE_BYTES = new byte[8];
     private static final NoiseUtil terrainNoise = new NoiseUtil(new Random().nextInt(), 1.0, 1.0);
-    private static final NoiseUtil npcNoise = new NoiseUtil(new Random().nextInt(), 1.0, 1.0);
 
     public WorldRegion getRegion(Location location) {
         double terrainVal = terrainNoise.getValue(location.getX(), location.getY());
         terrainVal = NoiseUtil.scale(terrainVal, -0.88, 0.88, 0.0, 100.0);
         terrainVal = terrainNoise.round(terrainVal);
 
-//        ByteBuffer.wrap(NOISE_BYTES).putDouble(terrainVal);
-//        int noiseFactor = ByteBuffer.wrap(NOISE_BYTES).getInt(4);
-//        int noise = Math.abs(noiseFactor % 9);
-//        System.out.println(terrainVal);
         if (terrainVal < 30) {
             return WorldRegion.DEEP_WATER;
         } else if (terrainVal < 40) {
@@ -280,30 +276,8 @@ public class World {
         } else if (terrainVal < 85) {
             return WorldRegion.TOWN_OUTER;
         } else {
-//            System.out.println(terrainVal + " -> " + location);
             return WorldRegion.TOWN_RESIDENCE;
         }
-
-//        if (terrainVal < .15) {
-//            return WorldRegion.DEEP_WATER;
-//        } else if (terrainVal < .25) {
-//            return WorldRegion.SHALLOW_WATER;
-//        } else if (terrainVal < .35) {
-//            return WorldRegion.SHORE;
-//        } else if (terrainVal < .45) {
-//            return WorldRegion.SHORT_FIELD;
-//        } else if (terrainVal < .55) {
-//            return WorldRegion.TALL_FIELD;
-//        } else if (terrainVal < .65) {
-//            return WorldRegion.FOREST;
-//        } else if (terrainVal < .75) {
-//            return WorldRegion.SHORT_FIELD;
-//        } else if (terrainVal < .85) {
-//            return WorldRegion.TOWN_OUTER;
-//        } else {
-//            System.out.println(terrainVal);
-//            return WorldRegion.TOWN_RESIDENCE;
-//        }
     }
 
     // Intended for use as consistent random
@@ -314,13 +288,17 @@ public class World {
     }
 
     public Terrain getTerrain(Location location) {
+        return getTerrain(getRegion(location), location);
+    }
+
+    public Terrain getTerrain(WorldRegion region, Location location) {
         double terrainVal = terrainNoise.getScaledValue(location.getX(), location.getY());
 
         ByteBuffer.wrap(NOISE_BYTES).putDouble(terrainVal);
         int noiseFactor = ByteBuffer.wrap(NOISE_BYTES).getInt(4);
         int noise = Math.abs(noiseFactor % 9);
 
-        switch (getRegion(location)) {
+        switch (region) {
             case DEEP_WATER: // todo deep water, dirt to show where it would be..
                 return WorldRegion.DEEP_WATER.getDefaultTerrain();
             case SHALLOW_WATER:
@@ -351,81 +329,16 @@ public class World {
                 } else {
                     return Terrain.Ids.DIRT.get();
                 }
-            case TOWN_OUTER:
+            case TOWN_OUTER: // Fall through..
+            case TOWN_RESIDENCE:
                 if (noise > 6) {
                     return WorldRegion.TOWN_OUTER.getDefaultTerrain();
                 } else {
                     return Terrain.Ids.DIRT.get();
                 }
-            case TOWN_RESIDENCE:
-                // Find the nearest city building center
-                int roundXPos = (int) (Math.round(location.getX() / CITY_BUILDINGS_DISTANCE) * CITY_BUILDINGS_DISTANCE);
-                int roundYPos = (int) (Math.round(location.getY() / CITY_BUILDINGS_DISTANCE) * CITY_BUILDINGS_DISTANCE);
-
-                Location buildingCenter = Location.create(roundXPos, roundYPos);
-
-                List<String> buildingIds = new ArrayList<>(BuildingData.getAllIds());
-                Collections.shuffle(buildingIds, getNoiseRandom(buildingCenter));
-                BuildingData building = Data.get(buildingIds.get(0));
-
-//                if (buildingCenter.equals(location)) {
-//                    return Terrain.Ids.DEEP_WATER.get();
-//                }
-                if (canBuild(this, buildingCenter, building)) {
-                    return getBuildingTerrain(building, location.getX() - roundXPos, location.getY() - roundYPos);
-                } else {
-                    return Terrain.Ids.GRASS.get();
-                }
         }
 
         throw new IllegalArgumentException("No terrain for " + location);
-    }
-
-    public static boolean canBuild(World world, Location center,
-            Building building) {
-
-        Layout layout = building.getLayout();
-
-        int widthFromCenter = layout.getStructure().getWidthFromCenter();
-        int heightFromCenter = layout.getStructure().getHeightFromCenter();
-
-        //  "+1" to account for the center tile itself.
-        for (int mapY = center.getY() - heightFromCenter, buildingY = 0; mapY < center.getY() + 1 + heightFromCenter; mapY++, buildingY++) {
-            for (int mapX = center.getX() - widthFromCenter, buildingX = 0; mapX < center.getX() + 1 + widthFromCenter; mapX++, buildingX++) {
-                Location buildingLocation = Location.create(mapX, mapY);
-                WorldRegion region = world.getRegion(buildingLocation);
-                if (region != WorldRegion.TOWN_RESIDENCE && region != WorldRegion.TOWN_OUTER) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    private Terrain getBuildingTerrain(Building building, int distToCenterX,
-            int distToCenterY) {
-
-        int absX = Math.abs(distToCenterX);
-        int absY = Math.abs(distToCenterY);
-
-        // needs thought: if x/y are within a house's height/width when centered
-        // on a point, then get the terrain from the layout.
-        //
-        Layout layout = building.getLayout();
-
-        if (absX <= layout.getStructure().getWidthFromCenter() && absY <= layout.getStructure().getHeightFromCenter()) {
-            // need to convert the relative distances to the center into x/y in the layout
-
-            int layoutX = distToCenterX + layout.getStructure().getWidthFromCenter();
-            int layoutY = distToCenterY + layout.getStructure().getHeightFromCenter();
-
-            String terrainId = layout.getStructure().getId(layoutX, layoutY);
-
-            return Terrain.get(terrainId);
-        }
-
-        return Terrain.Ids.DIRT.get();
     }
 
     public void move(CharacterSheet element, Location from, Location to) {

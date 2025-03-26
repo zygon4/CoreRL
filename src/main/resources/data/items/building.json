@@ -52,6 +52,17 @@
         "weight": 45
     },
     {
+        "id": "t_floor",
+        "type": "GENERIC",
+        "name": "Floor",
+        "description": "A wooden floor",
+        "symbol": ".",
+        "color": "Brown",
+        "flags": {
+            "VIEW_BLOCK": 0.1
+        }
+    },
+    {
         "id": "t_hearth",
         "type": "GENERIC",
         "name": "Hearth",
@@ -63,5 +74,30 @@
             "TERRAIN_DIFFICULTY": 0.1
         },
         "weight": 100
+    },
+    {
+        "id": "t_wall",
+        "type": "GENERIC",
+        "name": "Wall",
+        "description": "A wooden wall",
+        "symbol": "#",
+        "color": "SaddleBrown",
+        "flags": {
+            "IMPASSABLE": true,
+            "VIEW_BLOCK": 1.0
+        }
+    },
+    {
+        "id": "t_window",
+        "type": "GENERIC",
+        "name": "Window",
+        "description": "A window",
+        "symbol": "o",
+        "color": "Yellow",
+        "flags": {
+            "IMPASSABLE": false,
+            "VIEW_BLOCK": 0.5
+        }
     }
 ]
+

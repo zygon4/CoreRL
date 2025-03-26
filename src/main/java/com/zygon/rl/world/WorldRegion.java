@@ -14,7 +14,7 @@ public enum WorldRegion {
     TALL_FIELD(Terrain.Ids.TALL_GRASS.getId()),
     FOREST(Terrain.Ids.TREE.getId()),
     TOWN_OUTER(Terrain.Ids.GRASS.getId()),
-    TOWN_RESIDENCE(Terrain.Ids.WALL.getId());
+    TOWN_RESIDENCE(Terrain.Ids.DIRT.getId());
 
     private final String defaultTerrainId;
 
