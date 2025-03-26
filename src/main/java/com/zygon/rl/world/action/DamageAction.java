@@ -59,6 +59,10 @@ public abstract class DamageAction extends Action {
         logger.log(System.Logger.Level.INFO,
                 "DAMAGE: " + updatedDefender.getId() + " at " + defenderLocation + " from " + damage);
 
+        if (damage.isXpGained()) {
+            state = resolveXpGain(state, damage);
+        }
+
         if (!updatedDefender.isDead()) {
             state.getWorld().add(updatedDefender, defenderLocation);
 
@@ -83,6 +87,10 @@ public abstract class DamageAction extends Action {
             }
         }
 
+        return state;
+    }
+
+    protected GameState resolveXpGain(GameState state, DamageResolution damage) {
         return state;
     }
 

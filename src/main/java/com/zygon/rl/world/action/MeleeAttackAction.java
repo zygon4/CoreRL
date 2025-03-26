@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 import com.zygon.rl.data.Effect;
+import com.zygon.rl.data.character.Proficiencies;
 import com.zygon.rl.data.monster.Monster;
 import com.zygon.rl.game.GameConfiguration;
 import com.zygon.rl.game.GameState;
@@ -22,12 +23,14 @@ import com.zygon.rl.world.combat.CombatResolver;
 public class MeleeAttackAction extends DamageAction {
 
     private final CharacterSheet attacker;
+    private final Location attackerLocation;
 
     public MeleeAttackAction(GameConfiguration gameConfiguration,
-            CharacterSheet attacker, CharacterSheet defender,
-            Location defenderLocation) {
+            CharacterSheet attacker, Location attackerLocation,
+            CharacterSheet defender, Location defenderLocation) {
         super(gameConfiguration, defender, defenderLocation);
         this.attacker = Objects.requireNonNull(attacker, "Need attacker");
+        this.attackerLocation = Objects.requireNonNull(attackerLocation, "Need attacker location");
     }
 
     @Override
@@ -70,6 +73,13 @@ public class MeleeAttackAction extends DamageAction {
         DamageResolution combatDamage = combat.resolveCloseCombat(attacker, getDamaged());
 
         return combatDamage;
+    }
+
+    @Override
+    protected GameState resolveXpGain(GameState state, DamageResolution damage) {
+        state = super.resolveXpGain(state, damage);
+        GainXpAction gainXp = new GainXpAction(Proficiencies.Names.MELEE.getId(), attacker, attackerLocation);
+        return gainXp.execute(state);
     }
 
     private void updateToHostile(GameState state, CharacterSheet characterSheet,

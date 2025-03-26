@@ -117,7 +117,7 @@ public final class AISystem extends GameSystem {
                     if (characterLocation.getNeighbors().contains(world.getPlayerLocation())) {
                         CharacterSheet player = world.getPlayer();
                         return (c) -> new MeleeAttackAction(getGameConfiguration(),
-                                c, player, world.getPlayerLocation());
+                                c, characterLocation, player, world.getPlayerLocation());
                     } else {
                         // If within aggression range follow
                         if (characterLocation.getNeighbors(creatureTemplate.getAggression())
@@ -163,7 +163,7 @@ public final class AISystem extends GameSystem {
                     CharacterSheet defender = world.get(defenderLoc);
                     if (defender != null) {
                         return (c) -> new MeleeAttackAction(getGameConfiguration(),
-                                defender, neighborToDefendLoc, possibleHostile);
+                                defender, defenderLoc, neighborToDefendLoc, possibleHostile);
                     }
                 } else {
                     return follow(defenderLoc, possibleHostile, world, 1);
@@ -202,7 +202,7 @@ public final class AISystem extends GameSystem {
         if (hostileLocation.getNeighbors().contains(world.getPlayerLocation())) {
             CharacterSheet player = world.getPlayer();
             return (c) -> new MeleeAttackAction(getGameConfiguration(),
-                    c, player, world.getPlayerLocation());
+                    c, hostileLocation, player, world.getPlayerLocation());
         } else {
             return follow(hostileLocation, destination, world, 1);
         }

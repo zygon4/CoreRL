@@ -17,18 +17,21 @@ public class DamageResolution {
     private final boolean miss;
     private final boolean critial;
     private final Map<DamageType, Integer> damageByType = new LinkedHashMap<>();
+    private final boolean xpGained;
     private int totalDamage = 0;
 
     // TODO: damage to weapons/armor/items on person, or even damage
     // to the local area (acid spray, etc.), and status effects like knockdown.
     //
-    public DamageResolution(String defender, boolean miss, boolean critial) {
+    public DamageResolution(String defender, boolean miss, boolean critial,
+            boolean xpGained) {
         this.defender = defender;
         this.miss = miss;
         this.critial = critial;
         if (miss && critial) {
             throw new IllegalArgumentException();
         }
+        this.xpGained = xpGained;
     }
 
     // Will override, not add
@@ -55,6 +58,10 @@ public class DamageResolution {
 
     public boolean isMiss() {
         return miss;
+    }
+
+    public boolean isXpGained() {
+        return xpGained;
     }
 
     protected String getMissMessage() {

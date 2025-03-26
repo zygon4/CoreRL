@@ -3,28 +3,27 @@
  */
 package com.zygon.rl.game;
 
-import java.lang.System.Logger.Level;
 import java.util.Optional;
 
 import com.zygon.rl.data.Identifable;
-import com.zygon.rl.data.character.Proficiencies;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.action.Action;
-import com.zygon.rl.world.action.SetCharacterAction;
+import com.zygon.rl.world.action.GainXpAction;
 import com.zygon.rl.world.character.Ability;
 import com.zygon.rl.world.character.AbilityActionSet;
 import com.zygon.rl.world.character.CharacterSheet;
 
 /**
+ * Tool to run an ability and apply and progression to the character. This is
+ * player character only (for now). <br>
+ * Another option is to level proficiencies at a specific time (e.g. when
+ * sleeping).
  *
  * @author djc
  */
 public class AbilityResolver {
 
     private static final System.Logger logger = System.getLogger(AbilityResolver.class.getCanonicalName());
-
-    // TODO: dynamic xp
-    private final int xpGain = 5;
 
     private final Ability ability;
 
@@ -49,23 +48,12 @@ public class AbilityResolver {
         }
 
         if (!failed) {
-            CharacterSheet player = state.getWorld().getPlayer();
-
-            player = player.copy()
-                    .progress(player.getProgress().add(ability.getProficiencyId(), xpGain))
-                    .build();
-
-            SetCharacterAction setProgress = new SetCharacterAction(
-                    state.getWorld().getPlayerLocation(), player);
-
-            if (setProgress.canExecute(state)) {
-                state = setProgress.execute(state);
-                logger.log(Level.INFO, "{0} gained {1} xp in {2}",
-                        new Object[]{
-                            player.getName(),
-                            xpGain,
-                            Proficiencies.get(ability.getProficiencyId()).getName()}
-                );
+            String proficiencyId = ability.getProficiencyId();
+            if (proficiencyId != null) {
+                CharacterSheet player = state.getWorld().getPlayer();
+                GainXpAction gainXpAction = new GainXpAction(
+                        proficiencyId, player, state.getWorld().getPlayerLocation());
+                state = gainXpAction.execute(state);
             }
         }
 

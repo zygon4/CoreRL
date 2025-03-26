@@ -38,11 +38,14 @@ public interface Ability {
     String getDescription();
 
     /**
-     * Returns the proficiency associated with this ability.
+     * Returns the proficiency associated with this ability. <br> Could be a set
+     * of proficiencies?
      *
      * @return the proficiency associated with this ability.
      */
-    String getProficiencyId();
+    default String getProficiencyId() {
+        return null;
+    }
 
     /**
      * Returns the way in which this ability targets.

@@ -26,7 +26,7 @@ public class StatusResolver {
         // TODO: stat check
         int dmg = dice.rollD4() + intensity;
 
-        DamageResolution resolution = new DamageResolution(defender.getName(), false, false);
+        DamageResolution resolution = new DamageResolution(defender.getName(), false, false, false);
         if (dmg > 0) {
             resolution.set(damageType, dmg);
         }

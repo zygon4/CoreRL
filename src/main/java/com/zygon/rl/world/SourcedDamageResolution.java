@@ -14,7 +14,7 @@ public class SourcedDamageResolution extends DamageResolution {
     //
     public SourcedDamageResolution(String attacker, String defender,
             boolean miss, boolean critial) {
-        super(defender, miss, critial);
+        super(defender, miss, critial, !miss);
         this.attacker = attacker;
     }
 

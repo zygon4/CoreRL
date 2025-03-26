@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 import com.zygon.rl.data.Identifable;
-import com.zygon.rl.data.character.Proficiencies;
 import com.zygon.rl.game.GameConfiguration;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.world.Location;
@@ -35,11 +34,6 @@ public class InitiateDialog implements Ability {
     @Override
     public String getName() {
         return "INITIATE_DIALOG";
-    }
-
-    @Override
-    public String getProficiencyId() {
-        return Proficiencies.Names.CHARM.getId();
     }
 
     @Override

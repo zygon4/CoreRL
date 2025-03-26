@@ -87,9 +87,22 @@ public final class AbilityInputHandler extends BaseInputHandler {
 
     @Override
     public String getDisplayText(Input input) {
+
+        StringBuilder sb = new StringBuilder();
+
         Ability ability = abilitiesByKeyCode.get(input);
-        Proficiencies prof = Proficiencies.get(ability.getProficiencyId());
-        return ability.getName() + " - " + ability.getDescription() + " (" + prof.getName() + ")";
+        sb.append(ability.getName());
+        sb.append(" - ");
+        sb.append(ability.getDescription());
+
+        String proficiencyId = ability.getProficiencyId();
+        if (proficiencyId != null) {
+            sb.append("(")
+                    .append(Proficiencies.get(ability.getProficiencyId()).getName())
+                    .append(")");
+        }
+
+        return sb.toString();
     }
 
     public static Function<GameState, List<String>> getInputsFn() {

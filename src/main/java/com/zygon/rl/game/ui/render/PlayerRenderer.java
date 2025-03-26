@@ -4,8 +4,10 @@
 package com.zygon.rl.game.ui.render;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -60,7 +62,7 @@ public class PlayerRenderer implements GameComponentRenderer {
         int xOffset = 0;
         int yOffset = 1;
 
-        for (Renderable renderable : getStatsText(xOffset, yOffset, player.getModifiedStats())) {
+        for (Renderable renderable : getStatsText(xOffset, yOffset, player.getStats(), player.getModifiedStats())) {
             renderUtil.render(layer, Position.create(renderable.x(), renderable.y()),
                     renderable.content(), renderable.color());
         }
@@ -73,14 +75,14 @@ public class PlayerRenderer implements GameComponentRenderer {
         }
 
         xOffset = 0;
-        yOffset = 10;
+        yOffset = 15;
         for (Renderable renderable : getGeneralText(xOffset, yOffset, player)) {
             renderUtil.render(layer, Position.create(renderable.x(), renderable.y()),
                     renderable.content(), renderable.color());
         }
 
         xOffset = 40;
-        yOffset = 10;
+        yOffset = 15;
         for (Renderable renderable : getStatusText(xOffset, yOffset, player.getStatus())) {
             renderUtil.render(layer, Position.create(renderable.x(), renderable.y()),
                     renderable.content(), renderable.color());
@@ -88,19 +90,24 @@ public class PlayerRenderer implements GameComponentRenderer {
     }
 
     Collection<Renderable> getStatsText(final int baseX, final int baseY,
-            Stats stats) {
+            Stats stats, Stats modifiedStats) {
 
         Set<Renderable> renders = new HashSet<>();
 
         // Attributes are more generic, used for UI/UX
-        Set<Attribute> attributes = stats.getAttributes();
+        Set<Attribute> modifiedAttributes = modifiedStats.getAttributes();
+        Map<String, Attribute> baseStatsByAttrName = stats.getAttributes().stream()
+                .collect(Collectors.toMap(Attribute::getName, v -> v));
 
         int x = baseX;
         int y = baseY;
 
-        for (var attr : attributes) {
+        for (var attr : modifiedAttributes) {
             renders.add(new Renderable(x, y, attr.getName(), Color.GRAY));
             renders.add(new Renderable(x + 5, y, attr.getValue(), Color.BLUE));
+
+            Attribute base = baseStatsByAttrName.get(attr.getName());
+            renders.addAll(wrap(x + 10, y, base.getValue(), Color.RED, "|", Color.GRAY));
             y++;
         }
 
@@ -173,5 +180,20 @@ public class PlayerRenderer implements GameComponentRenderer {
         }
 
         return renders;
+    }
+
+    private List<Renderable> wrap(int x, int y, String value, Color valueColor,
+            String with, Color withColor) {
+        List<Renderable> wrapped = new ArrayList<>();
+
+        wrapped.add(new Renderable(x, y, with, withColor));
+
+        int withLength = with.length();
+        wrapped.add(new Renderable(x + withLength, y, value, valueColor));
+
+        int textLength = value.length();
+        wrapped.add(new Renderable(x + withLength + textLength, y, with, withColor));
+
+        return wrapped;
     }
 }
