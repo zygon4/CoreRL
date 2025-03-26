@@ -28,7 +28,7 @@ public class Audio {
             if (loop) {
                 clip.loop(Clip.LOOP_CONTINUOUSLY);
             }
-            setVolume(clip, 0.10f);
+            setVolume(clip, 0.05f);
             clip.start();
         }
     }
