@@ -8,9 +8,23 @@
         "color": "Wheat",
         "species": "HUMAN",
         "aggression": 5,
-        "hitPoints": 50,
+        "hitPoints": 20,
         "speed": 60,
         "flags": [],
         "weight": 150
+    },
+    {
+        "id": "npc_generic_soldier",
+        "type": "NPC",
+        "name": "?",
+        "description": "An equiped soldier",
+        "symbol": "P",
+        "color": "Gray",
+        "species": "HUMAN",
+        "aggression": 10,
+        "hitPoints": 30,
+        "speed": 80,
+        "flags": [],
+        "weight": 180
     }
 ]

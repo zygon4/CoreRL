@@ -13,16 +13,20 @@ import com.stewsters.util.name.FantasyNameGen;
 import com.zygon.rl.data.Creature;
 import com.zygon.rl.data.Effect;
 import com.zygon.rl.data.context.Data;
+import com.zygon.rl.data.items.ArmorData;
+import com.zygon.rl.data.items.Melee;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.util.dialog.Dialog;
 import com.zygon.rl.util.dialog.DialogChoice;
 import com.zygon.rl.world.CommonAttributes;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
+import com.zygon.rl.world.character.Armor;
 import com.zygon.rl.world.character.CharacterSheet;
 import com.zygon.rl.world.character.Stats;
 import com.zygon.rl.world.character.Status;
 import com.zygon.rl.world.character.StatusEffect;
+import com.zygon.rl.world.character.Weapon;
 
 /**
  * Summons a 1+ group of same-type monsters/NPCS around the location specified.
@@ -107,9 +111,11 @@ public class SummonAction extends Action {
 
         final String name;
         final Dialog dialog;
+        Weapon weapon = null;
 
         if (creature.getSpecies().equals(CommonAttributes.HUMAN.name())) {
             name = FantasyNameGen.generate();
+            weapon = generate(creature);
 
             Dialog start = Dialog.create("Greetings traveller. You look mighty pale today..");
             // I want them to hostile but don't have enough context here..
@@ -125,13 +131,47 @@ public class SummonAction extends Action {
             dialog = Dialog.create("...");
         }
 
-        CharacterSheet rando = CharacterSheet.create(creature, name,
+        CharacterSheet character = createBase(
+                creature,
                 generate(creature, random),
-                new Status(age, creature.getHitPoints(), statusEffects))
+                new Status(age, creature.getHitPoints(), statusEffects),
+                weapon,
+                name);
+
+        // TODO: proc gen dialog);
+        return character.set(dialog);
+    }
+
+    // This leaves a lot to be desired, need to drive armor/eq from JSON data..
+    CharacterSheet createBase(Creature species, Stats stats, Status status,
+            Weapon weapon, String name) {
+
+        CharacterSheet pc = CharacterSheet
+                .create(species, name, stats, status)
                 .build();
 
-        //TODO: proc gen dialog);
-        return rando.set(dialog);
+        if (species.getSpecies().equals("HUMAN")) {
+            ArmorData dataTunic = ArmorData.get("torso_tunic_plain");
+            ArmorData dataBoots = ArmorData.get("boots_leather");
+            ArmorData dataPants = ArmorData.get("legs_cotton_pants");
+            ArmorData dataArms = ArmorData.get("arms_leather_bracers");
+
+            Armor arms = new Armor(dataArms);
+            Armor tunic = new Armor(dataTunic);
+            Armor pants = new Armor(dataPants);
+            Armor boots = new Armor(dataBoots);
+
+            pc = pc.add(boots).equip(boots);
+            pc = pc.add(pants).equip(pants);
+            pc = pc.add(tunic).equip(tunic);
+            pc = pc.add(arms).equip(arms);
+
+            if (weapon != null) {
+                pc = pc.add(weapon).wield(weapon);
+            }
+        }
+
+        return pc;
     }
 
     static Stats generate(Creature creature, Random random) {
@@ -149,5 +189,17 @@ public class SummonAction extends Action {
                 .incInt(getStatFn.get())
                 .incStr(getStatFn.get() + weightMod)
                 .incWis(getStatFn.get());
+    }
+
+    static Weapon generate(Creature creature) {
+
+        switch (creature.getId()) {
+            case "npc_generic_soldier":
+                return new Weapon(Melee.get("sword"), 18, 4, 0);
+            case "npc_generic_farmer":
+                return new Weapon(Melee.get("scythe"), 18, 4, 0);
+            default:
+                return new Weapon(Melee.get("dagger"), 20, 2, 0);
+        }
     }
 }

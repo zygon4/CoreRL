@@ -1,14 +1,15 @@
 package com.zygon.rl.world.character;
 
-import com.zygon.rl.data.items.ArmorData;
-
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import com.zygon.rl.data.items.ArmorData;
 
 /**
  *
@@ -17,18 +18,24 @@ import java.util.stream.Collectors;
 public class Equipment {
 
     private final Map<Slot, Integer> slotCounts;
-    private final Map<Slot, List<Armor>> slots;
+    private final Map<Slot, Collection<Armor>> slots;
+    private final Map<Armor, Collection<Slot>> armor;
+
     // max count is the count of Slot.HAND
     private final List<Weapon> weapons;
 
-    private Equipment(Map<Slot, Integer> slotCounts, Map<Slot, List<Armor>> slots, List<Weapon> weapons) {
+    private Equipment(Map<Slot, Integer> slotCounts,
+            Map<Slot, Collection<Armor>> slots,
+            Map<Armor, Collection<Slot>> armor,
+            List<Weapon> weapons) {
         this.slotCounts = Collections.unmodifiableMap(slotCounts);
         this.slots = Collections.unmodifiableMap(slots);
+        this.armor = Collections.unmodifiableMap(armor);
         this.weapons = Collections.unmodifiableList(weapons);
     }
 
     public static Equipment create(Map<Slot, Integer> slotCounts) {
-        return new Equipment(slotCounts, Map.of(), List.of());
+        return new Equipment(slotCounts, Map.of(), Map.of(), List.of());
     }
 
     public boolean canWear(Armor armor) {
@@ -42,7 +49,7 @@ public class Equipment {
             int requiredCount = slotCount.getValue().intValue();
 
             // this is what is equipped
-            List<Armor> equipped = slots.get(slot);
+            Collection<Armor> equipped = slots.get(slot);
             int equippedCount = equipped != null ? equipped.size() : 0;
 
             // this is the max
@@ -58,56 +65,87 @@ public class Equipment {
         return canWear;
     }
 
-    public Map<Slot, List<Armor>> getEquipmentBySlot() {
+    public Map<Slot, Collection<Armor>> getEquipmentBySlot() {
         return slots;
+    }
+
+    public Collection<Armor> listEquipped() {
+        return this.armor.keySet();
     }
 
     public List<Weapon> getWeapons() {
         return weapons;
     }
 
+    public Equipment remove(Armor armor) {
+        Map<Slot, Long> requiredSlotCounts = getRequiredSlotCounts(armor);
+        Map<Slot, Collection<Armor>> newSlots = new HashMap<>();
+
+        for (Slot slot : requiredSlotCounts.keySet()) {
+            Long count = requiredSlotCounts.get(slot);
+
+            Collection<Armor> wornArmor = slots.get(slot);
+            List<Armor> newWornArmor = new ArrayList<>();
+
+            int removeCount = 0;
+            for (Armor worn : wornArmor) {
+                if (worn.getId().equals(armor.getId())
+                        && removeCount < count.longValue()) {
+                    removeCount++;
+                } else {
+                    newWornArmor.add(worn);
+                }
+            }
+
+            if (!newWornArmor.isEmpty()) {
+                newSlots.put(slot, newWornArmor);
+            }
+        }
+
+        Map<Armor, Collection<Slot>> newArmor = new HashMap<>();
+        for (Armor worn : this.armor.keySet()) {
+            if (!worn.getId().equals(armor.getId())) {
+                newArmor.put(worn, this.armor.get(worn));
+            }
+        }
+
+        return new Equipment(slotCounts, newSlots, newArmor, weapons);
+    }
+
     public Equipment wear(Armor armor) {
 
         Map<Slot, Long> requiredSlotCounts = getRequiredSlotCounts(armor);
 
-        Equipment newEq = this;
         if (canWear(armor)) {
+            Map<Slot, Collection<Armor>> newSlots = new HashMap<>(slots);
+
             for (var slot : requiredSlotCounts.entrySet()) {
-                Map<Slot, List<Armor>> newSlots = new HashMap<>(slots);
-                List<Armor> equipped = newSlots.get(slot.getKey());
-                List<Armor> newList = equipped == null
-                        ? new ArrayList<>() : new ArrayList<>(equipped);
+                Collection<Armor> equipped = newSlots.computeIfAbsent(
+                        slot.getKey(), s -> new ArrayList<>());
+                Collection<Armor> newList = new ArrayList<>(equipped);
 
                 for (int i = 0; i < slot.getValue(); i++) {
                     newList.add(armor);
                 }
 
                 newSlots.put(slot.getKey(), newList);
-
-                return new Equipment(slotCounts, newSlots, weapons);
             }
 
-            return newEq;
+            Map<Armor, Collection<Slot>> newArmor = new HashMap<>(this.armor);
+            Collection<Slot> equipped = newArmor.computeIfAbsent(armor, s -> new ArrayList<>());
+            Collection<Slot> newList = new ArrayList<>(equipped);
+            newArmor.put(armor, newList);
+
+            for (var reqSlot : requiredSlotCounts.entrySet()) {
+                Long count = requiredSlotCounts.get(reqSlot.getKey());
+                for (int i = 0; i < count; i++) {
+                    newList.add(reqSlot.getKey());
+                }
+            }
+
+            return new Equipment(slotCounts, newSlots, newArmor, weapons);
         }
 
-        // Has to be all or nothing, so do some pre-checking first
-//        List<Armor> equipped = slots.get(location);
-//        Integer maxCount = slotCounts.get(location);
-//
-//        if (equipped == null) {
-//            equipped = new ArrayList<>();
-//        }
-//
-//        if (equipped.size() + coveredSlots.size() < = maxCount) {
-//
-//            Map<Slot, List<Armor>> newSlots = new HashMap<>(slots);
-//
-//            List<Armor> newList = new ArrayList<>(equipped);
-//            newList.add(armor);
-//
-//            newSlots.put(location, newList);
-//            return new Equipment(slotCounts, newSlots, weapons);
-//        }
         // throw?
         return null;
     }
@@ -119,7 +157,7 @@ public class Equipment {
         if (weapons.size() < maxCount) {
             List<Weapon> newWeapons = new ArrayList<>(weapons);
             newWeapons.add(weapon);
-            return new Equipment(slotCounts, slots, newWeapons);
+            return new Equipment(slotCounts, slots, armor, newWeapons);
         }
 
         return null;
