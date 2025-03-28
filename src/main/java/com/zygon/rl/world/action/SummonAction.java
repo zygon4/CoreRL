@@ -134,7 +134,7 @@ public class SummonAction extends Action {
         CharacterSheet character = createBase(
                 creature,
                 generate(creature, random),
-                new Status(age, creature.getHitPoints(), statusEffects),
+                new Status(age, Status.health(creature.getHitPoints()), statusEffects),
                 weapon,
                 name);
 

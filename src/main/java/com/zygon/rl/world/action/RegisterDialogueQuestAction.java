@@ -37,7 +37,7 @@ public class RegisterDialogueQuestAction extends Action {
 
         CharacterSheet sheet = state.getWorld().getPlayer().add(quest);
         Action setCharacterAction
-                = new SetCharacterAction(state.getWorld().getPlayerLocation(), sheet);
+                = new SetCharacterAction(sheet, state.getWorld().getPlayerLocation());
         GameState newState = setCharacterAction.execute(state);
 
         newState.getQuestState().register(QuestType.DIALOGUE, dialogue);

@@ -11,12 +11,12 @@ import com.zygon.rl.world.character.CharacterSheet;
  */
 public class SetCharacterAction extends Action {
 
+    private final CharacterSheet character;
     private final Location location;
-    private final CharacterSheet sheet;
 
-    public SetCharacterAction(Location location, CharacterSheet sheet) {
+    public SetCharacterAction(CharacterSheet character, Location location) {
+        this.character = character;
         this.location = location;
-        this.sheet = sheet;
     }
 
     @Override
@@ -24,11 +24,19 @@ public class SetCharacterAction extends Action {
         return true;
     }
 
+    public Location getLocation() {
+        return location;
+    }
+
+    public CharacterSheet getCharacter() {
+        return character;
+    }
+
     @Override
     public GameState execute(GameState state) {
 
         // TBD: check if the character has an item from a quest?
-        state.getWorld().add(sheet, location);
+        state.getWorld().add(character, location);
 
         return state;
     }

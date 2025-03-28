@@ -56,8 +56,7 @@ public class StatusEffectSystem extends GameSystem {
                 int inceptionTurn = effect.getTurn();
                 if ((currentTurn - inceptionTurn) > 20) {
                     final String confusionId = Effect.EffectNames.CONFUSION.getId();
-                    return new SetCharacterAction(location,
-                            sheet.set(sheet.getStatus().removeEffect(confusionId)));
+                    return new SetCharacterAction(sheet.set(sheet.getStatus().removeEffect(confusionId)), location);
                 }
                 return null;
             }
@@ -67,8 +66,7 @@ public class StatusEffectSystem extends GameSystem {
                 int inceptionTurn = effect.getTurn();
                 if ((currentTurn - inceptionTurn) > 10) {
                     final String enhancedSpeedId = Effect.EffectNames.ENHANCED_SPEED.getId();
-                    return new SetCharacterAction(location,
-                            sheet.set(sheet.getStatus().removeEffect(enhancedSpeedId)));
+                    return new SetCharacterAction(sheet.set(sheet.getStatus().removeEffect(enhancedSpeedId)), location);
                 }
                 return null;
             }
@@ -108,18 +106,17 @@ public class StatusEffectSystem extends GameSystem {
                         if (!character.getStatus().getEffects().containsKey(sunFeverMinorId)) {
 
                             // TODO: common utility in this class to set effects..
-                            SetCharacterAction setSunFever = new SetCharacterAction(location,
-                                    character.set(character.getStatus()
-                                            .addEffect(new StatusEffect(
-                                                    Effect.get(sunFeverMinorId),
-                                                    state.getTurnCount()))));
+                            SetCharacterAction setSunFever = new SetCharacterAction(character.set(character.getStatus()
+                                    .addEffect(new StatusEffect(
+                                            Effect.get(sunFeverMinorId),
+                                            state.getTurnCount()))), location);
                             actions.add(setSunFever);
                         }
                     } else {
                         if (character.getStatus().getEffects()
                                 .containsKey(sunFeverMinorId)) {
-                            SetCharacterAction removeSunFever = new SetCharacterAction(location,
-                                    character.set(character.getStatus().removeEffect(sunFeverMinorId)));
+                            SetCharacterAction removeSunFever
+                                    = new SetCharacterAction(character.set(character.getStatus().removeEffect(sunFeverMinorId)), location);
                             actions.add(removeSunFever);
                         }
                     }

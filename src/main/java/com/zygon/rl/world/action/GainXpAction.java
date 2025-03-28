@@ -44,7 +44,7 @@ public class GainXpAction extends Action {
                 .build();
 
         SetCharacterAction setProgress = new SetCharacterAction(
-                location, player);
+                player, location);
 
         if (setProgress.canExecute(state)) {
             state = setProgress.execute(state);

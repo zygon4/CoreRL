@@ -1,5 +1,6 @@
 package com.zygon.rl.util;
 
+import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.Strictness;
@@ -17,4 +18,9 @@ public class StringUtil {
             .setPrettyPrinting()
             .setStrictness(Strictness.LENIENT)
             .create();
+
+    public static String padEnd(String str, int maxLength) {
+        //int padding = maxLength - str.length();
+        return Strings.padEnd(str, maxLength, ' ');
+    }
 }

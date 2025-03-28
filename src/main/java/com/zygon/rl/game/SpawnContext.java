@@ -61,13 +61,10 @@ public class SpawnContext {
         creatureIds = Collections.unmodifiableMap(spawnsByRegion);
     }
 
-    // auto-format of records is jank
     public static record SpawnActionContext(GameState state, Location location,
             Random random) {
 
     }
-
-    ;
 
     public static enum SpawnContextType {
         Building(20,

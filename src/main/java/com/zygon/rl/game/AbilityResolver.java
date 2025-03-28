@@ -9,9 +9,11 @@ import com.zygon.rl.data.Identifable;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.action.Action;
 import com.zygon.rl.world.action.GainXpAction;
+import com.zygon.rl.world.action.SetPoolAction;
 import com.zygon.rl.world.character.Ability;
 import com.zygon.rl.world.character.AbilityActionSet;
 import com.zygon.rl.world.character.CharacterSheet;
+import com.zygon.rl.world.character.Pool;
 
 /**
  * Tool to run an ability and apply and progression to the character. This is
@@ -34,6 +36,26 @@ public class AbilityResolver {
     public GameState resolve(GameState state, Optional<Identifable> targetEntity,
             Optional<Location> targetLocation) {
 
+        Optional<Ability.Cost> cost = this.ability.getCost();
+        if (cost.isPresent()) {
+            String poolName = cost.get().pool();
+            int poolAmmountChange = cost.get().ammount();
+            CharacterSheet player = state.getWorld().getPlayer();
+            Pool pool = player.getStatus().getPool(poolName);
+            int setPoolValue = pool.getPoints() - poolAmmountChange;
+
+            SetPoolAction updatePoolAction = new SetPoolAction(
+                    player,
+                    state.getWorld().getPlayerLocation(),
+                    poolName,
+                    setPoolValue);
+            if (!updatePoolAction.canExecute(state)) {
+                // Need additional Pylons
+                return state;
+            }
+            state = updatePoolAction.execute(state);
+        }
+
         AbilityActionSet abilityActions = this.ability.use(state, targetEntity, targetLocation);
 
         boolean failed = false;
@@ -48,11 +70,11 @@ public class AbilityResolver {
         }
 
         if (!failed) {
-            String proficiencyId = ability.getProficiencyId();
-            if (proficiencyId != null) {
+            Optional<String> proficiencyId = ability.getProficiencyId();
+            if (proficiencyId.isPresent()) {
                 CharacterSheet player = state.getWorld().getPlayer();
-                GainXpAction gainXpAction = new GainXpAction(
-                        proficiencyId, player, state.getWorld().getPlayerLocation());
+                GainXpAction gainXpAction = new GainXpAction(proficiencyId.get(),
+                        player, state.getWorld().getPlayerLocation());
                 state = gainXpAction.execute(state);
             }
         }

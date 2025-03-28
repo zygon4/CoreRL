@@ -16,11 +16,30 @@ import com.zygon.rl.world.Location;
  */
 public interface Ability {
 
+    /**
+     * The optional cost to initiate this ability.
+     */
+    public static record Cost(String pool, int ammount) {
+
+        public static Cost create(String pool, int ammount) {
+            return new Cost(pool, ammount);
+        }
+    }
+
     public enum Target {
         ADJACENT,
         ADJACENT_LIVING,
         NONE,
         RANGED // range vs ranged
+    }
+
+    /**
+     * Returns the {@link Cost} to initiate this ability.
+     *
+     * @return the {@link Cost} to initiate this ability.
+     */
+    default Optional<Cost> getCost() {
+        return Optional.empty();
     }
 
     /**
@@ -43,8 +62,8 @@ public interface Ability {
      *
      * @return the proficiency associated with this ability.
      */
-    default String getProficiencyId() {
-        return null;
+    default Optional<String> getProficiencyId() {
+        return Optional.empty();
     }
 
     /**

@@ -40,7 +40,7 @@ public class CombatResolveTest {
         CharacterSheet attacker = CharacterSheet.create(new Creature(eleATemplate, Species.MAMMAL.name(), 100, 120, 100),
                 "attacker",
                 new Stats(10, 10, 10, 10, 10, 10),
-                new Status(20, 10, Set.of()))
+                new Status(20, Status.health(10), Set.of()))
                 .build();
 
         attacker = attacker.add(weapon).wield(weapon);
@@ -49,7 +49,7 @@ public class CombatResolveTest {
         CharacterSheet defender = CharacterSheet.create(new Creature(eleDTemplate, Species.MAMMAL.name(), 100, 120, 100),
                 "defender",
                 new Stats(10, 10, 10, 10, 10, 10),
-                new Status(20, 10, Set.of()))
+                new Status(20, Status.health(10), Set.of()))
                 .build();
 
         defender = defender.add(weapon).wield(weapon);

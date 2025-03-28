@@ -43,6 +43,14 @@ public class Attribute {
     }
 
     @Override
+    public String toString() {
+        return String.join(",",
+                getName() != null ? getName() : "",
+                getDescription() != null ? getDescription() : "",
+                getValue() != null ? getValue() : "");
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;

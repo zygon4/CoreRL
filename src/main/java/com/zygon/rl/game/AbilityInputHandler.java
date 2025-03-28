@@ -95,12 +95,11 @@ public final class AbilityInputHandler extends BaseInputHandler {
         sb.append(" - ");
         sb.append(ability.getDescription());
 
-        String proficiencyId = ability.getProficiencyId();
-        if (proficiencyId != null) {
+        ability.getProficiencyId().ifPresent(proficiencyId -> {
             sb.append("(")
-                    .append(Proficiencies.get(ability.getProficiencyId()).getName())
+                    .append(Proficiencies.get(proficiencyId).getName())
                     .append(")");
-        }
+        });
 
         return sb.toString();
     }

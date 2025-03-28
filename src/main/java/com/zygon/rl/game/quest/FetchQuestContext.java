@@ -68,14 +68,14 @@ public class FetchQuestContext implements QuestInfo.QuestContext<GameState> {
                 player = player.remove(item);
 
                 SetCharacterAction removeItem = new SetCharacterAction(
-                        state.getWorld().getPlayerLocation(), player);
+                        player, state.getWorld().getPlayerLocation());
                 if (removeItem.canExecute(state)) {
                     state = removeItem.execute(state);
                 }
 
                 CharacterSheet target = state.getWorld().get(targetLocation); // Do the exchange
                 SetCharacterAction addItem = new SetCharacterAction(
-                        targetLocation, target);
+                        target, targetLocation);
                 if (addItem.canExecute(state)) {
                     state = addItem.execute(state);
                 }

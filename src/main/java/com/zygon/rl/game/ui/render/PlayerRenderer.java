@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.zygon.rl.game.GameState;
+import com.zygon.rl.util.StringUtil;
 import com.zygon.rl.world.Attribute;
 import com.zygon.rl.world.character.CharacterSheet;
 import com.zygon.rl.world.character.Proficiency;
@@ -49,8 +50,6 @@ public class PlayerRenderer implements GameComponentRenderer {
     private static record Renderable(int x, int y, String content, Color color) {
 
     }
-
-    ;
 
     @Override
     public void render(GameState gameState) {
@@ -128,6 +127,9 @@ public class PlayerRenderer implements GameComponentRenderer {
         int x = baseX;
         int y = baseY;
 
+        renders.add(new Renderable(x, y++, "Proficiencies", Color.GRAY));
+        y++;
+
         for (String key : attributes.keySet()) {
             Attribute attr = attributes.get(key);
             renders.add(new Renderable(x, y, attr.getName(), Color.GRAY));
@@ -157,7 +159,13 @@ public class PlayerRenderer implements GameComponentRenderer {
         renders.add(new Renderable(x, y++, "Weight:  " + player.getWeight(), Color.GRAY));
         renders.add(new Renderable(x, y++, "Age:     " + player.getStatus().getAge(), Color.GRAY));
         y++;// space
-        renders.add(new Renderable(x, y++, "HP:      " + player.getStatus().getHitPoints(), Color.GRAY));
+
+        Status status = player.getStatus();
+        for (String poolName : status.getPoolNames()) {
+            Attribute poolAttr = status.getPool(poolName).getAttribute();
+            String paddedName = StringUtil.padEnd(poolAttr.getName() + ":", 9);
+            renders.add(new Renderable(x, y++, paddedName + poolAttr.getValue(), Color.GRAY));
+        }
 
         return renders;
     }

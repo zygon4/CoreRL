@@ -81,7 +81,7 @@ public final class ProgressSystem extends GameSystem {
                     .build();
 
             SetCharacterAction setProf = new SetCharacterAction(
-                    state.getWorld().getPlayerLocation(), player);
+                    player, state.getWorld().getPlayerLocation());
 
             if (setProf.canExecute(state)) {
                 state = setProf.execute(state);

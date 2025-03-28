@@ -57,7 +57,7 @@ public class RegisterFetchQuestAction extends Action {
 
         CharacterSheet sheet = state.getWorld().getPlayer().add(fetchQuest);
         Action setCharacterAction
-                = new SetCharacterAction(state.getWorld().getPlayerLocation(), sheet);
+                = new SetCharacterAction(sheet, state.getWorld().getPlayerLocation());
 
         // TODO: notifications
         GameState newState = setCharacterAction.execute(state);

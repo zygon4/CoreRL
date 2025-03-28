@@ -212,7 +212,7 @@ public class BloodRLMain {
                 .create(species,
                         "Alucard",
                         new Stats(16, 16, 14, 12, 12, 16),
-                        new Status(19, 20, Set.of()))
+                        new Status(19, Status.health(20), Set.of()))
                 .build();
 
         ArmorData dataTunic = ArmorData.get("torso_tunic_black");
