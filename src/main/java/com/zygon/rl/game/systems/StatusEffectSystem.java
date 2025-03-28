@@ -92,17 +92,19 @@ public class StatusEffectSystem extends GameSystem {
                         if (!character.getStatus().getEffects().containsKey(sunFeverMinorId)) {
 
                             // TODO: common utility in this class to set effects..
-                            SetCharacterAction setSunFever = new SetCharacterAction(character.set(character.getStatus()
-                                    .addEffect(new StatusEffect(
-                                            Effect.get(sunFeverMinorId),
-                                            state.getTurnCount()))), location);
+                            SetCharacterAction setSunFever = new SetCharacterAction(
+                                    character.set(character.getStatus()
+                                            .addEffect(new StatusEffect(
+                                                    Effect.get(sunFeverMinorId),
+                                                    state.getTurnCount()))), location);
                             actions.add(setSunFever);
                         }
                     } else {
-                        if (character.getStatus().getEffects()
-                                .containsKey(sunFeverMinorId)) {
+                        if (character.getStatus().getEffects().containsKey(sunFeverMinorId)) {
                             SetCharacterAction removeSunFever
-                                    = new SetCharacterAction(character.set(character.getStatus().removeEffect(sunFeverMinorId)), location);
+                                    = new SetCharacterAction(
+                                            character.set(character.getStatus()
+                                                    .removeEffect(sunFeverMinorId)), location);
                             actions.add(removeSunFever);
                         }
                     }

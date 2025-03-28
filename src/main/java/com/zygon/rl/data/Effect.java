@@ -21,7 +21,7 @@ import com.zygon.rl.util.StringUtil;
  *
  * @author zygon
  */
-public final class Effect extends WorldElement {
+public final class Effect extends Element {
 
     private static final Logger logger = System.getLogger(Effect.class.getCanonicalName());
 

@@ -27,7 +27,7 @@
         "type": "EFFECT",
         "name": "Bleeding",
         "description": "You're bleeding profously, you may die",
-        "maxDuration": 20,
+        "maxDuration": 40,
         "statMods": [ { "name":"STR", "amount":-4 }, { "name":"DEX", "amount":-4 }, { "name":"CON", "amount":-4 }, { "name":"INT", "amount":-4 }, { "name":"WIS", "amount":-4 }, { "name":"CHA", "amount":-4 } ]
     },
     {
