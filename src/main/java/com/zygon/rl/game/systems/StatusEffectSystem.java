@@ -36,14 +36,18 @@ import com.zygon.rl.world.character.StatusEffect;
  */
 public class StatusEffectSystem extends GameSystem {
 
-    public StatusEffectSystem(GameConfiguration gameConfiguration) {
-        super(gameConfiguration);
-    }
+    // TODO: in JSON
+    private static final int MINOR_EFFECT_FREQ = 2;
+    private static final int MAJOR_EFFECT_FREQ = 4;
 
     private static final Set<String> STATUS_FLAGS = Set.of(
             CommonAttributes.WEAK_TO_SUN.name(),
             CommonAttributes.ENHANCED_SPEED.name()
     );
+
+    public StatusEffectSystem(GameConfiguration gameConfiguration) {
+        super(gameConfiguration);
+    }
 
     @Override
     public GameState apply(GameState state) {
@@ -133,14 +137,15 @@ public class StatusEffectSystem extends GameSystem {
             case BLEEDING_MAJOR -> {
                 // Doing this "every X turns" should be a utility..
                 int inceptionTurn = effect.getTurn();
-                if ((inceptionTurn - currentTurn) % 10 == 0) {
+                if ((inceptionTurn - currentTurn) % MAJOR_EFFECT_FREQ == 0) {
                     return new StatusDamageAction(getGameConfiguration(), effect, sheet, location);
                 }
                 return translateTurnBased(currentTurn, sheet, location, effect);
             }
             case HEALING_MINOR -> {
                 int inceptionTurn = effect.getTurn();
-                if ((inceptionTurn - currentTurn) % 2 == 0) {
+                // TODO: the frequency should be in JSON
+                if ((inceptionTurn - currentTurn) % MINOR_EFFECT_FREQ == 0) {
                     return new SetCharacterAction(sheet.gainHitPoints(1), location);
                 }
                 return translateTurnBased(currentTurn, sheet, location, effect);
