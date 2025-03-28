@@ -11,7 +11,7 @@
         "type": "EFFECT",
         "name": "Confusion",
         "description": "You are confused.",
-        "maxDuration": 8,
+        "maxDuration": 12,
         "statMods": [ { "name":"INT", "amount":-4 }, { "name":"WIS", "amount":-4 }, { "name":"CHA", "amount":-2 } ]
     },
     {
@@ -27,7 +27,7 @@
         "type": "EFFECT",
         "name": "Bleeding",
         "description": "You're bleeding profously, you may die",
-        "maxDuration": 100,
+        "maxDuration": 20,
         "statMods": [ { "name":"STR", "amount":-4 }, { "name":"DEX", "amount":-4 }, { "name":"CON", "amount":-4 }, { "name":"INT", "amount":-4 }, { "name":"WIS", "amount":-4 }, { "name":"CHA", "amount":-4 } ]
     },
     {

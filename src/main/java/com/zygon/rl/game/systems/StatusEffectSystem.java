@@ -9,6 +9,11 @@ import java.util.stream.Collectors;
 
 import com.zygon.rl.data.Effect;
 import com.zygon.rl.data.Effect.EffectNames;
+import static com.zygon.rl.data.Effect.EffectNames.BLEEDING_MAJOR;
+import static com.zygon.rl.data.Effect.EffectNames.CONFUSION;
+import static com.zygon.rl.data.Effect.EffectNames.ENHANCED_SPEED;
+import static com.zygon.rl.data.Effect.EffectNames.HEALING_MINOR;
+import static com.zygon.rl.data.Effect.EffectNames.TERRIFIED;
 import com.zygon.rl.game.GameConfiguration;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.game.GameSystem;
@@ -35,52 +40,33 @@ public class StatusEffectSystem extends GameSystem {
         super(gameConfiguration);
     }
 
-    // TODO: remove status effects that have a max duration..
-    //
-    private Action translate(GameState state, CharacterSheet sheet,
-            Location location, StatusEffect effect) {
-        switch (EffectNames.getInstance(effect.getEffect().getId())) {
-            case BLEEDING_MAJOR -> {
-                // Doing this "every X turns" should be a utility..
-                int currentTurn = state.getTurnCount();
-                int inceptionTurn = effect.getTurn();
-                if ((inceptionTurn - currentTurn) % 10 == 0) {
-                    return new StatusDamageAction(getGameConfiguration(), effect, sheet, location);
-                }
-                return null;
-            }
-            case CONFUSION -> {
-                // Doing this "every X turns" should be a utility..
-                // TODO: based on character stats/abilities to shake off..
-                int currentTurn = state.getTurnCount();
-                int inceptionTurn = effect.getTurn();
-                if ((currentTurn - inceptionTurn) > 20) {
-                    final String confusionId = Effect.EffectNames.CONFUSION.getId();
-                    return new SetCharacterAction(sheet.set(sheet.getStatus().removeEffect(confusionId)), location);
-                }
-                return null;
-            }
-            case ENHANCED_SPEED -> {
-                // Doing this "every X turns" should be a utility..
-                int currentTurn = state.getTurnCount();
-                int inceptionTurn = effect.getTurn();
-                if ((currentTurn - inceptionTurn) > 10) {
-                    final String enhancedSpeedId = Effect.EffectNames.ENHANCED_SPEED.getId();
-                    return new SetCharacterAction(sheet.set(sheet.getStatus().removeEffect(enhancedSpeedId)), location);
-                }
-                return null;
-            }
-            default -> {
-                return null;
-            }
-        }
-        // sun damage if weakened?
-    }
-
     private static final Set<String> STATUS_FLAGS = Set.of(
             CommonAttributes.WEAK_TO_SUN.name(),
             CommonAttributes.ENHANCED_SPEED.name()
     );
+
+    @Override
+    public GameState apply(GameState state) {
+        Map<Location, CharacterSheet> closeCharacters = state.getWorld().getAll(
+                state.getWorld().getPlayerLocation(), null, REALITY_BUBBLE);
+
+        Collection<Action> actions = new ArrayList<>();
+
+        for (var npc : closeCharacters.entrySet()) {
+            actions.addAll(auditStatusEffects(state, npc.getValue(), npc.getKey()));
+            actions.addAll(getStatusEffectActions(state, npc.getValue(), npc.getKey()));
+        }
+
+        CharacterSheet player = state.getWorld().getPlayer();
+        actions.addAll(auditStatusEffects(state, player, state.getWorld().getPlayerLocation()));
+        actions.addAll(getStatusEffectActions(state, player, state.getWorld().getPlayerLocation()));
+
+        for (Action action : actions) {
+            state = action.execute(state);
+        }
+
+        return state;
+    }
 
     private Collection<Action> auditStatusEffects(GameState state,
             CharacterSheet character, Location location) {
@@ -132,31 +118,51 @@ public class StatusEffectSystem extends GameSystem {
         Map<String, StatusEffect> currentStatusEffects = sheet.getStatus().getEffects();
 
         return currentStatusEffects.values().stream()
-                .map(se -> translate(state, sheet, location, se))
+                .map(se -> translateToAction(state, sheet, location, se))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public GameState apply(GameState state) {
-        Map<Location, CharacterSheet> closeCharacters = state.getWorld().getAll(
-                state.getWorld().getPlayerLocation(), null, REALITY_BUBBLE);
+    // Remove status effects that have a max duration.
+    private Action translateToAction(GameState state, CharacterSheet sheet,
+            Location location, StatusEffect effect) {
+        final int currentTurn = state.getTurnCount();
+        switch (EffectNames.getInstance(effect.getEffect().getId())) {
+            case BLEEDING_MAJOR -> {
+                // Doing this "every X turns" should be a utility..
+                int inceptionTurn = effect.getTurn();
+                if ((inceptionTurn - currentTurn) % 10 == 0) {
+                    return new StatusDamageAction(getGameConfiguration(), effect, sheet, location);
+                }
+                return translateTurnBased(currentTurn, sheet, location, effect);
+            }
+            case HEALING_MINOR -> {
+                int inceptionTurn = effect.getTurn();
+                if ((inceptionTurn - currentTurn) % 2 == 0) {
+                    return new SetCharacterAction(sheet.gainHitPoints(1), location);
+                }
+                return translateTurnBased(currentTurn, sheet, location, effect);
+            }
+            case CONFUSION, TERRIFIED, ENHANCED_SPEED -> {
+                return translateTurnBased(currentTurn, sheet, location, effect);
+            }
+            default -> {
+                return null;
+            }
+        }
+    }
 
-        Collection<Action> actions = new ArrayList<>();
+    private Action translateTurnBased(int currentTurn, CharacterSheet player,
+            Location location, StatusEffect statusEffect) {
+        int inceptionTurn = statusEffect.getTurn();
+        final String id = statusEffect.getEffect().getId();
+        Effect effectData = Effect.get(id);
 
-        for (var npc : closeCharacters.entrySet()) {
-            actions.addAll(auditStatusEffects(state, npc.getValue(), npc.getKey()));
-            actions.addAll(getStatusEffectActions(state, npc.getValue(), npc.getKey()));
+        if ((currentTurn - inceptionTurn) > effectData.getMaxDuration()) {
+            return new SetCharacterAction(player.set(player.getStatus()
+                    .removeEffect(id)), location);
         }
 
-        CharacterSheet player = state.getWorld().getPlayer();
-        actions.addAll(auditStatusEffects(state, player, state.getWorld().getPlayerLocation()));
-        actions.addAll(getStatusEffectActions(state, player, state.getWorld().getPlayerLocation()));
-
-        for (Action action : actions) {
-            state = action.execute(state);
-        }
-
-        return state;
+        return null;
     }
 }
