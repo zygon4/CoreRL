@@ -58,7 +58,8 @@ public final class Effect extends WorldElement {
         HOSTILE(Effect.get("effect_hostile")),
         PET(Effect.get("effect_pet")),
         TERRIFIED(Effect.get("effect_terror")),
-        SUN_FEVER_MINOR(Effect.get("effect_sun_fever_minor"));
+        SUN_FEVER_MINOR(Effect.get("effect_sun_fever_minor")),
+        HEALING_MINOR(Effect.get("effect_healing_minor"));
 
         private final Effect effect;
 

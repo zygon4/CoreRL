@@ -74,14 +74,14 @@ public class PlayerRenderer implements GameComponentRenderer {
         }
 
         xOffset = 0;
-        yOffset = 15;
+        yOffset = 18;
         for (Renderable renderable : getGeneralText(xOffset, yOffset, player)) {
             renderUtil.render(layer, Position.create(renderable.x(), renderable.y()),
                     renderable.content(), renderable.color());
         }
 
         xOffset = 40;
-        yOffset = 15;
+        yOffset = 18;
         for (Renderable renderable : getStatusText(xOffset, yOffset, player.getStatus())) {
             renderUtil.render(layer, Position.create(renderable.x(), renderable.y()),
                     renderable.content(), renderable.color());

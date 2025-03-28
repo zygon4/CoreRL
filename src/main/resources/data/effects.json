@@ -31,6 +31,14 @@
         "statMods": [ { "name":"STR", "amount":-4 }, { "name":"DEX", "amount":-4 }, { "name":"CON", "amount":-4 }, { "name":"INT", "amount":-4 }, { "name":"WIS", "amount":-4 }, { "name":"CHA", "amount":-4 } ]
     },
     {
+        "id": "effect_healing_minor",
+        "type": "EFFECT",
+        "name": "Minor healing",
+        "description": "You naturally heal slowly over time",
+        "maxDuration": 10,
+        "statMods": []
+    },
+    {
         "id": "effect_hostile",
         "type": "EFFECT",
         "name": "Hostile",

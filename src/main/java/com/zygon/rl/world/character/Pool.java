@@ -49,12 +49,12 @@ public final class Pool {
     }
 
     public Pool decrement(int points) {
-        int val = Math.max(points - points, min);
+        int val = Math.max(this.points - points, min);
         return new Pool(name, description, val, min, max);
     }
 
     public Pool increment(int points) {
-        int val = Math.min(points + points, max);
+        int val = Math.min(this.points + points, max);
         return new Pool(name, description, val, min, max);
     }
 

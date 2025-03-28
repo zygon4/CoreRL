@@ -1,6 +1,7 @@
 package com.zygon.rl.world.character;
 
 import com.zygon.rl.data.Effect;
+import com.zygon.rl.game.GameState;
 
 /**
  * Maybe the runtime version of Effect for player status?
@@ -23,5 +24,9 @@ public final class StatusEffect {
 
     public int getTurn() {
         return turn;
+    }
+
+    public static StatusEffect create(Effect id, GameState state) {
+        return new StatusEffect(id, state.getTurnCount());
     }
 }
