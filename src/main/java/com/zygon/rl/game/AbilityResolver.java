@@ -48,9 +48,11 @@ public class AbilityResolver {
                     player,
                     state.getWorld().getPlayerLocation(),
                     poolId,
-                    setPoolValue);
+                    setPoolValue,
+                    false);
             if (!updatePoolAction.canExecute(state)) {
                 // Need additional Pylons
+                // TODO: sound effect?
                 return state;
             }
             state = updatePoolAction.execute(state);

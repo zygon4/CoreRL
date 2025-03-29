@@ -212,7 +212,7 @@ public class StatusEffectSystem extends GameSystem {
                 int freq = pool.getPoolData().getDrainFrequency();
                 if (freq > 0) {
                     if (state.getTurnCount() % freq == 0) {
-                        return new SetPoolAction(player, location, poolId, pool.getPoints() - 1);
+                        return new SetPoolAction(player, location, poolId, pool.getPoints() - 1, true);
                     }
                 }
             }

@@ -16,19 +16,28 @@ public class SetPoolAction extends SetCharacterAction {
 
     private final String poolId;
     private final int ammount; //exact number
+    private final boolean cap;
 
     // Use??
     //  private final StatusResolver statusResolver;
     public SetPoolAction(CharacterSheet character, Location location,
-            String poolId, int ammount) {
+            String poolId, int ammount, boolean cap) {
         super(character, location);
         this.poolId = poolId;
         this.ammount = ammount;
+        this.cap = cap;
 //        this.statusResolver = new StatusResolver(gameConfiguration.getRandom());
     }
 
     @Override
     public boolean canExecute(GameState state) {
+        // The actual update will cap the value (min or max) always, but we
+        // can choose to fail *this* check too when we need exact change. e.g.
+        // spending mana on a spell.
+        if (cap) {
+            return true;
+        }
+
         Pool pool = getPool();
 
         return pool != null
