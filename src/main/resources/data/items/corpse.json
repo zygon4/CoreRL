@@ -3,10 +3,18 @@
         "id": "corpse",
         "type": "CORPSE",
         "symbol": "x",
-        "color": "Crimson",
+        "color": "Red",
         "name": "Corpse",
         "description": "A dead thing",
-        "weight": 12,
-        "weight": 0
+        "weight": 1
+    },
+    {
+        "id": "corpse_mutilated",
+        "type": "CORPSE",
+        "symbol": "x",
+        "color": "Crimson",
+        "name": "Mutilated corpse",
+        "description": "A foul, mutilated corpse.",
+        "weight": 1
     }
 ]

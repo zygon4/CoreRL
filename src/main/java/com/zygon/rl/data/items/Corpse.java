@@ -28,6 +28,22 @@ public class Corpse extends ItemClass {
 
     private static final String PATH = "/data/items/corpse.json";
 
+    public static enum Ids {
+
+        CORPSE("corpse"),
+        CORPSE_MUT("corpse_mutilated");
+
+        private final String id;
+
+        private Ids(String id) {
+            this.id = id;
+        }
+
+        public String getId() {
+            return id;
+        }
+    }
+
     public static void load() throws FileNotFoundException, IOException {
 
         List<Corpse> element = null;

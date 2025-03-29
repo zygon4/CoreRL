@@ -25,6 +25,7 @@ import com.zygon.rl.data.context.Data;
 import com.zygon.rl.data.items.ArmorData;
 import com.zygon.rl.data.items.Corpse;
 import com.zygon.rl.data.items.Melee;
+import com.zygon.rl.data.monster.Monster;
 import com.zygon.rl.data.monster.Species;
 import com.zygon.rl.game.Game;
 import com.zygon.rl.game.GameConfiguration;
@@ -280,7 +281,10 @@ public class BloodRLMain {
 //        }
         world.add(new Weapon(dagger, 18, 4, 0), Location.create(0, 0));
         world.add(new Weapon(dagger, 18, 4, 0), Location.create(0, -1));
-        world.add(new CorpseItem(Corpse.get("corpse"), 50), Location.create(0, 1));
+        world.add(new CorpseItem(
+                Corpse.get(Corpse.Ids.CORPSE.getId()),
+                CharacterSheet.create(Monster.get("mon_wolf"), "dead", null, null).build()),
+                Location.create(0, 1));
 
         GameState initialState = GameState.builder(config)
                 .setWorld(world)
