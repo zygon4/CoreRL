@@ -184,9 +184,7 @@ public final class CharacterSheet extends Tangible {
     }
 
     public CharacterSheet gainHitPoints(int hps) {
-        Creature creature = getTemplate();
-
-        int maxHp = creature.getHitPoints();
+        int maxHp = getStatus().getMaxHitPoints();
         int currentHp = getStatus().getHitPoints();
 
         if (currentHp < maxHp) {

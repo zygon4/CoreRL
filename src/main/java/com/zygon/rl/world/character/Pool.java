@@ -1,47 +1,61 @@
 package com.zygon.rl.world.character;
 
+import com.zygon.rl.data.PoolData;
 import com.zygon.rl.world.Attribute;
 
 /**
- * A pool for any character status. E.g. health, stamina, etc.
+ * A runtime pool for any character status. E.g. health, stamina, etc.
  *
  * @author zygon
  */
 public final class Pool {
 
-    private final String name;
-    private final String description;
+    private final PoolData poolData;
     private final int points;
-    private final int min;
-    private final int max;
 
-    private Pool(String name, String description, int points, int min, int max) {
-        this.name = name;
-        this.description = description;
+    public Pool(PoolData poolData, int points) {
+        this.poolData = poolData;
         this.points = points;
-        this.min = min;
-        this.max = max;
     }
 
-    public static Pool create(String name, String description, int points,
-            int min, int max) {
-        return new Pool(name, description, points, min, max);
+    /**
+     * Sets the pool current value to {@link PoolData#getMax() }
+     *
+     * @param poolData
+     * @return {@link Pool}
+     */
+    public static Pool createMax(PoolData poolData) {
+        return new Pool(poolData, poolData.getMax());
+    }
+
+    /**
+     * Sets the pool current value to the midway point between min and max.
+     *
+     * @param poolData
+     * @return {@link Pool}
+     */
+    public static Pool createMid(PoolData poolData) {
+        return new Pool(poolData, (poolData.getMax() - poolData.getMin()) / 2);
+    }
+
+    public PoolData getPoolData() {
+        return poolData;
     }
 
     public String getDescription() {
-        return description;
+        return poolData.getDescription();
     }
 
     public int getMax() {
-        return max;
+        return poolData.getMax();
     }
 
     public int getMin() {
-        return min;
+        return poolData.getMin();
     }
 
     public String getName() {
-        return name;
+        return poolData.getName();
     }
 
     public int getPoints() {
@@ -49,19 +63,19 @@ public final class Pool {
     }
 
     public Pool decrement(int points) {
-        int val = Math.max(this.points - points, min);
-        return new Pool(name, description, val, min, max);
+        int val = Math.max(getPoints() - points, getMin());
+        return new Pool(poolData, val);
     }
 
     public Pool increment(int points) {
-        int val = Math.min(this.points + points, max);
-        return new Pool(name, description, val, min, max);
+        int val = Math.min(getPoints() + points, getMax());
+        return new Pool(poolData, val);
     }
 
     public Pool set(int points) {
-        int val = Math.min(points, max);
-        val = Math.max(points, min);
-        return new Pool(name, description, val, min, max);
+        int val = Math.min(points, getMax());
+        val = Math.max(points, getMin());
+        return new Pool(poolData, val);
     }
 
     public Attribute getAttribute() {

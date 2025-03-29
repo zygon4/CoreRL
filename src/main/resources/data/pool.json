@@ -1,0 +1,38 @@
+[
+    {
+        "id": "pool_health_small",
+        "type": "POOL",
+        "name": "Health",
+        "description": "A small health pool",
+        "min": 0,
+        "max": 20,
+        "actsAsHealth": true
+    },
+    {
+        "id": "pool_health_medium",
+        "type": "POOL",
+        "name": "Health",
+        "description": "A medium health pool",
+        "min": 0,
+        "max": 40,
+        "actsAsHealth": true
+    },
+    {
+        "id": "pool_health_large",
+        "type": "POOL",
+        "name": "Health",
+        "description": "A large health pool",
+        "min": 0,
+        "max": 80,
+        "actsAsHealth": true
+    },
+    {
+        "id": "pool_blood_medium",
+        "type": "POOL",
+        "name": "Blood",
+        "description": "Blood pool",
+        "min": 0,
+        "max": 40,
+        "drainFrequency": 60
+    }
+]

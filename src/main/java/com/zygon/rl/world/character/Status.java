@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.zygon.rl.data.Effect;
+import com.zygon.rl.data.PoolData;
 import com.zygon.rl.world.Attribute;
 
 /**
@@ -18,37 +19,41 @@ import com.zygon.rl.world.Attribute;
  */
 public final class Status {
 
-    // A couple common names, could/should go elsewhere
-    public static final String HEALTH_POOL_NAME = "HEALTH";
-    public static final String BLOOD_POOL_NAME = "BLOOD";
-
     private static final int MIN_ENERGY = 100;
 
     private final int age;
-    private Map<String, Pool> poolsByName;
+    private final Map<String, Pool> poolsById;
+    private final String healthPoolId;
     // effects ability to move/act, this is a private implementation detail
     private final int energy;
     private final Map<String, StatusEffect> effects;
 
-    private Status(int age, Map<String, Pool> poolsByName, int energy,
+    private Status(int age,
+            Map<String, Pool> poolsById,
+            int energy,
             Map<String, StatusEffect> effects) {
         this.age = age;
-        this.poolsByName = poolsByName;
+        this.poolsById = poolsById;
+        // This is a re-calc that happens every set, could be optimized
+        this.healthPoolId = poolsById.values().stream()
+                .filter(p -> p.getPoolData().actsAsHealth())
+                .map(Pool::getPoolData)
+                .map(PoolData::getId)
+                .findAny().orElseThrow(() -> new RuntimeException("bad pool "
+                + poolsById.keySet().stream().collect(Collectors.joining(","))));
         this.energy = energy;
         this.effects = effects;
     }
 
-    public Status(int age, Map<String, Pool> poolsByName,
+    public Status(int age,
+            Set<Pool> pools,
             Set<StatusEffect> effects) {
-        this(age, Collections.unmodifiableMap(poolsByName), 0,
+        this(age,
+                Collections.unmodifiableMap(pools.stream()
+                        .collect(Collectors.toMap(k -> k.getPoolData().getId(), v -> v))),
+                0,
                 Collections.unmodifiableMap(effects.stream()
                         .collect(Collectors.toMap(k -> k.getEffect().getId(), v -> v))));
-    }
-
-    public static Map<String, Pool> health(int hps) {
-        return Map.of(HEALTH_POOL_NAME,
-                Pool.create(HEALTH_POOL_NAME, "Hit Points", hps,
-                        0, Integer.MAX_VALUE));
     }
 
     // Used to calculate ability to move/act, not a traditional stat or "mana", etc.
@@ -69,47 +74,50 @@ public final class Status {
     }
 
     public int getHitPoints() {
-        // TODO: getPool()
-        return this.poolsByName.get(HEALTH_POOL_NAME).getPoints();
+        return this.poolsById.get(this.healthPoolId).getPoints();
+    }
+
+    public int getMaxHitPoints() {
+        return this.poolsById.get(this.healthPoolId).getMax();
     }
 
     public Status decHitPoints(int hps) {
-        Map<String, Pool> poolsByName = new HashMap<>(this.poolsByName);
-        poolsByName.put(HEALTH_POOL_NAME,
-                poolsByName.get(HEALTH_POOL_NAME).decrement(hps));
+        Map<String, Pool> poolsByName = new HashMap<>(this.poolsById);
+        poolsByName.put(this.healthPoolId,
+                poolsByName.get(this.healthPoolId).decrement(hps));
         return new Status(age, poolsByName, energy, effects);
     }
 
     public Status incAge() {
-        return new Status(age + 1, poolsByName, energy, effects);
+        return new Status(age + 1, poolsById, energy, effects);
     }
 
     public Status incHitPoints(int hps) {
-        Map<String, Pool> poolsByName = new HashMap<>(this.poolsByName);
-        poolsByName.put(HEALTH_POOL_NAME,
-                poolsByName.get(HEALTH_POOL_NAME).increment(hps));
-        return new Status(age, poolsByName, energy, effects);
+        Map<String, Pool> poolsById = new HashMap<>(this.poolsById);
+        poolsById.put(this.healthPoolId,
+                poolsById.get(this.healthPoolId).increment(hps));
+        return new Status(age, poolsById, energy, effects);
     }
 
     public Status addEffect(StatusEffect effect) {
         Map<String, StatusEffect> effects = new HashMap<>(this.effects);
         effects.put(effect.getEffect().getId(), effect);
 
-        return new Status(age, poolsByName, energy, effects);
+        return new Status(age, poolsById, energy, effects);
     }
 
     public Status removeEffect(String effect) {
         Map<String, StatusEffect> effects = new HashMap<>(this.effects);
         effects.remove(effect);
-        return new Status(age, poolsByName, energy, effects);
+        return new Status(age, poolsById, energy, effects);
     }
 
     /*pkg*/ Status incEnergy(int amount) {
-        return new Status(age, poolsByName, energy + amount, effects);
+        return new Status(age, poolsById, energy + amount, effects);
     }
 
     /*pkg*/ Status resetEnergy() {
-        return new Status(age, poolsByName, energy - MIN_ENERGY, effects);
+        return new Status(age, poolsById, energy - MIN_ENERGY, effects);
     }
 
     public Set<Attribute> getEffectAttributes() {
@@ -128,15 +136,15 @@ public final class Status {
     }
 
     public Pool getPool(String poolName) {
-        return poolsByName.get(poolName);
+        return poolsById.get(poolName);
     }
 
     public Set<String> getPoolNames() {
-        return Collections.unmodifiableSet(poolsByName.keySet());
+        return Collections.unmodifiableSet(poolsById.keySet());
     }
 
     public Status setPool(Pool pool) {
-        Map<String, Pool> poolsByName = new HashMap<>(this.poolsByName);
+        Map<String, Pool> poolsByName = new HashMap<>(this.poolsById);
         poolsByName.put(pool.getName(), pool);
         return new Status(age, poolsByName, energy, effects);
     }

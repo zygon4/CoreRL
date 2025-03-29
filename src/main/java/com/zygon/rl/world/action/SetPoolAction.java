@@ -14,15 +14,15 @@ import com.zygon.rl.world.character.Status;
  */
 public class SetPoolAction extends SetCharacterAction {
 
-    private final String poolName;
+    private final String poolId;
     private final int ammount; //exact number
 
     // Use??
     //  private final StatusResolver statusResolver;
     public SetPoolAction(CharacterSheet character, Location location,
-            String poolName, int ammount) {
+            String poolId, int ammount) {
         super(character, location);
-        this.poolName = poolName;
+        this.poolId = poolId;
         this.ammount = ammount;
 //        this.statusResolver = new StatusResolver(gameConfiguration.getRandom());
     }
@@ -52,6 +52,6 @@ public class SetPoolAction extends SetCharacterAction {
     private Pool getPool() {
         CharacterSheet character = getCharacter();
         Status status = character.getStatus();
-        return status.getPool(this.poolName);
+        return status.getPool(this.poolId);
     }
 }

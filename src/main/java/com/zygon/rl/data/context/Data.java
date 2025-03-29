@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.zygon.rl.data.Effect;
 import com.zygon.rl.data.Element;
+import com.zygon.rl.data.PoolData;
 import com.zygon.rl.data.Terrain;
 import com.zygon.rl.data.buildings.BuildingData;
 import com.zygon.rl.data.character.Proficiencies;
@@ -40,6 +41,7 @@ public class Data {
             Melee.load();
             Monster.load();
             Npc.load();
+            PoolData.load();
             Proficiencies.load();
             Terrain.load();
             WorldData.load();
@@ -90,6 +92,10 @@ public class Data {
 
         for (var v : Npc.getAllIds()) {
             elementsById.put(v, Npc.get(v));
+        }
+
+        for (var v : PoolData.getAllIds()) {
+            elementsById.put(v, PoolData.get(v));
         }
 
         for (var v : Proficiencies.getAllIds()) {

@@ -9,6 +9,7 @@
         "species": "HUMAN",
         "aggression": 5,
         "hitPoints": 20,
+        "pools": ["pool_health_medium"],
         "speed": 60,
         "flags": [],
         "weight": 150
@@ -23,6 +24,7 @@
         "species": "HUMAN",
         "aggression": 10,
         "hitPoints": 30,
+        "pools": ["pool_health_large"],
         "speed": 80,
         "flags": [],
         "weight": 180

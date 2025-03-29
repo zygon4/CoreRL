@@ -11,12 +11,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import com.zygon.rl.data.Creature;
+import com.zygon.rl.data.PoolData;
 import com.zygon.rl.data.WorldElement;
 import com.zygon.rl.data.context.Data;
 import com.zygon.rl.data.items.ArmorData;
@@ -36,6 +39,7 @@ import com.zygon.rl.world.World;
 import com.zygon.rl.world.character.Ability;
 import com.zygon.rl.world.character.Armor;
 import com.zygon.rl.world.character.CharacterSheet;
+import com.zygon.rl.world.character.Pool;
 import com.zygon.rl.world.character.Stats;
 import com.zygon.rl.world.character.Status;
 import com.zygon.rl.world.character.Weapon;
@@ -207,12 +211,18 @@ public class BloodRLMain {
 //        StatusEffect statusEffect = new StatusEffect(effect);
 //
         WorldElement eleTemplate = new WorldElement("player", "player", "@", "PaleVioletRed", "Alucard", "He's cool but moody", Map.of(), 150);
-        Creature species = new Creature(eleTemplate, Species.HUMAN.name(), 100, 120, 100);
+        Creature species = new Creature(
+                eleTemplate, Species.HUMAN.name(), 100,
+                List.of(PoolData.Pools.HEALTH_MEDIUM.getId()), 100);
+        Set<Pool> pools = species.getPools().stream()
+                .map(id -> PoolData.get(id))
+                .map(e -> Pool.createMax(e))
+                .collect(Collectors.toSet());
         CharacterSheet pc = CharacterSheet
                 .create(species,
                         "Alucard",
                         new Stats(16, 16, 14, 12, 12, 16),
-                        new Status(19, Status.health(20), Set.of()))
+                        new Status(19, pools, Set.of()))
                 .build();
 
         ArmorData dataTunic = ArmorData.get("torso_tunic_black");

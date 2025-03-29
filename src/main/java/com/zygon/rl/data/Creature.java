@@ -9,7 +9,7 @@ public class Creature extends WorldElement {
 
     private String species;
     private int aggression;
-    private int hitPoints;
+    private List<String> pools;
     private int speed;
     private List<String> spawns;
 
@@ -17,22 +17,22 @@ public class Creature extends WorldElement {
     }
 
     public Creature(WorldElement template, String species, int aggression,
-            int hitPoints, int speed, List<String> spawns) {
+            List<String> pools, int speed, List<String> spawns) {
         super(template);
         this.species = species;
         this.aggression = aggression;
-        this.hitPoints = hitPoints;
+        this.pools = pools;
         this.speed = speed;
         this.spawns = spawns;
     }
 
     public Creature(WorldElement template, String species, int aggression,
-            int hitPoints, int speed) {
-        this(template, species, aggression, hitPoints, speed, null);
+            List<String> pools, int speed) {
+        this(template, species, aggression, pools, speed, null);
     }
 
     public Creature copy(WorldElement template) {
-        return new Creature(template, species, aggression, hitPoints, speed, spawns);
+        return new Creature(template, species, aggression, pools, speed, spawns);
     }
 
     public String getSpecies() {
@@ -43,8 +43,8 @@ public class Creature extends WorldElement {
         return aggression;
     }
 
-    public int getHitPoints() {
-        return hitPoints;
+    public List<String> getPools() {
+        return pools;
     }
 
     public int getSpeed() {
@@ -59,8 +59,8 @@ public class Creature extends WorldElement {
         this.aggression = aggression;
     }
 
-    public void setHitPoints(int hitPoints) {
-        this.hitPoints = hitPoints;
+    public void setPools(List<String> pools) {
+        this.pools = pools;
     }
 
     public void setSpawns(List<String> spawns) {

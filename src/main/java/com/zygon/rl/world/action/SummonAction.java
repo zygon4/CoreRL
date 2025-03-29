@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import com.stewsters.util.name.FantasyNameGen;
 import com.zygon.rl.data.Creature;
 import com.zygon.rl.data.Effect;
+import com.zygon.rl.data.PoolData;
 import com.zygon.rl.data.context.Data;
 import com.zygon.rl.data.items.ArmorData;
 import com.zygon.rl.data.items.Melee;
@@ -23,6 +24,7 @@ import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
 import com.zygon.rl.world.character.Armor;
 import com.zygon.rl.world.character.CharacterSheet;
+import com.zygon.rl.world.character.Pool;
 import com.zygon.rl.world.character.Stats;
 import com.zygon.rl.world.character.Status;
 import com.zygon.rl.world.character.StatusEffect;
@@ -105,6 +107,11 @@ public class SummonAction extends Action {
 
     private CharacterSheet getRandomCharacter(GameState state, Creature creature) {
         final int age = 1 + random.nextInt(4);
+
+        Set<Pool> pools = creature.getPools().stream()
+                .map(id -> PoolData.get(id))
+                .map(e -> Pool.createMax(e))
+                .collect(Collectors.toSet());
         Set<StatusEffect> statusEffects = effects.stream()
                 .map(e -> new StatusEffect(e, state.getTurnCount()))
                 .collect(Collectors.toSet());
@@ -134,7 +141,7 @@ public class SummonAction extends Action {
         CharacterSheet character = createBase(
                 creature,
                 generate(creature, random),
-                new Status(age, Status.health(creature.getHitPoints()), statusEffects),
+                new Status(age, pools, statusEffects),
                 weapon,
                 name);
 

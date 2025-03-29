@@ -38,16 +38,16 @@ public class AbilityResolver {
 
         Optional<Ability.Cost> cost = this.ability.getCost();
         if (cost.isPresent()) {
-            String poolName = cost.get().pool();
+            String poolId = cost.get().pool();
             int poolAmmountChange = cost.get().ammount();
             CharacterSheet player = state.getWorld().getPlayer();
-            Pool pool = player.getStatus().getPool(poolName);
+            Pool pool = player.getStatus().getPool(poolId);
             int setPoolValue = pool.getPoints() - poolAmmountChange;
 
             SetPoolAction updatePoolAction = new SetPoolAction(
                     player,
                     state.getWorld().getPlayerLocation(),
-                    poolName,
+                    poolId,
                     setPoolValue);
             if (!updatePoolAction.canExecute(state)) {
                 // Need additional Pylons
