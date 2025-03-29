@@ -135,17 +135,17 @@ public final class Status {
         return effectAttrs;
     }
 
-    public Pool getPool(String poolName) {
-        return poolsById.get(poolName);
+    public Pool getPool(String poolId) {
+        return poolsById.get(poolId);
     }
 
-    public Set<String> getPoolNames() {
+    public Set<String> getPoolIds() {
         return Collections.unmodifiableSet(poolsById.keySet());
     }
 
     public Status setPool(Pool pool) {
         Map<String, Pool> poolsByName = new HashMap<>(this.poolsById);
-        poolsByName.put(pool.getName(), pool);
+        poolsByName.put(pool.getPoolData().getId(), pool);
         return new Status(age, poolsByName, energy, effects);
     }
 }

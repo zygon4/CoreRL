@@ -161,7 +161,7 @@ public class PlayerRenderer implements GameComponentRenderer {
         y++;// space
 
         Status status = player.getStatus();
-        for (String poolName : status.getPoolNames()) {
+        for (String poolName : status.getPoolIds()) {
             Attribute poolAttr = status.getPool(poolName).getAttribute();
             String paddedName = StringUtil.padEnd(poolAttr.getName() + ":", 9);
             renders.add(new Renderable(x, y++, paddedName + poolAttr.getValue(), Color.GRAY));
