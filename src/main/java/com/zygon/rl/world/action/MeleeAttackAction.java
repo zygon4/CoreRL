@@ -1,9 +1,7 @@
 package com.zygon.rl.world.action;
 
 import java.util.Objects;
-import java.util.function.Predicate;
 
-import com.zygon.rl.data.Effect;
 import com.zygon.rl.data.character.Proficiencies;
 import com.zygon.rl.data.monster.Monster;
 import com.zygon.rl.game.GameConfiguration;
@@ -11,7 +9,6 @@ import com.zygon.rl.game.GameState;
 import com.zygon.rl.world.DamageResolution;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.character.CharacterSheet;
-import com.zygon.rl.world.character.StatusEffect;
 import com.zygon.rl.world.combat.CombatResolver;
 
 /**
@@ -80,30 +77,5 @@ public class MeleeAttackAction extends DamageAction {
         state = super.resolveXpGain(state, damage);
         GainXpAction gainXp = new GainXpAction(Proficiencies.Names.MELEE.getId(), attacker, attackerLocation);
         return gainXp.execute(state);
-    }
-
-    private void updateToHostile(GameState state, CharacterSheet characterSheet,
-            Location location) {
-        if (!characterSheet.getId().equals("player")) {
-            if (!characterSheet.getStatus().isEffected(Effect.EffectNames.HOSTILE.getId())) {
-                CharacterSheet updatedToHostile = characterSheet.set(characterSheet.getStatus()
-                        .addEffect(new StatusEffect(Effect.EffectNames.HOSTILE.getEffect(), state.getTurnCount())));
-
-                state.getWorld().add(updatedToHostile, location);
-            }
-        }
-    }
-
-    // Also seems like a possible pattern..
-    private void updateToHostile(GameState state,
-            Predicate<CharacterSheet> isHostileFn, Location near) {
-        near.getNeighbors(20).stream()
-                .forEach(n -> {
-                    CharacterSheet hostileCharacter = state.getWorld().get(n);
-                    if (hostileCharacter != null && isHostileFn.test(hostileCharacter)) {
-
-                        updateToHostile(state, hostileCharacter, n);
-                    }
-                });
     }
 }

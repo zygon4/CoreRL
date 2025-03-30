@@ -13,6 +13,7 @@ import com.zygon.rl.game.GameState;
 import com.zygon.rl.game.GameSystem;
 import com.zygon.rl.world.CommonAttributes;
 import com.zygon.rl.world.Location;
+import com.zygon.rl.world.Tangible;
 import com.zygon.rl.world.World;
 import com.zygon.rl.world.action.Action;
 import com.zygon.rl.world.action.MeleeAttackAction;
@@ -20,6 +21,7 @@ import com.zygon.rl.world.action.MoveAction;
 import com.zygon.rl.world.character.CharacterSheet;
 
 /**
+ * This system acts on the data available, it doesn't set new information.
  *
  * @author zygon
  */
@@ -84,7 +86,7 @@ public final class AISystem extends GameSystem {
             return wander(characterLocation, world);
         }
 
-        if (character.getStatus().isEffected(Effect.EffectNames.PET.getId())) {
+        if (isPet(character)) {
             Location playerLocation = world.getPlayerLocation();
             // player location can be null if dead
             if (playerLocation != null) {
@@ -100,7 +102,19 @@ public final class AISystem extends GameSystem {
         if (isHostile(character)) {
             Location playerLocation = world.getPlayerLocation();
             if (playerLocation != null) {
-                return hostile(characterLocation, world.getPlayerLocation(), world);
+                return hostile(characterLocation, playerLocation, world);
+            }
+        }
+
+        if (isSentry(character)) {
+            // look for a list of naughty items, if found, set status effect e.g. "looking for player" or maybe temp increase aggro range?
+            Map<Location, Tangible> occultEvidence = StatusEffectSystem.discoverNearby(
+                    world, character, characterLocation, CommonAttributes.OCCULT.name());
+            if (!occultEvidence.isEmpty()) {
+                Location randomOccultLoc = occultEvidence.keySet().iterator().next();
+                return follow(characterLocation, randomOccultLoc, world, 1);
+            } else {
+                return wander(characterLocation, world);
             }
         }
 
@@ -114,6 +128,7 @@ public final class AISystem extends GameSystem {
                 // This seems like a common pattern of behavior.
                 case AMPHIBIAN, MAMMAL -> {
                     // If next to, attack
+                    // TODO: I think this is slighty wrong, there's no *need* to start swinging..
                     if (characterLocation.getNeighbors().contains(world.getPlayerLocation())) {
                         CharacterSheet player = world.getPlayer();
                         return (c) -> new MeleeAttackAction(getGameConfiguration(),
@@ -136,12 +151,7 @@ public final class AISystem extends GameSystem {
             }
 
         } else if (character.getType().equals(CommonAttributes.NPC.name())) {
-
-            if (isHostile(character)) {
-                return hostile(characterLocation, world.getPlayerLocation(), world);
-            } else {
-                return wander(characterLocation, world);
-            }
+            return wander(characterLocation, world);
         }
 
         return null;
@@ -219,6 +229,10 @@ public final class AISystem extends GameSystem {
 
     private static boolean isHostile(CharacterSheet character) {
         return character.getStatus().isEffected(Effect.EffectNames.HOSTILE.getId());
+    }
+
+    private static boolean isSentry(CharacterSheet character) {
+        return character.getStatus().isEffected(Effect.EffectNames.SENTRY.getId());
     }
 
     private static boolean isPet(CharacterSheet character) {

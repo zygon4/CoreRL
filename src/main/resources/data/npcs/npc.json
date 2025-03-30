@@ -7,11 +7,10 @@
         "symbol": "P",
         "color": "Wheat",
         "species": "HUMAN",
-        "aggression": 5,
+        "aggression": 1,
         "hitPoints": 20,
         "pools": ["pool_health_medium"],
-        "speed": 60,
-        "flags": [],
+        "speed": 90,
         "weight": 150
     },
     {
@@ -25,8 +24,10 @@
         "aggression": 10,
         "hitPoints": 30,
         "pools": ["pool_health_large"],
-        "speed": 80,
-        "flags": [],
+        "speed": 100,
+        "flags": {
+            "SENTRY": true
+        },
         "weight": 180
     }
 ]

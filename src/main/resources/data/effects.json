@@ -53,6 +53,14 @@
         "statMods": [ { "name":"SPD", "amount": 100 } ]
     },
     {
+        "id": "effect_sentry",
+        "type": "EFFECT",
+        "name": "Sentry",
+        "description": "Seek and destroy",
+        "maxDuration": 20,
+        "statMods": [ { "name":"SPD", "amount": 10 }, { "name":"STR", "amount":2 } ]
+    },
+    {
         "id": "effect_sun_fever_minor",
         "type": "EFFECT",
         "name": "Weakend by sunlight",

@@ -15,6 +15,9 @@
         "color": "Crimson",
         "name": "Mutilated corpse",
         "description": "A foul, mutilated corpse.",
-        "weight": 1
+        "weight": 1,
+        "flags": {
+            "OCCULT": true
+        }
     }
 ]

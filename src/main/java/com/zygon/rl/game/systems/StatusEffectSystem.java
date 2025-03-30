@@ -19,8 +19,11 @@ import com.zygon.rl.game.GameState;
 import com.zygon.rl.game.GameSystem;
 import com.zygon.rl.world.CommonAttributes;
 import com.zygon.rl.world.Location;
+import com.zygon.rl.world.Tangible;
 import com.zygon.rl.world.Weather;
+import com.zygon.rl.world.World;
 import com.zygon.rl.world.action.Action;
+import com.zygon.rl.world.action.DamageAction;
 import com.zygon.rl.world.action.SetCharacterAction;
 import com.zygon.rl.world.action.SetPoolAction;
 import com.zygon.rl.world.action.StatusDamageAction;
@@ -37,6 +40,8 @@ import com.zygon.rl.world.character.StatusEffect;
  * @author zygon
  */
 public class StatusEffectSystem extends GameSystem {
+
+    private static final System.Logger LOGGER = System.getLogger(StatusEffectSystem.class.getCanonicalName());
 
     private static class EffectSystem extends GameSystem {
 
@@ -82,6 +87,24 @@ public class StatusEffectSystem extends GameSystem {
 
                 // can't use the CommonAttributes becaue it's not a constant expression :(
                 switch (flag) {
+                    case "SENTRY" -> {
+                        final String sentryId = Effect.EffectNames.SENTRY.getId();
+                        if (character.getStatus().getEffects().containsKey(sentryId)) {
+                            // if already in sentry mode, look to hostile
+                            if (isPlayerNearby(state.getWorld(), character, location)) {
+                                DamageAction.updateToHostile(state, character, location);
+                            }
+                        } else {
+                            // check if "sentry worthy" items are nearby and react..
+                            Map<Location, Tangible> occultEvidence = discoverNearby(
+                                    state.getWorld(), character, location, CommonAttributes.OCCULT.name());
+
+                            // How harsh? any evidence? 2+ instances?
+                            if (!occultEvidence.isEmpty()) {
+                                DamageAction.addStatusEffect(state, character, location, Effect.EffectNames.SENTRY.getId());
+                            }
+                        }
+                    }
                     case "WEAK_TO_SUN" -> {
                         final String sunFeverMinorId = Effect.EffectNames.SUN_FEVER_MINOR.getId();
 
@@ -124,6 +147,8 @@ public class StatusEffectSystem extends GameSystem {
                     .collect(Collectors.toList());
         }
 
+        // TODO: how to disable HOSTILE??
+        //
         // Remove status effects that have a max duration.
         private Action translateToAction(GameState state, CharacterSheet sheet,
                 Location location, StatusEffect effect) {
@@ -145,7 +170,7 @@ public class StatusEffectSystem extends GameSystem {
                     }
                     return translateTurnBased(currentTurn, sheet, location, effect);
                 }
-                case CONFUSION, TERRIFIED, ENHANCED_SPEED -> {
+                case CONFUSION, TERRIFIED, ENHANCED_SPEED, SENTRY -> {
                     return translateTurnBased(currentTurn, sheet, location, effect);
                 }
                 default -> {
@@ -226,8 +251,8 @@ public class StatusEffectSystem extends GameSystem {
     private static final int MAJOR_EFFECT_FREQ = 4;
 
     private static final Set<String> STATUS_FLAGS = Set.of(
-            CommonAttributes.WEAK_TO_SUN.name(),
-            CommonAttributes.ENHANCED_SPEED.name()
+            CommonAttributes.SENTRY.name(),
+            CommonAttributes.WEAK_TO_SUN.name()
     );
 
     private final EffectSystem effectSystem;
@@ -244,5 +269,33 @@ public class StatusEffectSystem extends GameSystem {
         state = effectSystem.apply(state);
         state = poolSystem.apply(state);
         return state;
+    }
+
+    // Not sure where this belongs but at least it's used a couple times..
+    /**
+     * Range is wis + int
+     *
+     * @param world
+     * @param character
+     * @param location
+     * @param flag
+     * @return
+     */
+    static Map<Location, Tangible> discoverNearby(World world,
+            CharacterSheet character, Location location, String flag) {
+        int range = getDiscoveryRange(character);
+        return world.getAllByFlag(location, flag, range, false);
+    }
+
+    static boolean isPlayerNearby(World world, CharacterSheet npc,
+            Location npcLoc) {
+        int npcDiscoveryRange = getDiscoveryRange(npc);
+        Location playerLoc = world.getPlayerLocation();
+        return playerLoc.getDistance(npcLoc) <= npcDiscoveryRange;
+    }
+
+    static int getDiscoveryRange(CharacterSheet character) {
+        return character.getModifiedStats().getWisdom()
+                + character.getModifiedStats().getIntelligence();
     }
 }

@@ -18,6 +18,8 @@ public enum CommonAttributes {
     MAGIC,
     MONSTER,
     NPC,
+    OCCULT,
+    SENTRY,
     TEMPERMENT,
     TERRAIN_DIFFICULTY,
     UNDEAD,

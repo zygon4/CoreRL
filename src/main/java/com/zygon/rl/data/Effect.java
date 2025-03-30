@@ -58,6 +58,7 @@ public final class Effect extends Element {
         HOSTILE(Effect.get("effect_hostile")),
         PET(Effect.get("effect_pet")),
         TERRIFIED(Effect.get("effect_terror")),
+        SENTRY(Effect.get("effect_sentry")),
         SUN_FEVER_MINOR(Effect.get("effect_sun_fever_minor")),
         HEALING_MINOR(Effect.get("effect_healing_minor"));
 

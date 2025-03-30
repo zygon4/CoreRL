@@ -1,5 +1,6 @@
 package com.zygon.rl.world.action;
 
+import java.lang.System.Logger.Level;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -104,26 +105,46 @@ public abstract class DamageAction extends Action {
         return state;
     }
 
-    private void updateToHostile(GameState state, CharacterSheet characterSheet,
+    /*
+     These utilities below could/should be moved somewhere more common..
+     */
+    public static void updateToHostile(GameState state,
+            CharacterSheet characterSheet,
             Location location) {
-        if (!characterSheet.getId().equals("player")) {
-            if (!characterSheet.getStatus().isEffected(Effect.EffectNames.HOSTILE.getId())) {
-                CharacterSheet updatedToHostile = characterSheet.set(characterSheet.getStatus()
-                        .addEffect(new StatusEffect(Effect.EffectNames.HOSTILE.getEffect(), state.getTurnCount())));
+        addStatusEffect(state, characterSheet, location, Effect.EffectNames.HOSTILE.getId());
+    }
 
-                state.getWorld().add(updatedToHostile, location);
+    public static void addStatusEffect(GameState state,
+            CharacterSheet characterSheet, Location location,
+            final String statusEffectId) {
+        if (!characterSheet.getId().equals("player")) {
+            if (!characterSheet.getStatus().isEffected(statusEffectId)) {
+
+                Effect effect = Effect.EffectNames.getInstance(statusEffectId).getEffect();
+
+                logger.log(Level.INFO, "{0} {1} is now effected by {2}",
+                        new Object[]{characterSheet.getSpecies(), characterSheet.getName(), effect.getName()});
+
+                CharacterSheet updated = characterSheet
+                        .set(characterSheet.getStatus()
+                                .addEffect(new StatusEffect(
+                                        effect,
+                                        state.getTurnCount())));
+
+                new SetCharacterAction(updated, location).execute(state);
+
+                // TODO: set message log?
             }
         }
     }
 
     // Also seems like a possible pattern..
-    private void updateToHostile(GameState state,
+    public static void updateToHostile(GameState state,
             Predicate<CharacterSheet> isHostileFn, Location near) {
         near.getNeighbors(20).stream()
                 .forEach(n -> {
                     CharacterSheet hostileCharacter = state.getWorld().get(n);
                     if (hostileCharacter != null && isHostileFn.test(hostileCharacter)) {
-
                         updateToHostile(state, hostileCharacter, n);
                     }
                 });
