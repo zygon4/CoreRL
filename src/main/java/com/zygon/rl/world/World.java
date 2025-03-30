@@ -259,21 +259,21 @@ public class World {
         terrainVal = NoiseUtil.scale(terrainVal, -0.88, 0.88, 0.0, 100.0);
         terrainVal = terrainNoise.round(terrainVal);
 
-        if (terrainVal < 30) {
+        if (terrainVal < 10) {
             return WorldRegion.DEEP_WATER;
-        } else if (terrainVal < 40) {
+        } else if (terrainVal < 20) {
             return WorldRegion.SHALLOW_WATER;
-        } else if (terrainVal < 45) {
+        } else if (terrainVal < 25) {
             return WorldRegion.SHORE;
-        } else if (terrainVal < 55) {
+        } else if (terrainVal < 40) {
             return WorldRegion.SHORT_FIELD;
-        } else if (terrainVal < 65) {
+        } else if (terrainVal < 60) {
             return WorldRegion.TALL_FIELD;
         } else if (terrainVal < 75) {
             return WorldRegion.FOREST;
         } else if (terrainVal < 80) {
             return WorldRegion.SHORT_FIELD;
-        } else if (terrainVal < 85) {
+        } else if (terrainVal < 95) {
             return WorldRegion.TOWN_OUTER;
         } else {
             return WorldRegion.TOWN_RESIDENCE;
