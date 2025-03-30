@@ -42,7 +42,8 @@
         "id": "effect_hostile",
         "type": "EFFECT",
         "name": "Hostile",
-        "description": "Hostile"
+        "description": "Hostile",
+        "maxDuration": 20
     },
     {
         "id": "effect_enhanced_speed",

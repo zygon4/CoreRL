@@ -13,6 +13,7 @@ import static com.zygon.rl.data.Effect.EffectNames.BLEEDING_MAJOR;
 import static com.zygon.rl.data.Effect.EffectNames.CONFUSION;
 import static com.zygon.rl.data.Effect.EffectNames.ENHANCED_SPEED;
 import static com.zygon.rl.data.Effect.EffectNames.HEALING_MINOR;
+import static com.zygon.rl.data.Effect.EffectNames.SENTRY;
 import static com.zygon.rl.data.Effect.EffectNames.TERRIFIED;
 import com.zygon.rl.game.GameConfiguration;
 import com.zygon.rl.game.GameState;
@@ -57,12 +58,12 @@ public class StatusEffectSystem extends GameSystem {
             Collection<Action> actions = new ArrayList<>();
 
             for (var npc : closeCharacters.entrySet()) {
-                actions.addAll(auditStatusEffects(state, npc.getValue(), npc.getKey()));
+                actions.addAll(auditFlagStatusEffects(state, npc.getValue(), npc.getKey()));
                 actions.addAll(getStatusEffectActions(state, npc.getValue(), npc.getKey()));
             }
 
             CharacterSheet player = state.getWorld().getPlayer();
-            actions.addAll(auditStatusEffects(state, player, state.getWorld().getPlayerLocation()));
+            actions.addAll(auditFlagStatusEffects(state, player, state.getWorld().getPlayerLocation()));
             actions.addAll(getStatusEffectActions(state, player, state.getWorld().getPlayerLocation()));
 
             for (Action action : actions) {
@@ -72,7 +73,15 @@ public class StatusEffectSystem extends GameSystem {
             return state;
         }
 
-        private Collection<Action> auditStatusEffects(GameState state,
+        /**
+         * Checks all creature flags which may affect status effects.
+         *
+         * @param state
+         * @param character
+         * @param location
+         * @return
+         */
+        private Collection<Action> auditFlagStatusEffects(GameState state,
                 CharacterSheet character, Location location) {
 
             Collection<Action> actions = new ArrayList<>();
@@ -147,8 +156,6 @@ public class StatusEffectSystem extends GameSystem {
                     .collect(Collectors.toList());
         }
 
-        // TODO: how to disable HOSTILE??
-        //
         // Remove status effects that have a max duration.
         private Action translateToAction(GameState state, CharacterSheet sheet,
                 Location location, StatusEffect effect) {
@@ -170,7 +177,7 @@ public class StatusEffectSystem extends GameSystem {
                     }
                     return translateTurnBased(currentTurn, sheet, location, effect);
                 }
-                case CONFUSION, TERRIFIED, ENHANCED_SPEED, SENTRY -> {
+                case CONFUSION, ENHANCED_SPEED, HOSTILE, SENTRY, TERRIFIED -> {
                     return translateTurnBased(currentTurn, sheet, location, effect);
                 }
                 default -> {
