@@ -318,23 +318,23 @@ final class GameView extends BaseView {
         ((TextArea) componentsByName.get("stats"))
                 .setText(statsBuilder.toString());
 
-        // Needs better layout
+        // TODO: Needs better layout
         String status = playerSheet.getStatus().getEffects().entrySet().stream()
                 .map(entry -> Data.get(entry.getKey()).getName())
-                .collect(Collectors.joining("\n"));
+                .collect(Collectors.joining("\r\n"));
 
         ((TextOverride) componentsByName.get("status"))
                 .setText("Age: " + playerSheet.getStatus().getAge() + "  "
                         + "HP: " + playerSheet.getStatus().getHitPoints()
-                        + " Spd: " + playerSheet.getSpeed() + "\n"
+                        + " Spd: " + playerSheet.getSpeed() + "\r\n"
                         + status);
         //
         // TODO: list NPCs nearby
         // TODO: log area is SLOW so use text area
         TextArea logArea = (TextArea) componentsByName.get("log");
 
-        // Doesn't wrap, need to insert newlines!
-        String collect = game.getState().getLog().getRecent(10).stream()
+        String collect = game.getState().getLog()
+                .getRecent(10, logArea.getWidth()).stream()
                 .collect(Collectors.joining("\n"));
 
         logArea.setText(collect);

@@ -56,7 +56,7 @@ final class TitleView extends BaseView {
         Button startButton = Components.button()
                 .withText("NEW GAME")
                 .withAlignmentAround(header, ComponentAlignment.BOTTOM_CENTER)
-                .withTileset(CP437TilesetResources.rexPaint16x16())
+                .withTileset(CP437TilesetResources.rexPaint20x20())
                 .build();
 
         startButton.handleMouseEvents(MouseEventType.MOUSE_CLICKED, (p1, p2) -> {
@@ -68,7 +68,7 @@ final class TitleView extends BaseView {
         Button quitButton = Components.button()
                 .withText("QUIT")
                 .withAlignmentAround(startButton, ComponentAlignment.BOTTOM_CENTER)
-                .withTileset(CP437TilesetResources.rexPaint16x16())
+                .withTileset(CP437TilesetResources.rexPaint20x20())
                 .build();
 
         quitButton.handleMouseEvents(MouseEventType.MOUSE_CLICKED, (p1, p2) -> {

@@ -15,6 +15,8 @@ import org.hexworks.zircon.api.grid.TileGrid;
  */
 public class GameUI {
 
+    private static final String POWERED_BY = "[powered by https://github.com/zygon4/CoreRL]";
+
     private final Game game;
 
     public GameUI(Game game) {
@@ -29,13 +31,11 @@ public class GameUI {
                         .withSize(Size.create(120, 70))
                         //                        .withDebugMode(true)
                         //                        .withDebugConfig(DebugConfig.newBuilder().withRelaxBoundsCheck(true).build())
-                        .withDefaultTileset(CP437TilesetResources.rexPaint16x16())
+                        .withDefaultTileset(CP437TilesetResources.rexPaint20x20())
                         .build());
 
         TitleView titleView = new TitleView(tileGrid, ColorThemes.afterDark(), game);
 
         titleView.dock();
     }
-
-    private static final String POWERED_BY = "[powered by https://github.com/zygon4/CoreRL]";
 }

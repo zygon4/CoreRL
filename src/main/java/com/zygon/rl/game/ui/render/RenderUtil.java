@@ -56,10 +56,10 @@ public class RenderUtil {
 
     public void render(Layer layer, Position offset, String text, Color color) {
 
-        List<CharacterTile> fooBar = toTiles(color, text);
-        for (int x = 1, i = 0; i < fooBar.size(); x++, i++) {
+        List<CharacterTile> tiles = toTiles(color, text);
+        for (int x = 1, i = 0; i < tiles.size(); x++, i++) {
             Position pos = Position.create(offset.getX() + x, offset.getY());
-            layer.draw(fooBar.get(i), pos);
+            layer.draw(tiles.get(i), pos);
         }
     }
 

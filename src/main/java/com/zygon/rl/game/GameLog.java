@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.text.WordUtils;
+
 /**
  * Simple game log. Still needs a throttling mechanism.
  *
@@ -100,15 +102,20 @@ public class GameLog {
                 .collect(Collectors.toList());
     }
 
-    public List<String> getRecent(int count) {
+    public List<String> getRecent(int count, int wrap) {
         int reCount = Math.min(count, this.messages.size());
 
         List<String> recentMessages = new ArrayList<>();
 
         for (int i = this.messages.size() - reCount; i < this.messages.size(); i++) {
             CountedMessage countedMsg = this.messages.get(i);
-            recentMessages.add(countedMsg.getDisplay());
+            String display = countedMsg.getDisplay();
+            recentMessages.add(WordUtils.wrap(display, wrap));
         }
         return recentMessages;
+    }
+
+    public List<String> getRecent(int count) {
+        return getRecent(count, Integer.MAX_VALUE);
     }
 }
