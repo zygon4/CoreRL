@@ -67,66 +67,57 @@ public class SpawnContext {
     }
 
     public static enum SpawnContextType {
-        Building(20,
-                center -> {
-                    int freq = 20;
-                    Set<Location> spawnLocations = new HashSet<>();
+        Building(center -> {
+            int freq = 20;
+            Set<Location> spawnLocations = new HashSet<>();
 
-                    Location roundedCenter = center.round(freq);
+            Location roundedCenter = center.round(freq);
 
-                    for (int y = roundedCenter.getY() + 200, realY = 0; y > roundedCenter.getY() - 200; y -= freq, realY++) {
-                        for (int x = roundedCenter.getX() - 200, realX = 0; x < roundedCenter.getX() + 200; x += freq, realX++) {
-                            spawnLocations.add(Location.create(x, y));
-                        }
-                    }
-                    return spawnLocations;
-                },
+            for (int y = roundedCenter.getY() + 200, realY = 0; y > roundedCenter.getY() - 200; y -= freq, realY++) {
+                for (int x = roundedCenter.getX() - 200, realX = 0; x < roundedCenter.getX() + 200; x += freq, realX++) {
+                    spawnLocations.add(Location.create(x, y));
+                }
+            }
+            return spawnLocations;
+        },
                 SpawnContext::getBuildingSpawnAction),
-        Item(5,
-                center -> {
-                    int freq = 20;
-                    Set<Location> spawnLocations = new HashSet<>();
+        Item(center -> {
+            int freq = 20;
+            Set<Location> spawnLocations = new HashSet<>();
 
-                    Location roundedCenter = center.round(freq);
+            Location roundedCenter = center.round(freq);
 
-                    for (int y = roundedCenter.getY() + 200, realY = 0; y > roundedCenter.getY() - 200; y -= freq, realY++) {
-                        for (int x = roundedCenter.getX() - 200, realX = 0; x < roundedCenter.getX() + 200; x += freq, realX++) {
-                            spawnLocations.add(Location.create(x, y));
-                        }
-                    }
-                    return spawnLocations;
-                },
+            for (int y = roundedCenter.getY() + 200, realY = 0; y > roundedCenter.getY() - 200; y -= freq, realY++) {
+                for (int x = roundedCenter.getX() - 200, realX = 0; x < roundedCenter.getX() + 200; x += freq, realX++) {
+                    spawnLocations.add(Location.create(x, y));
+                }
+            }
+            return spawnLocations;
+        },
                 SpawnContext::getItemSpawnAction),
-        Living(30,
-                center -> {
-                    int freq = 50;
-                    Set<Location> spawnLocations = new HashSet<>();
+        Living(center -> {
+            int freq = 100;
+            Set<Location> spawnLocations = new HashSet<>();
 
-                    Location roundedCenter = center.round(freq);
+            Location roundedCenter = center.round(freq);
 
-                    for (int y = roundedCenter.getY() + 200, realY = 0; y > roundedCenter.getY() - 200; y -= freq, realY++) {
-                        for (int x = roundedCenter.getX() - 200, realX = 0; x < roundedCenter.getX() + 200; x += freq, realX++) {
-                            spawnLocations.add(Location.create(x, y));
-                        }
-                    }
-                    return spawnLocations;
-                },
+            for (int y = roundedCenter.getY() + 200, realY = 0; y > roundedCenter.getY() - 200; y -= freq, realY++) {
+                for (int x = roundedCenter.getX() - 200, realX = 0; x < roundedCenter.getX() + 200; x += freq, realX++) {
+                    spawnLocations.add(Location.create(x, y));
+                }
+            }
+            return spawnLocations;
+        },
                 SpawnContext::getLivingSpawnAction);
 
-        private final int spawnFrequency;
         private final Function<Location, Set<Location>> getSpawnLocFn;
         private final Function<SpawnActionContext, List<Action>> getSpawnActionsFn;
 
-        private SpawnContextType(int spawnFrequency,
+        private SpawnContextType(
                 Function<Location, Set<Location>> getSpawnLocFn,
                 Function<SpawnActionContext, List<Action>> getSpawnActionsFn) {
-            this.spawnFrequency = spawnFrequency;
             this.getSpawnLocFn = getSpawnLocFn;
             this.getSpawnActionsFn = getSpawnActionsFn;
-        }
-
-        public final int spawnFrequency() {
-            return spawnFrequency;
         }
 
         public final Function<Location, Set<Location>> getGetSpawnLocFn() {
