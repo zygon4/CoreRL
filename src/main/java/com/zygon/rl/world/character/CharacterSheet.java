@@ -8,6 +8,7 @@ import java.util.Set;
 
 import com.zygon.rl.data.Creature;
 import com.zygon.rl.data.Effect;
+import com.zygon.rl.data.items.ArmorData;
 import com.zygon.rl.util.dialog.Dialog;
 import com.zygon.rl.util.quest.QuestInfo;
 import com.zygon.rl.world.Item;
@@ -99,6 +100,16 @@ public final class CharacterSheet extends Tangible {
         return baseSpeed;
     }
 
+    public int getAV() {
+        // TODO: Add prof bonuses
+        final int dexMod = getModifiedStats().getDexterityModifier();
+        return dexMod + getEquipment().listEquipped().stream()
+                .map(a -> (ArmorData) a.getTemplate())
+                .map(ArmorData::getAv)
+                .mapToInt(Integer::valueOf)
+                .sum();
+    }
+
     public Stats getModifiedStats() {
         Stats baseStats = getStats();
 
@@ -165,6 +176,12 @@ public final class CharacterSheet extends Tangible {
 
     public Set<Proficiency> getProficiencies() {
         return proficiencies;
+    }
+
+    public Proficiency getProficiency(String id) {
+        return getProficiencies().stream()
+                .filter(p -> p.getProficiency().getId().equals(id))
+                .findFirst().orElse(null);
     }
 
     public Dialog getDialog() {

@@ -183,8 +183,8 @@ public class SummonAction extends Action {
 
     static Stats generate(Creature creature, Random random) {
 
-        final int baseStat = 8;
-        Supplier<Integer> getStatFn = () -> baseStat + random.nextInt(4);
+        final int baseStat = 1 + (creature.getWeight() / 16);
+        final Supplier<Integer> getStatFn = () -> baseStat + random.nextInt(2);
 
         final int weight = creature.getWeight();
         final int weightMod = weight / 100;

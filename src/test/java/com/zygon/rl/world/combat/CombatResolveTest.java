@@ -77,6 +77,7 @@ public class CombatResolveTest {
         DamageResolution resolvedMelee = resolver.resolveCloseCombat(attacker, defender);
 
         Assert.assertNotNull(resolvedMelee);
+        System.out.println(resolvedMelee);
         // TODO: expect simple result, no weapons/armor
     }
 

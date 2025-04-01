@@ -57,10 +57,19 @@ public class ArmorData extends ItemClass {
         return BY_ID.keySet();
     }
 
+    private int av;
     private List<String> slots;
+
+    public int getAv() {
+        return av;
+    }
 
     public List<String> getSlots() {
         return slots;
+    }
+
+    public void setAv(int av) {
+        this.av = av;
     }
 
     public void setSlots(List<String> slots) {

@@ -7,6 +7,7 @@
         "name": "pair of cotton pants",
         "description": "A simple pair of pants",
         "weight": 1,
+        "av": 1,
         "slots" : [ "LEG", "LEG" ]
     },
     {
@@ -17,6 +18,7 @@
         "name": "pair of tough leather pants",
         "description": "Good leather pants",
         "weight": 2,
+        "av": 2,
         "slots" : [ "LEG", "LEG" ]
     },
     {
@@ -27,6 +29,7 @@
         "name": "pair of wool pants",
         "description": "A pair of wool pants",
         "weight": 1,
+        "av": 1,
         "slots" : [ "LEG", "LEG" ]
     },
     {
@@ -37,6 +40,7 @@
         "name": "pair of velvet pants",
         "description": "A fancy pair of velvet pants",
         "weight": 1,
+        "av": 1,
         "slots" : [ "LEG", "LEG" ]
     },
     {
@@ -47,6 +51,7 @@
         "name": "pair of silk pants",
         "description": "A soft pair of pants",
         "weight": 1,
+        "av": 1,
         "slots" : [ "LEG", "LEG" ]
     }
 ]

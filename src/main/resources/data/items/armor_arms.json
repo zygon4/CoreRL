@@ -6,7 +6,8 @@
         "color": "Brown",
         "name": "leather bracers",
         "description": "Tough leather arm bracers",
-        "weight": 1,
+        "weight": 2,
+        "av": 4,
         "slots" : [ "ARM", "ARM" ]
     },
     {
@@ -16,7 +17,8 @@
         "color": "Silver",
         "name": "chainmail bracers",
         "description": "Chainmail arm bracers",
-        "weight": 2,
+        "weight": 4,
+        "av": 8,
         "slots" : [ "ARM", "ARM" ]
     },
     {
@@ -26,7 +28,8 @@
         "color": "Brown",
         "name": "leather vambraces",
         "description": "Leather vambraces",
-        "weight": 1,
+        "weight": 2,
+        "av": 4,
         "slots" : [ "ARM", "ARM" ]
     },
     {
@@ -36,7 +39,8 @@
         "color": "Silver",
         "name": "chainmail vambraces",
         "description": "Chainmail vambraces",
-        "weight": 2,
+        "weight": 4,
+        "av": 8,
         "slots" : [ "ARM", "ARM" ]
     }
 ]

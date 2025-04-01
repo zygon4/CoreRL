@@ -15,7 +15,7 @@ public class DamageResolution {
 
     private final String defender;
     private final boolean miss;
-    private final boolean critial;
+    private final boolean critical;
     private final Map<DamageType, Integer> damageByType = new LinkedHashMap<>();
     private final boolean xpGained;
     private int totalDamage = 0;
@@ -23,12 +23,12 @@ public class DamageResolution {
     // TODO: damage to weapons/armor/items on person, or even damage
     // to the local area (acid spray, etc.), and status effects like knockdown.
     //
-    public DamageResolution(String defender, boolean miss, boolean critial,
+    public DamageResolution(String defender, boolean miss, boolean critical,
             boolean xpGained) {
         this.defender = defender;
         this.miss = miss;
-        this.critial = critial;
-        if (miss && critial) {
+        this.critical = critical;
+        if (miss && critical) {
             throw new IllegalArgumentException();
         }
         this.xpGained = xpGained;
@@ -52,8 +52,8 @@ public class DamageResolution {
         return totalDamage;
     }
 
-    public boolean isCritial() {
-        return critial;
+    public boolean isCritical() {
+        return critical;
     }
 
     public boolean isMiss() {
@@ -64,36 +64,42 @@ public class DamageResolution {
         return xpGained;
     }
 
+    protected String getHitMessage() {
+        return "HIT";
+    }
+
     protected String getMissMessage() {
-        return "No effect";
+        return "MISS";
     }
 
     protected String getCritMessage() {
-        return "String effect";
+        return "CRITICAL";
     }
 
     protected String getDamageMessage() {
+
         StringBuilder sb = new StringBuilder();
-        sb.append(getDefender()).append(" for ")
-                .append(getTotalDamage()).append(" damage\n  ")
-                .append(getDamageByType().entrySet().stream()
-                        .map(entry -> entry.getKey().name() + " - " + entry.getValue() + " damage")
-                        .collect(Collectors.joining("\n  ")));
+        if (isMiss()) {
+            sb.append(getMissMessage()).append(" ");
+        } else {
+            if (isCritical()) {
+                sb.append(getCritMessage()).append(" ");
+            } else {
+                sb.append(getHitMessage()).append(" ");
+            }
+            sb.append(getDefender()).append("\n")
+                    .append(" for ")
+                    .append(getTotalDamage())
+                    .append(" damage\n ")
+                    .append(getDamageByType().entrySet().stream()
+                            .map(entry -> entry.getKey().name() + " - " + entry.getValue() + " damage")
+                            .collect(Collectors.joining("\n  ")));
+        }
         return sb.toString();
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        if (isMiss()) {
-            sb.append(getMissMessage());
-        } else {
-            if (isCritial()) {
-                sb.append(getCritMessage()).append("\n");
-            }
-            sb.append(getDamageMessage());
-        }
-        return sb.toString();
+        return getDamageMessage();
     }
-
 }

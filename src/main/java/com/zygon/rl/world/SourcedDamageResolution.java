@@ -19,17 +19,17 @@ public class SourcedDamageResolution extends DamageResolution {
     }
 
     @Override
-    protected String getCritMessage() {
-        return "Critical!";
+    protected String getHitMessage() {
+        return attacker + " " + super.getHitMessage();
     }
 
     @Override
     protected String getMissMessage() {
-        return attacker + " missed!";
+        return attacker + " " + super.getMissMessage();
     }
 
     @Override
-    protected String getDamageMessage() {
-        return attacker + " hit " + super.getDamageMessage();
+    protected String getCritMessage() {
+        return attacker + " " + super.getCritMessage();
     }
 }

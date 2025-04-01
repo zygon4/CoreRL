@@ -42,24 +42,48 @@ public class Stats {
         return charisma;
     }
 
+    public int getCharismaModifier() {
+        return getModifier(getCharisma());
+    }
+
     public int getConstitution() {
         return constitution;
+    }
+
+    public int getConstitutionModifier() {
+        return getModifier(getConstitution());
     }
 
     public int getDexterity() {
         return dexterity;
     }
 
+    public int getDexterityModifier() {
+        return getModifier(getDexterity());
+    }
+
     public int getIntelligence() {
         return intelligence;
+    }
+
+    public int getIntelligenceModifier() {
+        return getModifier(getIntelligence());
     }
 
     public int getStrength() {
         return strength;
     }
 
+    public int getStrengthModifier() {
+        return getModifier(getStrength());
+    }
+
     public int getWisdom() {
         return wisdom;
+    }
+
+    public int getWisdomModifier() {
+        return getModifier(getWisdom());
     }
 
     public Stats incStr(int ammount) {
@@ -111,5 +135,10 @@ public class Stats {
         sb.append("CHA: ").append(getCharisma());
 
         return sb.toString();
+    }
+
+    private static int getModifier(int stat) {
+        // TODO: should be rounded down
+        return Math.round((stat - 10) / 2);
     }
 }
