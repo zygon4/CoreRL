@@ -110,7 +110,12 @@ public class GameLog {
         for (int i = this.messages.size() - reCount; i < this.messages.size(); i++) {
             CountedMessage countedMsg = this.messages.get(i);
             String display = countedMsg.getDisplay();
-            recentMessages.add(WordUtils.wrap(display, wrap));
+
+            // need to break up the display by newline and wrap the individuals
+            String[] lines = display.split("\\r?\\n");
+            for (String line : lines) {
+                recentMessages.add(WordUtils.wrap(line, wrap));
+            }
         }
         return recentMessages;
     }

@@ -28,7 +28,7 @@ public class GameUI {
         TileGrid tileGrid = SwingApplications.startTileGrid(
                 AppConfig.newBuilder()
                         .withTitle(game.getConfiguration().getGameName() + "      " + POWERED_BY)
-                        .withSize(Size.create(120, 70))
+                        .withSize(Size.create(160, 70))
                         //                        .withDebugMode(true)
                         //                        .withDebugConfig(DebugConfig.newBuilder().withRelaxBoundsCheck(true).build())
                         .withDefaultTileset(CP437TilesetResources.rexPaint20x20())

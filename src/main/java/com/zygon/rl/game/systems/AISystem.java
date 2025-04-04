@@ -126,17 +126,22 @@ public final class AISystem extends GameSystem {
             // with different flee/fight caracteristics.
             switch (species) {
                 // This seems like a common pattern of behavior.
-                case AMPHIBIAN, MAMMAL -> {
-                    // If next to, attack
-                    // TODO: I think this is slighty wrong, there's no *need* to start swinging..
-                    if (characterLocation.getNeighbors().contains(world.getPlayerLocation())) {
+                case AMPHIBIAN, MAMMAL, HUMAN, SPIDER, VAMPIRE, ZOMBIE -> {
+                    // if within aggressive range -> follow, if next to -> attack
+                    // This works around setting HOSTILE state because the game
+                    // is not passed in here, it acts on current state. However,
+                    // attacking the player will cause HOSTILE status if the
+                    // player swings back.
+                    if (creatureTemplate.getAggression() > 0
+                            && characterLocation.getNeighbors().contains(world.getPlayerLocation())) {
                         CharacterSheet player = world.getPlayer();
                         return (c) -> new MeleeAttackAction(getGameConfiguration(),
                                 c, characterLocation, player, world.getPlayerLocation());
                     } else {
-                        // If within aggression range follow
-                        if (characterLocation.getNeighbors(creatureTemplate.getAggression())
-                                .contains(world.getPlayerLocation())) {
+                        // If within aggression range follow hostile behavior
+                        if (creatureTemplate.getAggression() > 0
+                                && characterLocation.getNeighbors(creatureTemplate.getAggression())
+                                        .contains(world.getPlayerLocation())) {
                             Location playerLocation = world.getPlayerLocation();
                             // player location can be null if dead
                             if (playerLocation != null) {
@@ -149,9 +154,6 @@ public final class AISystem extends GameSystem {
                     }
                 }
             }
-
-        } else if (character.getType().equals(CommonAttributes.NPC.name())) {
-            return wander(characterLocation, world);
         }
 
         return null;

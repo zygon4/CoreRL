@@ -109,8 +109,7 @@ public abstract class DamageAction extends Action {
      These utilities below could/should be moved somewhere more common..
      */
     public static void updateToHostile(GameState state,
-            CharacterSheet characterSheet,
-            Location location) {
+            CharacterSheet characterSheet, Location location) {
         addStatusEffect(state, characterSheet, location, Effect.EffectNames.HOSTILE.getId());
     }
 

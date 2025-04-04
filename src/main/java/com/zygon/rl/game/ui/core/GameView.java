@@ -66,7 +66,7 @@ final class GameView extends BaseView {
 
     private static final System.Logger logger = System.getLogger(GameView.class.getCanonicalName());
 
-    private static final int SIDEBAR_SCREEN_WIDTH = 18;
+    private static final int SIDEBAR_SCREEN_WIDTH = 24;
     // TODO: support for different kinds of extra-sensory vision
     private static final Tile BLACK_TILE = Tile.newBuilder()
             .withBackgroundColor(ANSITileColor.BLACK)
@@ -273,7 +273,7 @@ final class GameView extends BaseView {
                 .withSize(SIDEBAR_SCREEN_WIDTH - 2, 5).build());
         // TODO: full screen log area (view?) to see/search all
         componentsByName.put("log", Components.textArea()
-                .withSize(SIDEBAR_SCREEN_WIDTH - 2, 25)
+                .withSize(SIDEBAR_SCREEN_WIDTH - 2, 30)
                 .build());
 
         String playerName = getPlayer(game).getName();
