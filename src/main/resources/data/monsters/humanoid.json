@@ -10,8 +10,7 @@
         "aggression": 0,
         "pools": ["pool_health_medium"],
         "speed": 90,
-        "weight": 150,
-        "spawns": ["TALL_FIELD", "SHORT_FIELD", "TOWN_OUTER", "TOWN_RESIDENCE"]
+        "weight": 150
     },
     {
         "id": "mon_soldier",
@@ -30,8 +29,7 @@
         "weight": 180,
         "proficiencies": {
             "melee": 1
-        },
-        "spawns": ["TOWN_OUTER", "TOWN_RESIDENCE"]
+        }
     },
     {
         "id": "mon_tough_soldier",
@@ -50,8 +48,7 @@
         "weight": 200,
         "proficiencies": {
             "melee": 2
-        },
-        "spawns": ["TOWN_RESIDENCE"]
+        }
     },
     {
         "id": "mon_townsfolk",
@@ -67,7 +64,6 @@
         "weight": 140,
         "proficiencies": {
             "charm": 1
-        },
-        "spawns": ["TOWN_RESIDENCE"]
+        }
     }
 ]

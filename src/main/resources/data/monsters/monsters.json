@@ -11,8 +11,7 @@
         "pools": ["pool_health_small"],
         "speed": 140,
         "flags": { "FLIES": true },
-        "weight": 1,
-        "spawns": ["DEEP_WATER", "SHALLOW_WATER", "SHORT_FIELD", "TOWN_OUTER", "TOWN_RESIDENCE"]
+        "weight": 1
     },
     {
         "id": "mon_giant_frog",
@@ -26,8 +25,7 @@
         "pools": ["pool_health_small"],
         "speed": 80,
         "flags": {},
-        "weight": 30,
-        "spawns": ["SHALLOW_WATER", "SHORE"]
+        "weight": 30
     },
     {
         "id": "mon_wolf",
@@ -41,8 +39,7 @@
         "pools": ["pool_health_medium"],
         "speed": 120,
         "flags": {},
-        "weight": 75,
-        "spawns": ["FOREST", "TALL_FIELD"]
+        "weight": 75
     },
     {
         "id": "mon_rat",
@@ -56,8 +53,7 @@
         "pools": ["pool_health_small"],
         "speed": 40,
         "flags": {},
-        "weight": 2,
-        "spawns": ["SHALLOW_WATER", "SHORE", "SHORT_FIELD", "TOWN_RESIDENCE"]
+        "weight": 2
     },
     {
         "id": "mon_bear",
@@ -71,8 +67,7 @@
         "pools": ["pool_health_large"],
         "speed": 90,
         "flags": {},
-        "weight": 285,
-        "spawns": ["SHALLOW_WATER", "SHORE", "TALL_FIELD", "FOREST"]
+        "weight": 285
     },
     {
         "id": "mon_deer",
@@ -86,8 +81,7 @@
         "pools": ["pool_health_medium"],
         "speed": 120,
         "flags": {},
-        "weight": 105,
-        "spawns": ["SHALLOW_WATER", "SHORE", "TALL_FIELD", "SHORT_FIELD", "FOREST"]
+        "weight": 105
     },
     {
         "id": "mon_opossum",
@@ -101,8 +95,7 @@
         "pools": ["pool_health_small"],
         "speed": 80,
         "flags": {},
-        "weight": 12,
-        "spawns": ["TALL_FIELD", "SHORT_FIELD"]
+        "weight": 12
     },
     {
         "id": "mon_giant_spider",
@@ -116,8 +109,7 @@
         "pools": ["pool_health_small"],
         "speed": 80,
         "flags": {},
-        "weight": 10,
-        "spawns": ["FOREST"]
+        "weight": 10
     },
     {
         "id": "mon_vampire",
@@ -135,8 +127,7 @@
             "UNDEAD": true,
             "WEAK_TO_SUN": true
         },
-        "weight": 180,
-        "spawns": []
+        "weight": 180
     },
     {
         "id": "mon_lich",
@@ -153,8 +144,7 @@
             "MAGIC": 4,
             "UNDEAD": true
         },
-        "weight": 120,
-        "spawns": []
+        "weight": 120
     },
     {
         "id": "mon_zombie",
@@ -170,7 +160,6 @@
         "flags": {
             "UNDEAD": true
         },
-        "weight": 120,
-        "spawns": ["FOREST"]
+        "weight": 120
     }
 ]

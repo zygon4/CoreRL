@@ -13,28 +13,21 @@ public class Creature extends WorldElement {
     private List<String> pools;
     private Map<String, Integer> proficiencies;
     private int speed;
-    private List<String> spawns;
 
     public Creature() {
     }
 
     public Creature(WorldElement template, String species, int aggression,
-            List<String> pools, int speed, List<String> spawns) {
+            List<String> pools, int speed) {
         super(template);
         this.species = species;
         this.aggression = aggression;
         this.pools = pools;
         this.speed = speed;
-        this.spawns = spawns;
-    }
-
-    public Creature(WorldElement template, String species, int aggression,
-            List<String> pools, int speed) {
-        this(template, species, aggression, pools, speed, null);
     }
 
     public Creature copy(WorldElement template) {
-        return new Creature(template, species, aggression, pools, speed, spawns);
+        return new Creature(template, species, aggression, pools, speed);
     }
 
     public String getSpecies() {
@@ -57,10 +50,6 @@ public class Creature extends WorldElement {
         return speed;
     }
 
-    public List<String> getSpawns() {
-        return spawns;
-    }
-
     public void setAggression(int aggression) {
         this.aggression = aggression;
     }
@@ -71,10 +60,6 @@ public class Creature extends WorldElement {
 
     public void setProficiencies(Map<String, Integer> proficiencies) {
         this.proficiencies = proficiencies;
-    }
-
-    public void setSpawns(List<String> spawns) {
-        this.spawns = spawns;
     }
 
     public void setSpecies(String species) {
