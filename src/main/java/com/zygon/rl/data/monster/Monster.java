@@ -43,9 +43,9 @@ public class Monster extends Creature {
                 Monster.class.getResourceAsStream(path)))) {
             List<Monster> monsters = StringUtil.JSON.fromJson(jsonReader, TYPE);
 
-            logger.log(Level.INFO, "Loading : {0}", path);
+            logger.log(Level.DEBUG, "Loading : {0}", path);
             monsters.forEach(m -> {
-                logger.log(Level.INFO, "Loading : {0}", m);
+                logger.log(Level.DEBUG, "Loading : {0}", m);
             });
 
             BY_ID.putAll(monsters.stream()

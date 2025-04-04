@@ -48,9 +48,9 @@ public class MonsterGroups extends Element {
                 MonsterGroups.class.getResourceAsStream(path)))) {
             List<MonsterGroups> ls = StringUtil.JSON.fromJson(jsonReader, TYPE);
 
-            logger.log(Level.INFO, "Loading : {0}", path);
+            logger.log(Level.DEBUG, "Loading : {0}", path);
             ls.forEach(m -> {
-                logger.log(Level.INFO, "Loading : {0}", m);
+                logger.log(Level.DEBUG, "Loading : {0}", m);
             });
 
             BY_ID.putAll(ls.stream()
