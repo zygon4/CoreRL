@@ -224,7 +224,8 @@ public class StatusEffectSystem extends GameSystem {
 
             CharacterSheet player = state.getWorld().getPlayer();
 
-            Action playerPools = translateTurnBased(state, player, state.getWorld().getPlayerLocation());
+            Action playerPools = translateTurnBased(state, player,
+                    state.getWorld().getPlayerLocation());
             if (playerPools != null) {
                 actions.add(playerPools);
             }
@@ -238,6 +239,24 @@ public class StatusEffectSystem extends GameSystem {
 
         private Action translateTurnBased(GameState state, CharacterSheet player,
                 Location location) {
+
+            for (String poolId : player.getStatus().getPoolIds()) {
+                Pool pool = player.getStatus().getPool(poolId);
+                int freq = pool.getPoolData().getDrainFrequency();
+                if (freq > 0) {
+                    if (state.getTurnCount() % freq == 0) {
+                        return new SetPoolAction(player, location, poolId, pool.getPoints() - 1, true);
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        // TODO actions to notify
+        // TODO: this is not used yet..
+        private Action translateNotification(GameState state,
+                CharacterSheet player, Location location) {
 
             for (String poolId : player.getStatus().getPoolIds()) {
                 Pool pool = player.getStatus().getPool(poolId);

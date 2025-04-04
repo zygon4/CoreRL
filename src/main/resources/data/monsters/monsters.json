@@ -22,7 +22,7 @@
         "symbol": "f",
         "color": "DarkSeaGreen",
         "species": "AMPHIBIAN",
-        "aggression": 4,
+        "aggression": 2,
         "pools": ["pool_health_small"],
         "speed": 80,
         "flags": {},
@@ -103,6 +103,21 @@
         "flags": {},
         "weight": 12,
         "spawns": ["TALL_FIELD", "SHORT_FIELD"]
+    },
+    {
+        "id": "mon_giant_spider",
+        "type": "MONSTER",
+        "name": "Spider",
+        "description": "A giant spider",
+        "symbol": "s",
+        "color": "Brown",
+        "species": "SPIDER",
+        "aggression": 3,
+        "pools": ["pool_health_small"],
+        "speed": 80,
+        "flags": {},
+        "weight": 10,
+        "spawns": ["FOREST"]
     },
     {
         "id": "mon_vampire",

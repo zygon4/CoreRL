@@ -59,7 +59,7 @@
         "symbol": ".",
         "color": "Brown",
         "flags": {
-            "VIEW_BLOCK": 0.1
+            "VIEW_BLOCK": 0.0
         }
     },
     {
@@ -71,7 +71,7 @@
         "color": "Red",
         "flags": {
             "VIEW_BLOCK": 0.9,
-            "TERRAIN_DIFFICULTY": 0.1
+            "TERRAIN_DIFFICULTY": 0.2
         },
         "weight": 100
     },

@@ -26,37 +26,43 @@ public class Monster extends Creature {
 
     public static final String MONSTER_TYPE = "MONSTER";
 
-    private static final Map<String, Monster> NPC_BY_ID = new HashMap<>();
+    private static final Map<String, Monster> BY_ID = new HashMap<>();
 
     private static final Type TYPE = new TypeToken<List<Monster>>() {
     }.getType();
 
+    private static final String HUMANOID_PATH = "/data/monsters/humanoid.json";
     private static final String RESOURCE_PATH = "/data/monsters/monsters.json";
 
     public Monster() {
         super();
     }
 
-    public static void load() throws FileNotFoundException, IOException {
-
+    private static void load(String path) throws FileNotFoundException, IOException {
         try (Reader jsonReader = new BufferedReader(new InputStreamReader(
-                Monster.class.getResourceAsStream(RESOURCE_PATH)))) {
+                Monster.class.getResourceAsStream(path)))) {
             List<Monster> monsters = StringUtil.JSON.fromJson(jsonReader, TYPE);
 
-            monsters.forEach(effect -> {
-                logger.log(Level.DEBUG, "Loading monster: {0}", effect);
+            logger.log(Level.INFO, "Loading : {0}", path);
+            monsters.forEach(m -> {
+                logger.log(Level.INFO, "Loading : {0}", m);
             });
 
-            NPC_BY_ID.putAll(monsters.stream()
+            BY_ID.putAll(monsters.stream()
                     .collect(Collectors.toMap(m -> m.getId(), m -> m)));
         }
     }
 
+    public static void load() throws FileNotFoundException, IOException {
+        load(HUMANOID_PATH);
+        load(RESOURCE_PATH);
+    }
+
     public static Monster get(String id) {
-        return NPC_BY_ID.get(id);
+        return BY_ID.get(id);
     }
 
     public static Set<String> getAllIds() {
-        return NPC_BY_ID.keySet();
+        return BY_ID.keySet();
     }
 }

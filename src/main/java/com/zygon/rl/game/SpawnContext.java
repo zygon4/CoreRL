@@ -3,24 +3,21 @@ package com.zygon.rl.game;
 import java.lang.System.Logger;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
 
 import com.zygon.rl.data.ItemClass;
-import com.zygon.rl.data.Terrain;
 import com.zygon.rl.data.buildings.Building;
 import com.zygon.rl.data.buildings.BuildingData;
 import com.zygon.rl.data.buildings.BuildingLayout;
 import com.zygon.rl.data.buildings.Layout;
 import com.zygon.rl.data.context.Data;
 import com.zygon.rl.data.items.WorldData;
-import com.zygon.rl.data.monster.Monster;
-import com.zygon.rl.data.npc.Npc;
+import com.zygon.rl.data.monstergroups.Group;
+import com.zygon.rl.data.monstergroups.MonsterGroups;
 import com.zygon.rl.world.Item;
 import com.zygon.rl.world.Location;
 import com.zygon.rl.world.World;
@@ -41,25 +38,6 @@ import com.zygon.rl.world.action.SummonAction;
 public class SpawnContext {
 
     private static final Logger LOGGER = System.getLogger(SpawnContext.class.getCanonicalName());
-
-    // TODO: this seems to belong somewhere else - Monster maybe?
-    private static Map<WorldRegion, Set<String>> creatureIds;
-
-    static {
-        // Wish this were more functional..
-        Map<WorldRegion, Set<String>> spawnsByRegion = new HashMap<>();
-        for (String id : Monster.getAllIds()) {
-            Monster mon = Monster.get(id);
-            List<String> spawns = mon.getSpawns();
-            for (String spawn : spawns) {
-                WorldRegion wr = WorldRegion.valueOf(spawn);
-                Set<String> creatureIds = spawnsByRegion.computeIfAbsent(wr, k -> new HashSet<>());
-                creatureIds.add(id);
-            }
-        }
-
-        creatureIds = Collections.unmodifiableMap(spawnsByRegion);
-    }
 
     public static record SpawnActionContext(GameState state, Location location,
             Random random) {
@@ -164,6 +142,7 @@ public class SpawnContext {
 
         GameState state = actionContext.state();
         Location location = actionContext.location();
+        Random random = actionContext.random();
 
         List<Action> actions = new ArrayList<>();
 
@@ -180,11 +159,7 @@ public class SpawnContext {
                 if (canBuild(state.getWorld(), location, building)) {
                     Set<Action> spawnActions = spawnBuilding(location, building);
                     actions.addAll(spawnActions);
-                    // TODO: drive spawns from json data
-
-                    String npcId = getRandomSetElement(Npc.getAllIds(), actionContext.random());
-                    SummonAction summonAction = new SummonAction(location, 1, npcId, actionContext.random());
-                    actions.add(summonAction);
+                    actions.add(summonGroup(location, "grp_city", random));
                 }
             }
         }
@@ -249,36 +224,30 @@ public class SpawnContext {
         int noiseY = -20 + random.nextInt(40);
 
         Location rngLocation = Location.create(location.getX() + noiseX, location.getY() + noiseY);
-        Terrain terrain = world.getTerrain(location);
         WorldRegion region = world.getRegion(location);
-        Set<String> regionCreatureIds = creatureIds.get(region);
 
-        Action summonAction = null;
-
-        if (!terrain.getId().equals(Terrain.Ids.PUDDLE.getId())
-                && !terrain.getId().equals(Terrain.Ids.DEEP_WATER.getId())) {
-
-            String creatureId = null;
-
-            if (random.nextDouble() > .10) {
-                creatureId = getRandomSetElement(regionCreatureIds, random);
-            } else {
-                // TODO: set names on resulting spawns
-                // TODO: equipment/items on NPCs
-                creatureId = getRandomSetElement(Npc.getAllIds(), random);
+        switch (region) {
+            case SHALLOW_WATER, SHORE -> {
+                actions.add(summonGroup(rngLocation, "grp_shore", random));
             }
-
-            summonAction = new SummonAction(rngLocation, random.nextInt(4), creatureId, random);
-            actions.add(summonAction);
+            case SHORT_FIELD, TALL_FIELD -> {
+                actions.add(summonGroup(rngLocation, "grp_field", random));
+            }
+            case FOREST -> {
+                actions.add(summonGroup(rngLocation, "grp_forest", random));
+            }
         }
 
         return actions;
     }
 
-    private static <E> E getRandomSetElement(Set<E> set, Random random) {
-        return set.stream()
-                .skip(random.nextInt(set.size()))
-                .findFirst().orElse(null);
+    private static Action summonGroup(final Location location,
+            final String groupId, final Random random) {
+        MonsterGroups monGroup = MonsterGroups.get(groupId);
+        Group group = monGroup.getGroup(random);
+        String id = group.getId();
+        int packSize = group.getPackSize(random);
+        return new SummonAction(location, packSize, id, random);
     }
 
     /**
@@ -322,29 +291,4 @@ public class SpawnContext {
 
         return spawnActions;
     }
-
-//    private Terrain getBuildingTerrain(Building building, int distToCenterX,
-//            int distToCenterY) {
-//
-//        int absX = Math.abs(distToCenterX);
-//        int absY = Math.abs(distToCenterY);
-//
-//        // needs thought: if x/y are within a house's height/width when centered
-//        // on a point, then get the terrain from the layout.
-//        //
-//        Layout layout = building.getLayout();
-//
-//        if (absX <= layout.getStructure().getWidthFromCenter() && absY <= layout.getStructure().getHeightFromCenter()) {
-//            // need to convert the relative distances to the center into x/y in the layout
-//
-//            int layoutX = distToCenterX + layout.getStructure().getWidthFromCenter();
-//            int layoutY = distToCenterY + layout.getStructure().getHeightFromCenter();
-//
-//            String terrainId = layout.getStructure().getId(layoutX, layoutY);
-//
-//            return Terrain.get(terrainId);
-//        }
-//
-//        return getTerrain(TOWN_OUTER, Location.create(distToCenterX, distToCenterY));
-//    }
 }

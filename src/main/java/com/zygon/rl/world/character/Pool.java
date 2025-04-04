@@ -62,6 +62,12 @@ public final class Pool {
         return points;
     }
 
+    public boolean isLow() {
+        double pct = getPoints() / getPoolData().getMax();
+        pct *= 100.0;
+        return pct <= 40.0;
+    }
+
     public Pool decrement(int points) {
         int val = Math.max(getPoints() - points, getMin());
         return new Pool(poolData, val);

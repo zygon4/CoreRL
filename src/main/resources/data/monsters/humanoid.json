@@ -1,0 +1,73 @@
+[
+    {
+        "id": "mon_generic_farmer",
+        "type": "MONSTER",
+        "name": "farmer",
+        "description": "Salt of the earth",
+        "symbol": "@",
+        "color": "Wheat",
+        "species": "HUMAN",
+        "aggression": 1,
+        "pools": ["pool_health_medium"],
+        "speed": 90,
+        "weight": 150,
+        "spawns": ["TALL_FIELD", "SHORT_FIELD", "TOWN_OUTER", "TOWN_RESIDENCE"]
+    },
+    {
+        "id": "mon_soldier",
+        "type": "MONSTER",
+        "name": "soldier",
+        "description": "An equiped soldier",
+        "symbol": "@",
+        "color": "Gray",
+        "species": "HUMAN",
+        "aggression": 8,
+        "pools": ["pool_health_medium"],
+        "speed": 100,
+        "flags": {
+            "SENTRY": true
+        },
+        "weight": 180,
+        "proficiencies": {
+            "melee": 1
+        },
+        "spawns": ["TOWN_OUTER", "TOWN_RESIDENCE"]
+    },
+    {
+        "id": "mon_tough_soldier",
+        "type": "MONSTER",
+        "name": "tough soldier",
+        "description": "A tough equiped soldier",
+        "symbol": "@",
+        "color": "SlateGray",
+        "species": "HUMAN",
+        "aggression": 12,
+        "pools": ["pool_health_medium"],
+        "speed": 110,
+        "flags": {
+            "SENTRY": true
+        },
+        "weight": 200,
+        "proficiencies": {
+            "melee": 2
+        },
+        "spawns": ["TOWN_RESIDENCE"]
+    },
+    {
+        "id": "mon_townsfolk",
+        "type": "MONSTER",
+        "name": "townsfolk",
+        "description": "A local townsfolk",
+        "symbol": "@",
+        "color": "Wheat",
+        "species": "HUMAN",
+        "aggression": 1,
+        "pools": ["pool_health_small"],
+        "speed": 100,
+        "weight": 140,
+        "proficiencies": {
+            "charm": 1
+        },
+        "spawns": ["TOWN_RESIDENCE"]
+    }
+]

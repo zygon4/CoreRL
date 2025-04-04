@@ -3,13 +3,13 @@ package com.zygon.rl.world.action;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import com.stewsters.util.name.FantasyNameGen;
 import com.zygon.rl.data.Creature;
 import com.zygon.rl.data.Effect;
 import com.zygon.rl.data.PoolData;
@@ -53,7 +53,7 @@ public class SummonAction extends Action {
         this.location = location;
         this.count = count;
         this.radius = radius;
-        this.id = id;
+        this.id = Objects.requireNonNull(id, "id");
         this.effects = effects != null
                 ? Collections.unmodifiableSet(effects) : Collections.emptySet();
         this.random = random;
@@ -77,7 +77,7 @@ public class SummonAction extends Action {
     public GameState execute(GameState state) {
         Set<Location> summonLocations = getSummonLocations(count, state.getWorld());
 
-        Creature actor = Data.get(id);
+        Creature actor = Objects.requireNonNull(Data.get(id), id);
 
         for (Location loc : summonLocations) {
             CharacterSheet generated = getRandomCharacter(state, actor);
@@ -116,12 +116,10 @@ public class SummonAction extends Action {
                 .map(e -> new StatusEffect(e, state.getTurnCount()))
                 .collect(Collectors.toSet());
 
-        final String name;
         final Dialog dialog;
         Weapon weapon = null;
 
         if (creature.getSpecies().equals(CommonAttributes.HUMAN.name())) {
-            name = FantasyNameGen.generate();
             weapon = generate(creature);
 
             Dialog start = Dialog.create("Greetings traveller. You look mighty pale today..");
@@ -134,7 +132,6 @@ public class SummonAction extends Action {
 
             dialog = start.addChoices(List.of(yes, no));
         } else {
-            name = creature.getName();
             dialog = Dialog.create("...");
         }
 
@@ -143,7 +140,7 @@ public class SummonAction extends Action {
                 generate(creature, random),
                 new Status(age, pools, statusEffects),
                 weapon,
-                name);
+                creature.getName());
 
         // TODO: proc gen dialog);
         return character.set(dialog);
@@ -157,7 +154,7 @@ public class SummonAction extends Action {
                 .create(species, name, stats, status)
                 .build();
 
-        if (species.getSpecies().equals("HUMAN")) {
+        if (species.getSpecies().equals(CommonAttributes.HUMAN.name())) {
             ArmorData dataTunic = ArmorData.get("torso_tunic_plain");
             ArmorData dataBoots = ArmorData.get("boots_leather");
             ArmorData dataPants = ArmorData.get("legs_cotton_pants");
@@ -201,10 +198,12 @@ public class SummonAction extends Action {
     static Weapon generate(Creature creature) {
 
         switch (creature.getId()) {
-            case "npc_generic_soldier":
+            case "mon_soldier":
+                return new Weapon(Melee.get("sword"), 20, 2, 0);
+            case "mon_tough_soldier":
                 return new Weapon(Melee.get("sword"), 18, 4, 0);
-            case "npc_generic_farmer":
-                return new Weapon(Melee.get("scythe"), 18, 4, 0);
+            case "mon_generic_farmer":
+                return new Weapon(Melee.get("scythe"), 20, 3, 0);
             default:
                 return new Weapon(Melee.get("dagger"), 20, 2, 0);
         }

@@ -1,6 +1,7 @@
 package com.zygon.rl.data;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Needs stats?
@@ -10,6 +11,7 @@ public class Creature extends WorldElement {
     private String species;
     private int aggression;
     private List<String> pools;
+    private Map<String, Integer> proficiencies;
     private int speed;
     private List<String> spawns;
 
@@ -47,6 +49,10 @@ public class Creature extends WorldElement {
         return pools;
     }
 
+    public Map<String, Integer> getProficiencies() {
+        return proficiencies;
+    }
+
     public int getSpeed() {
         return speed;
     }
@@ -61,6 +67,10 @@ public class Creature extends WorldElement {
 
     public void setPools(List<String> pools) {
         this.pools = pools;
+    }
+
+    public void setProficiencies(Map<String, Integer> proficiencies) {
+        this.proficiencies = proficiencies;
     }
 
     public void setSpawns(List<String> spawns) {

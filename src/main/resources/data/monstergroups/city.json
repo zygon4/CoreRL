@@ -1,0 +1,16 @@
+[
+  {
+    "id": "grp_city",
+    "type": "monstergroup",
+    "groups": [
+      { "id": "mon_townsfolk", "weight": 60 },
+      { "id": "mon_townsfolk", "weight": 10, "packSize": [ 2, 4 ] },
+      { "id": "mon_townsfolk", "weight": 5, "packSize": [ 4, 8 ] },
+      { "id": "mon_generic_farmer", "weight": 5},
+      { "id": "mon_generic_farmer", "weight": 5, "packSize": [ 2, 3 ] },
+      { "id": "mon_soldier", "weight": 5 },
+      { "id": "mon_soldier", "weight": 5, "packSize": [ 2, 6 ] },
+      { "id": "mon_tough_soldier", "weight": 5, "packSizes": [ 1, 3 ] }
+    ]
+  }
+]

@@ -1,5 +1,8 @@
 package com.zygon.rl.util;
 
+import java.util.List;
+import java.util.Random;
+
 import com.stewsters.util.noise.OpenSimplexNoise;
 
 /**
@@ -52,5 +55,27 @@ public final class NoiseUtil {
     public static double scale(final double valueIn, final double baseMin,
             final double baseMax, final double limitMin, final double limitMax) {
         return ((limitMax - limitMin) * (valueIn - baseMin) / (baseMax - baseMin)) + limitMin;
+    }
+
+    public static int getWeightedRandom(Random random, List<Integer> weights) {
+
+        // Compute the total weight of all items together
+        int totalWeight = 0;
+        for (Integer i : weights) {
+            totalWeight += i.intValue();
+        }
+
+        // Now choose a random item
+        int randomIndex = -1;
+        double rand = random.nextDouble() * totalWeight;
+        for (int i = 0; i < weights.size(); ++i) {
+            rand -= weights.get(i);
+            if (rand <= 0.0d) {
+                randomIndex = i;
+                break;
+            }
+        }
+
+        return randomIndex;
     }
 }
