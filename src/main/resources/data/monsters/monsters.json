@@ -67,7 +67,21 @@
         "pools": ["pool_health_large"],
         "speed": 90,
         "flags": {},
-        "weight": 285
+        "weight": 385
+    },
+    {
+        "id": "mon_bobcat",
+        "type": "MONSTER",
+        "name": "Bobcat",
+        "description": "A bobcat",
+        "symbol": "c",
+        "color": "Brown",
+        "species": "MAMMAL",
+        "aggression": 1,
+        "pools": ["pool_health_small"],
+        "speed": 150,
+        "flags": {},
+        "weight": 20
     },
     {
         "id": "mon_deer",
@@ -79,9 +93,23 @@
         "species": "MAMMAL",
         "aggression": 1,
         "pools": ["pool_health_medium"],
-        "speed": 120,
+        "speed": 280,
         "flags": {},
-        "weight": 105
+        "weight": 210
+    },
+    {
+        "id": "mon_fawn",
+        "type": "MONSTER",
+        "name": "Fawn",
+        "description": "A juvenile deer",
+        "symbol": "D",
+        "color": "RosyBrown",
+        "species": "MAMMAL",
+        "aggression": 0,
+        "pools": ["pool_health_small"],
+        "speed": 180,
+        "flags": {},
+        "weight": 90
     },
     {
         "id": "mon_opossum",

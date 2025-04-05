@@ -1,7 +1,6 @@
 [
   {
     "id": "grp_shore",
-    "type": "monstergroup",
     "groups": [
       { "id": "mon_generic_farmer", "weight": 25 },
       { "id": "mon_deer", "weight": 15, "packSize": [ 1, 3 ] },
@@ -11,10 +10,11 @@
   },
   {
     "id": "grp_field",
-    "type": "monstergroup",
     "groups": [
       { "id": "mon_generic_farmer", "weight": 20, "packSize": [ 1, 3 ] },
-      { "id": "mon_deer", "weight": 25, "packSize": [ 1, 3 ] },
+      { "id": "mon_bobcat", "weight": 5 },
+      { "id": "mon_deer", "weight": 15, "packSize": [ 1, 3 ] },
+      { "id": "mon_fawn", "weight": 5},
       { "id": "mon_giant_frog", "weight": 10 },
       { "id": "mon_opossum", "weight": 20 },
       { "id": "mon_rat", "weight": 15 },
@@ -23,12 +23,13 @@
   },
   {
     "id": "grp_forest",
-    "type": "monstergroup",
     "groups": [
-      { "id": "mon_deer", "weight": 10 },
+      { "id": "mon_bobcat", "weight": 5 },
+      { "id": "mon_deer", "weight": 5 },
       { "id": "mon_deer", "weight": 10, "packSize": [ 2, 5 ] },
+      { "id": "mon_fawn", "weight": 5},
       { "id": "mon_giant_frog", "weight": 10 },
-      { "id": "mon_opossum", "weight": 10 },
+      { "id": "mon_opossum", "weight": 5 },
       { "id": "mon_rat", "weight": 10 },
       { "id": "mon_giant_spider", "weight": 10 },
       { "id": "mon_simple_bat", "weight": 10, "packSize": [ 1, 2 ] },

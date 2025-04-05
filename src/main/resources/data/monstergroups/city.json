@@ -1,7 +1,6 @@
 [
   {
     "id": "grp_city",
-    "type": "monstergroup",
     "groups": [
       { "id": "mon_townsfolk", "weight": 60 },
       { "id": "mon_townsfolk", "weight": 10, "packSize": [ 2, 4 ] },
