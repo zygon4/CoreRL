@@ -44,7 +44,6 @@ public class InventoryRenderer extends PlayerDataRenderer {
         if (items != null) {
             List<String> equipped = items.get(Boolean.TRUE);
 
-            // setting to two is weird, make better or explain
             yOffset = Y_START_OFFSET + 1;
             for (String text : equipped) {
                 getRenderUtil().render(getLayer(), Position.create(0, yOffset), text, Color.RED);

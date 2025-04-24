@@ -99,23 +99,6 @@ public final class InventoryInputHandler extends BaseInputHandler {
         return sb.toString();
     }
 
-    public Map<Input, Item> getEquipmentByKeyCode() {
-        return equipmentByKeyCode;
-    }
-
-    public Map<Input, Item> getInvByKeyCode() {
-        return invByKeyCode;
-    }
-
-    // todo: move
-    private Item get(Input input) {
-        Item item = equipmentByKeyCode.get(input);
-        if (item == null) {
-            item = invByKeyCode.get(input);
-        }
-        return item;
-    }
-
     public static Function<GameState, Map<Boolean, List<String>>> getInputsFn() {
         return gameState -> {
             GameState.InputContext ic = gameState.getInputContext().peek();
@@ -136,6 +119,22 @@ public final class InventoryInputHandler extends BaseInputHandler {
             }
             return null;
         };
+    }
+
+    private Map<Input, Item> getEquipmentByKeyCode() {
+        return equipmentByKeyCode;
+    }
+
+    private Map<Input, Item> getInvByKeyCode() {
+        return invByKeyCode;
+    }
+
+    private Item get(Input input) {
+        Item item = equipmentByKeyCode.get(input);
+        if (item == null) {
+            item = invByKeyCode.get(input);
+        }
+        return item;
     }
 
     private static void addText(List<String> destText, Set<Input> inputs,
