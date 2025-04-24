@@ -276,7 +276,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
 
                 // This type of "pass me in" is going to happen at least a few times..
                 InventoryInputHandler inventoryHandler = InventoryInputHandler.create(
-                        getGameConfiguration(), player.getInventory());
+                        getGameConfiguration(), player.getEquipment(), player.getInventory());
 
                 copy.addInputContext(
                         GameState.InputContext.builder()

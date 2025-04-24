@@ -138,12 +138,31 @@ public abstract class BaseInputHandler implements LayerInputHandler {
         return Location.create(nextX, nextY, nextZ);
     }
 
-    // maps alphabet characters (ordered) as inputs to the elements provided.
-    // If more characters are needed, it'll pull them from the KeyCode enum.
-    protected static final <T> Map<Input, T> createAlphaInputs(List<T> ts) {
+    protected static <T> Map<Input, T> createAlphaInputsLs(
+            List<List<T>> ts) {
 
         Map<Input, T> inputs = new LinkedHashMap<>();
-        int index = KeyCode.KEY_A.getCode();
+        int start = KeyCode.KEY_A.getCode();
+        for (List<T> t : ts) {
+            Map<Input, T> alphaInputs = createAlphaInputs(t, start);
+            inputs.putAll(alphaInputs);
+            start += alphaInputs.size();
+        }
+
+        return inputs;
+    }
+
+    protected static <T> Map<Input, T> createAlphaInputs(List<T> ts) {
+        return createAlphaInputs(ts, 0);
+    }
+
+    // maps alphabet characters (ordered) as inputs to the elements provided.
+    // If more characters are needed, it'll pull them from the KeyCode enum.
+    protected static <T> Map<Input, T> createAlphaInputs(List<T> ts,
+            int startIndex) {
+
+        Map<Input, T> inputs = new LinkedHashMap<>();
+        int index = KeyCode.KEY_A.getCode() + startIndex;
 
         for (T t : ts) {
             Input input = Input.valueOf(index++);

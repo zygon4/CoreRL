@@ -1,83 +1,63 @@
+/*
+ * Copyright Liminal Data Systems 2025
+ */
 package com.zygon.rl.game.ui.render;
 
 import java.awt.Color;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.function.Function;
 
 import com.zygon.rl.game.GameState;
-import com.zygon.rl.world.character.Armor;
-import com.zygon.rl.world.character.CharacterSheet;
-import com.zygon.rl.world.character.Equipment;
-import com.zygon.rl.world.character.Weapon;
 
 import org.hexworks.zircon.api.data.Position;
 import org.hexworks.zircon.api.graphics.Layer;
 
 /**
  *
- * @author zygon
+ * @author djc
  */
-public class InventoryRenderer implements GameComponentRenderer {
+public class InventoryRenderer extends PlayerDataRenderer {
 
-    private final Layer inventoryLayer;
-    private final RenderUtil renderUtil;
+    private static final int INV_OFFSET = 40;
+    private static final int Y_START_OFFSET = 1;
 
-    public InventoryRenderer(Layer inventoryLayer, RenderUtil renderUtil) {
-        this.inventoryLayer = Objects.requireNonNull(inventoryLayer);
-        this.renderUtil = Objects.requireNonNull(renderUtil);
-    }
+    private final Function<GameState, Map<Boolean, List<String>>> getTextFn;
 
-    @Override
-    public void clear() {
-        inventoryLayer.clear();
+    public InventoryRenderer(Layer inventoryLayer, RenderUtil renderUtil,
+            Function<GameState, Map<Boolean, List<String>>> getTextFn) {
+        super(inventoryLayer, renderUtil);
+        this.getTextFn = getTextFn;
     }
 
     @Override
     public void render(GameState gameState) {
 
-        renderUtil.fill(inventoryLayer);
+        getRenderUtil().fill(getLayer());
 
-        int yOffset = 1;
-        renderUtil.render(inventoryLayer, Position.create(0, yOffset++), "*EQUIPMENT*", Color.yellow);
+        int yOffset = Y_START_OFFSET;
 
-        CharacterSheet character = gameState.getWorld().getPlayer();
-        Equipment eq = character.getEquipment();
-        List<Weapon> weapons = eq.getWeapons();
+        getRenderUtil().render(getLayer(), Position.create(0, yOffset), "*EQUIPMENT*", Color.YELLOW);
+        getRenderUtil().render(getLayer(), Position.create(INV_OFFSET, yOffset), "*INVENTORY*", Color.YELLOW);
 
-        if (!weapons.isEmpty()) {
-            Weapon rWeap = weapons.get(0);
-            if (rWeap != null) {
-                String txt = "[RIGHT HAND] " + rWeap;
-                renderUtil.render(inventoryLayer, Position.create(0, yOffset), txt, Color.MAGENTA);
+        Map<Boolean, List<String>> items = getTextFn.apply(gameState);
+        if (items != null) {
+            List<String> equipped = items.get(Boolean.TRUE);
+
+            // setting to two is weird, make better or explain
+            yOffset = Y_START_OFFSET + 1;
+            for (String text : equipped) {
+                getRenderUtil().render(getLayer(), Position.create(0, yOffset), text, Color.RED);
+                yOffset++;
             }
-        }
-        yOffset++;
 
-        if (weapons.size() > 1) {
-            Weapon lWeap = weapons.get(1);
-            if (lWeap != null) {
-                String txt = "[LEFT HAND] " + lWeap;
-                renderUtil.render(inventoryLayer, Position.create(0, yOffset), txt, Color.MAGENTA);
+            List<String> inv = items.get(Boolean.FALSE);
+
+            yOffset = Y_START_OFFSET + 1;
+            for (String text : inv) {
+                getRenderUtil().render(getLayer(), Position.create(INV_OFFSET, yOffset), text, Color.RED);
+                yOffset++;
             }
-        }
-        yOffset++;
-
-        for (var equipment : character.getEquipment().getEquipmentBySlot().entrySet()) {
-            for (Armor armor : equipment.getValue()) {
-                String txt = equipment.getKey().getName() + ": " + armor.getName() + " - " + armor.getDescription();
-                renderUtil.render(inventoryLayer, Position.create(0, yOffset++), txt, Color.CYAN);
-            }
-        }
-
-        yOffset++;
-        renderUtil.render(inventoryLayer, Position.create(0, yOffset++), "*INVENTORY*", Color.yellow);
-
-        List<String> inv = character.getInventory().getItems().stream()
-                .map(item -> item.getName() + ": " + item.getDescription())
-                .collect(Collectors.toList());
-        for (String item : inv) {
-            renderUtil.render(inventoryLayer, Position.create(0, yOffset++), item, Color.WHITE);
         }
     }
 }

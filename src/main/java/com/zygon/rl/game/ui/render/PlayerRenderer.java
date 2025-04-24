@@ -4,12 +4,9 @@
 package com.zygon.rl.game.ui.render;
 
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,30 +28,16 @@ import org.hexworks.zircon.api.graphics.Layer;
  *
  * @author djc
  */
-public class PlayerRenderer implements GameComponentRenderer {
-
-    private final Layer layer;
-    private final RenderUtil renderUtil;
+public class PlayerRenderer extends PlayerDataRenderer {
 
     public PlayerRenderer(Layer layer, RenderUtil renderUtil) {
-        this.layer = Objects.requireNonNull(layer);
-        this.renderUtil = Objects.requireNonNull(renderUtil);
-    }
-
-    @Override
-    public void clear() {
-        layer.clear();
-    }
-
-    // Could become common..
-    private static record Renderable(int x, int y, String content, Color color) {
-
+        super(layer, renderUtil);
     }
 
     @Override
     public void render(GameState gameState) {
 
-        renderUtil.fill(layer);
+        getRenderUtil().fill(getLayer());
 
         CharacterSheet player = gameState.getWorld().getPlayer();
 
@@ -62,28 +45,28 @@ public class PlayerRenderer implements GameComponentRenderer {
         int yOffset = 1;
 
         for (Renderable renderable : getStatsText(xOffset, yOffset, player.getStats(), player.getModifiedStats())) {
-            renderUtil.render(layer, Position.create(renderable.x(), renderable.y()),
+            getRenderUtil().render(getLayer(), Position.create(renderable.x(), renderable.y()),
                     renderable.content(), renderable.color());
         }
 
         xOffset = 40;
         for (Renderable renderable : getProficiencyText(xOffset, yOffset,
                 player.getProficiencies(), player.getProgress())) {
-            renderUtil.render(layer, Position.create(renderable.x(), renderable.y()),
+            getRenderUtil().render(getLayer(), Position.create(renderable.x(), renderable.y()),
                     renderable.content(), renderable.color());
         }
 
         xOffset = 0;
         yOffset = 18;
         for (Renderable renderable : getGeneralText(xOffset, yOffset, player)) {
-            renderUtil.render(layer, Position.create(renderable.x(), renderable.y()),
+            getRenderUtil().render(getLayer(), Position.create(renderable.x(), renderable.y()),
                     renderable.content(), renderable.color());
         }
 
         xOffset = 40;
         yOffset = 18;
         for (Renderable renderable : getStatusText(xOffset, yOffset, player.getStatus())) {
-            renderUtil.render(layer, Position.create(renderable.x(), renderable.y()),
+            getRenderUtil().render(getLayer(), Position.create(renderable.x(), renderable.y()),
                     renderable.content(), renderable.color());
         }
     }
@@ -188,20 +171,5 @@ public class PlayerRenderer implements GameComponentRenderer {
         }
 
         return renders;
-    }
-
-    private List<Renderable> wrap(int x, int y, String value, Color valueColor,
-            String with, Color withColor) {
-        List<Renderable> wrapped = new ArrayList<>();
-
-        wrapped.add(new Renderable(x, y, with, withColor));
-
-        int withLength = with.length();
-        wrapped.add(new Renderable(x + withLength, y, value, valueColor));
-
-        int textLength = value.length();
-        wrapped.add(new Renderable(x + withLength + textLength, y, with, withColor));
-
-        return wrapped;
     }
 }
