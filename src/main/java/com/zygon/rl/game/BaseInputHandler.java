@@ -171,4 +171,20 @@ public abstract class BaseInputHandler implements LayerInputHandler {
 
         return inputs;
     }
+
+    protected static GameState dropInputContext(final GameState state) {
+        return state.copy()
+                .removeInputContext()
+                .build();
+    }
+
+    protected static GameState dropInputContext(final GameState state, int times) {
+        GameState newState = state;
+        if (times > 0) {
+            for (int i = 0; i < times; i++) {
+                newState = dropInputContext(newState);
+            }
+        }
+        return newState;
+    }
 }

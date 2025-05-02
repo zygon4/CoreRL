@@ -1,5 +1,6 @@
 package com.zygon.rl.data;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,5 +40,11 @@ public class WorldElement extends Element {
 
     public void setWeight(int weight) {
         this.weight = weight;
+    }
+
+    @Override
+    public void toDisplay(List<String> toDisplay) {
+        super.toDisplay(toDisplay);
+        toDisplay.add("weight: " + getWeight());
     }
 }

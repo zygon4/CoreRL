@@ -1,5 +1,9 @@
 package com.zygon.rl.world;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.zygon.rl.data.Identifable;
 import com.zygon.rl.data.WorldElement;
 
@@ -45,8 +49,15 @@ public class Tangible implements Identifable {
         return weight;
     }
 
+    public void toDisplay(List<String> toDisplay) {
+        getTemplate().toDisplay(toDisplay);
+        toDisplay.add("weight: " + getWeight());
+    }
+
     @Override
     public String toString() {
-        return getName() + " - " + getDescription();
+        ArrayList<String> ls = new ArrayList<>();
+        toDisplay(ls);
+        return ls.stream().collect(Collectors.joining(","));
     }
 }

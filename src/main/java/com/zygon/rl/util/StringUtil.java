@@ -19,8 +19,12 @@ public class StringUtil {
             .setStrictness(Strictness.LENIENT)
             .create();
 
-    public static String padEnd(String str, int maxLength) {
+    public static String padEnd(String str, char filler, int maxLength) {
         //int padding = maxLength - str.length();
-        return Strings.padEnd(str, maxLength, ' ');
+        return Strings.padEnd(str, maxLength, filler);
+    }
+
+    public static String padEnd(String str, int maxLength) {
+        return padEnd(str, ' ', maxLength);
     }
 }

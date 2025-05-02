@@ -47,7 +47,7 @@
         "name": "Rat",
         "description": "A rat",
         "symbol": "r",
-        "color": "Black",
+        "color": "Brown",
         "species": "MAMMAL",
         "aggression": 1,
         "pools": ["pool_health_small"],

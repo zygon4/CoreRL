@@ -1,21 +1,24 @@
+/*
+ * Copyright Liminal Data Systems 2025
+ */
 package com.zygon.rl.world.action;
 
 import com.zygon.rl.game.GameState;
-import com.zygon.rl.world.Item;
 import com.zygon.rl.world.World;
 import com.zygon.rl.world.character.CharacterSheet;
+import com.zygon.rl.world.character.Weapon;
 
 /**
  * Explicitly player oriented.
  *
  * @author zygon
  */
-public class DropItemAction extends Action {
+public class WieldPlayerItemAction extends Action {
 
-    private final Item item;
+    private final Weapon weapon;
 
-    public DropItemAction(Item item) {
-        this.item = item;
+    public WieldPlayerItemAction(final Weapon weapon) {
+        this.weapon = weapon;
     }
 
     @Override
@@ -30,10 +33,8 @@ public class DropItemAction extends Action {
 
         if (canExecute(state)) {
             World world = state.getWorld();
-            world.add(player.remove(item), world.getPlayerLocation());
-
-            world.add(item, world.getPlayerLocation());
-            return state.log("Dropped " + item.getName());
+            world.add(player.wield(weapon), world.getPlayerLocation());
+            return state.log("Wielding " + weapon.getName());
         }
 
         return state;

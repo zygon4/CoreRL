@@ -1,5 +1,7 @@
 package com.zygon.rl.world.character;
 
+import java.util.List;
+
 import com.zygon.rl.data.items.Melee;
 import com.zygon.rl.util.DiceRoller;
 import com.zygon.rl.world.Item;
@@ -32,11 +34,15 @@ public class Weapon extends Item {
     public int calculateCrit(DiceRoller dice) {
         int damageDealt = 0;
 
-        for (int i = 0; i < critMod; i++) {
+        for (int i = 0; i < getCritMod(); i++) {
             damageDealt += calculateHit(dice, 0);
         }
 
         return damageDealt + getMelee().getToDamage();
+    }
+
+    public int getCritMod() {
+        return critMod;
     }
 
     public int getCritRange() {
@@ -49,6 +55,16 @@ public class Weapon extends Item {
 
     public int getToHit() {
         return getMelee().getToDamage();
+    }
+
+    @Override
+    public void toDisplay(List<String> toDisplay) {
+        StringBuilder sb = new StringBuilder();
+
+        getMelee().toDisplay(toDisplay);
+
+        toDisplay.add("Crit Range " + getCritRange());
+        toDisplay.add("Crit Modifier " + getCritMod());
     }
 
     private static int calcDamage(DiceRoller dice, int numDice, int damage) {

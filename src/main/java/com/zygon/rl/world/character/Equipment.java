@@ -1,9 +1,13 @@
+/*
+ * Copyright Liminal Data Systems 2025
+ */
 package com.zygon.rl.world.character;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -73,36 +77,50 @@ public class Equipment {
         return this.armor.keySet();
     }
 
+    public Collection<Weapon> listWielded() {
+        return this.weapons.stream()
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+    }
+
     public List<Weapon> getWeapons() {
         return weapons;
     }
 
     public Equipment remove(Armor armor) {
-        Map<Slot, Long> requiredSlotCounts = getRequiredSlotCounts(armor);
-        Map<Slot, Collection<Armor>> newSlots = new HashMap<>();
+        // There is a bug here: this is only rebuilding the slots for this armor,
+        // not all of them.
 
-        for (Slot slot : requiredSlotCounts.keySet()) {
-            Long count = requiredSlotCounts.get(slot);
+        final Map<Slot, Collection<Armor>> newSlots = new HashMap<>();
+        final Map<Slot, Long> requiredSlotCounts = getRequiredSlotCounts(armor);
 
-            Collection<Armor> wornArmor = slots.get(slot);
-            List<Armor> newWornArmor = new ArrayList<>();
+        for (Slot currentSlot : this.slots.keySet()) {
+            if (requiredSlotCounts.containsKey(currentSlot)) {
+                for (Slot slot : requiredSlotCounts.keySet()) {
+                    Long count = requiredSlotCounts.get(slot);
 
-            int removeCount = 0;
-            for (Armor worn : wornArmor) {
-                if (worn.getId().equals(armor.getId())
-                        && removeCount < count.longValue()) {
-                    removeCount++;
-                } else {
-                    newWornArmor.add(worn);
+                    Collection<Armor> wornArmor = slots.get(slot);
+                    List<Armor> newWornArmor = new ArrayList<>();
+
+                    int removeCount = 0;
+                    for (Armor worn : wornArmor) {
+                        if (worn.getId().equals(armor.getId())
+                                && removeCount < count.longValue()) {
+                            removeCount++;
+                        } else {
+                            newWornArmor.add(worn);
+                        }
+                    }
+
+                    if (!newWornArmor.isEmpty()) {
+                        newSlots.put(slot, newWornArmor);
+                    }
                 }
-            }
-
-            if (!newWornArmor.isEmpty()) {
-                newSlots.put(slot, newWornArmor);
+            } else {
+                newSlots.put(currentSlot, this.slots.get(currentSlot));
             }
         }
 
-        Map<Armor, Collection<Slot>> newArmor = new HashMap<>();
+        final Map<Armor, Collection<Slot>> newArmor = new HashMap<>();
         for (Armor worn : this.armor.keySet()) {
             if (!worn.getId().equals(armor.getId())) {
                 newArmor.put(worn, this.armor.get(worn));
@@ -110,6 +128,18 @@ public class Equipment {
         }
 
         return new Equipment(slotCounts, newSlots, newArmor, weapons);
+    }
+
+    public Equipment remove(Weapon weapon) {
+        final List<Weapon> newWeapons = new ArrayList<>();
+
+        for (Weapon w : getWeapons()) {
+            if (!w.getId().equals(weapon.getId())) {
+                newWeapons.add(w);
+            }
+        }
+
+        return new Equipment(slotCounts, slots, armor, newWeapons);
     }
 
     public Equipment wear(Armor armor) {

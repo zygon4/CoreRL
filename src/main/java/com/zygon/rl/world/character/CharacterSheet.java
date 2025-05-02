@@ -1,3 +1,6 @@
+/*
+ * Copyright Liminal Data Systems 2025
+ */
 package com.zygon.rl.world.character;
 
 import java.util.Collections;
@@ -265,11 +268,35 @@ public final class CharacterSheet extends Tangible {
                 .build();
     }
 
+    /**
+     *
+     * @param item
+     * @param equipped
+     * @return
+     */
+    public CharacterSheet remove(Item item, boolean equipped) {
+        if (equipped) {
+            return switch (item) {
+                case Armor a ->
+                    copy()
+                    .equipment(equipment.remove(a))
+                    .build();
+                case Weapon w ->
+                    copy()
+                    .equipment(equipment.remove(w))
+                    .build();
+                default ->
+                    null;
+            };
+        } else {
+            return copy()
+                    .inventory(inventory.remove(item))
+                    .build();
+        }
+    }
+
     public CharacterSheet remove(Item item) {
-        return copy()
-                .inventory(inventory.remove(item))
-                .build();
-        // TODO: drop equipped/wielded
+        return remove(item, false);
     }
 
     // hopefully not necessary, use the helper functions

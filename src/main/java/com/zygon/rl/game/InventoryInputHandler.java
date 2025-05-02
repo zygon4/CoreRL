@@ -1,3 +1,6 @@
+/*
+ * Copyright Liminal Data Systems 2025
+ */
 package com.zygon.rl.game;
 
 import java.util.ArrayList;
@@ -10,6 +13,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.zygon.rl.game.ui.render.InventoryRenderer;
+import com.zygon.rl.util.StringUtil;
 import com.zygon.rl.world.Item;
 import com.zygon.rl.world.character.Equipment;
 import com.zygon.rl.world.character.Inventory;
@@ -75,9 +80,25 @@ public final class InventoryInputHandler extends BaseInputHandler {
                         .build();
             }
             default -> {
-                // TODO: push another input handler that displays the item in detail and provides options such as: drop/equip
-                Item item = get(input);
-                System.out.println("ITEM: " + item.getName() + " - " + item.getDescription());
+                boolean equipped = true;
+                Item item = equipmentByKeyCode.get(input);
+                if (item == null) {
+                    item = invByKeyCode.get(input);
+                    equipped = false;
+                }
+
+                if (item == null) {
+                    throw new IllegalStateException("Item not found..");
+                }
+
+                newState = newState.copy()
+                        .addInputContext(
+                                GameState.InputContext.builder()
+                                        .setName(GameState.InputContextPrompt.ITEM.name())
+                                        .setHandler(ItemInputHandler.create(getGameConfiguration(), item, equipped))
+                                        .setPrompt(GameState.InputContextPrompt.ITEM)
+                                        .build())
+                        .build();
             }
         }
 
@@ -91,10 +112,10 @@ public final class InventoryInputHandler extends BaseInputHandler {
 
         Item item = get(input);
 
-        sb.append(item.getName());
-        // TODO: push input handler which renders the full description
-//        sb.append(" - ");
-//        sb.append(item.getDescription());
+        final String name = StringUtil.padEnd(item.getName(), '.', InventoryRenderer.INV_OFFSET - 10);
+        sb.append(name);
+        sb.append(item.getWeight());
+        sb.append(" ").append(getGameConfiguration().getWeightUnit());
 
         return sb.toString();
     }

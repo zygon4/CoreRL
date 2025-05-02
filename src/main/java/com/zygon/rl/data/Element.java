@@ -1,8 +1,9 @@
 package com.zygon.rl.data;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-
-import com.zygon.rl.util.StringUtil;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -107,8 +108,16 @@ public class Element implements Identifable {
         this.flags = flags;
     }
 
+    public void toDisplay(List<String> toDisplay) {
+        toDisplay.add(getName());
+        toDisplay.add(getDescription());
+        // TODO: display flags in a meaningful way.
+    }
+
     @Override
     public String toString() {
-        return StringUtil.JSON.toJson(this);
+        ArrayList<String> ls = new ArrayList<>();
+        toDisplay(ls);
+        return ls.stream().collect(Collectors.joining(","));
     }
 }

@@ -25,9 +25,11 @@ import com.zygon.rl.game.Game;
 import com.zygon.rl.game.GameState;
 import com.zygon.rl.game.Input;
 import com.zygon.rl.game.InventoryInputHandler;
+import com.zygon.rl.game.ItemInputHandler;
 import com.zygon.rl.game.ui.render.AbilityRenderer;
 import com.zygon.rl.game.ui.render.GameComponentRenderer;
 import com.zygon.rl.game.ui.render.InventoryRenderer;
+import com.zygon.rl.game.ui.render.ItemRenderer;
 import com.zygon.rl.game.ui.render.MapRenderer;
 import com.zygon.rl.game.ui.render.OuterWorldRenderer;
 import com.zygon.rl.game.ui.render.PlayerRenderer;
@@ -159,6 +161,14 @@ final class GameView extends BaseView {
             getScreen().addLayer(inventoryLayer);
             componentRenderersByPrompt.put(GameState.InputContextPrompt.INVENTORY,
                     new InventoryRenderer(inventoryLayer, renderUtil, InventoryInputHandler.getInputsFn()));
+
+            Layer itemLayer = Layer.newBuilder()
+                    .withSize(overlayScreenSize)
+                    .withOffset(overlayScreenPos)
+                    .build();
+            getScreen().addLayer(itemLayer);
+            componentRenderersByPrompt.put(GameState.InputContextPrompt.ITEM,
+                    new ItemRenderer(game.getConfiguration(), itemLayer, renderUtil, ItemInputHandler.getInputsFn()));
 
             Layer mapLayer = Layer.newBuilder()
                     .withSize(overlayScreenSize)

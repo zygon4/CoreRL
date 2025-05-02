@@ -75,4 +75,13 @@ public class ArmorData extends ItemClass {
     public void setSlots(List<String> slots) {
         this.slots = slots;
     }
+
+    @Override
+    public void toDisplay(List<String> toDisplay) {
+        super.toDisplay(toDisplay);
+
+        final String avStr = StringUtil.padEnd("AV: " + getAv(), 10);
+        toDisplay.add(avStr);
+        toDisplay.add("Fits: " + getSlots().stream().collect(Collectors.joining(",")));
+    }
 }

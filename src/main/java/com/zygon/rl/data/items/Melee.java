@@ -83,4 +83,14 @@ public class Melee extends ItemClass {
     public void setToDamage(int toDamage) {
         this.toDamage = toDamage;
     }
+
+    @Override
+    public void toDisplay(List<String> toDisplay) {
+        super.toDisplay(toDisplay);
+
+        toDisplay.add(getDice() + "d" + getDamage());
+        if (getToHit() > 0) {
+            toDisplay.add("+" + getToHit());
+        }
+    }
 }

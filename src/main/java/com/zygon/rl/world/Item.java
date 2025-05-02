@@ -1,3 +1,6 @@
+/*
+ * Copyright Liminal Data Systems 2025
+ */
 package com.zygon.rl.world;
 
 import com.zygon.rl.data.ItemClass;

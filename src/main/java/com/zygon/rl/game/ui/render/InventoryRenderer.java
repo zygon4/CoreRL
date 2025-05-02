@@ -19,7 +19,7 @@ import org.hexworks.zircon.api.graphics.Layer;
  */
 public class InventoryRenderer extends PlayerDataRenderer {
 
-    private static final int INV_OFFSET = 40;
+    public static final int INV_OFFSET = 40;
     private static final int Y_START_OFFSET = 1;
 
     private final Function<GameState, Map<Boolean, List<String>>> getTextFn;

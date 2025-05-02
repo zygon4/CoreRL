@@ -21,7 +21,7 @@ import com.zygon.rl.world.Tangible;
 import com.zygon.rl.world.World;
 import com.zygon.rl.world.action.Action;
 import com.zygon.rl.world.action.CloseDoorAction;
-import com.zygon.rl.world.action.DropItemAction;
+import com.zygon.rl.world.action.DropPlayerItemAction;
 import com.zygon.rl.world.action.ExamineAction;
 import com.zygon.rl.world.action.GetItemAction;
 import com.zygon.rl.world.action.MeleeAttackAction;
@@ -151,7 +151,7 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                     }
                 }
             }
-            // DROP
+            // DROP - this goes away, ya?
             case KEY_D -> {
                 // This is pretty clunky, eh?
                 List<Item> items = state.getWorld().getPlayer().getInventory().getItems();
@@ -159,16 +159,15 @@ public final class DefaultOuterInputHandler extends BaseInputHandler {
                 if (items.isEmpty()) {
                     copy.addLog("There is nothing to drop.");
                 } else if (items.size() == 1) {
-                    Action getItem = new DropItemAction(items.get(0));
+                    Action getItem = new DropPlayerItemAction(items.get(0), false);
                     if (getItem.canExecute(state)) {
                         copy = getItem.execute(state).copy();
                     }
                 } else {
-                    copy.addInputContext(
-                            GameState.InputContext.builder()
+                    copy.addInputContext(GameState.InputContext.builder()
                                     .setName("DROP")
                                     .setHandler(ListActionInputHandler.create(getGameConfiguration(),
-                                            items, e -> new DropItemAction(e)))
+                                            items, e -> new DropPlayerItemAction(e, false)))
                                     .setPrompt(GameState.InputContextPrompt.LIST)
                                     .build());
                 }
